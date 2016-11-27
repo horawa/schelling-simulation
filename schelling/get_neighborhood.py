@@ -73,6 +73,5 @@ def get_neighborhood_exclusive(array, agent_index, radius=1):
 	neighborhood[agent_to_remove_row].pop(agent_to_remove_col)
 	return neighborhood
 
-
 # def get_unlike_neighbor_fraction(array, agent_index, radius=1):
 # 	neighborhood = get_neighborhood()
