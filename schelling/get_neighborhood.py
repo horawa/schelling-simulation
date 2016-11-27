@@ -1,9 +1,7 @@
 def get_neighborhood(array, agent_index, radius=1):
 	"""Get neighborhood of agent with specified radius.
 	Neighboorhood a square with side 2*radius + 1 and center at agent_index.
-	The retured neighborhood is a 2d list with preserved structure.
-	The agent is not included in neighborhood.
-	
+	The retured neighborhood is a 2d array.	
 	
 	Args:
 	    array (ndarray): array of agents
@@ -11,7 +9,7 @@ def get_neighborhood(array, agent_index, radius=1):
 	    radius (int, optional): radius of neighborhood
 	
 	Returns:
-	    list: 2d list of neighbors with agent excluded
+	    ndarray: 2d array of neighbors with agent included
 	"""
 	array_rows = array.shape[0]
 	array_cols = array.shape[1]
@@ -21,10 +19,8 @@ def get_neighborhood(array, agent_index, radius=1):
 
 	if col - radius >= 0:
 		lbound  = col - radius
-		agent_to_remove_col = radius
 	else:
 		lbound = 0
-		agent_to_remove_col = col
 	
 	if col + radius + 1 <= array_cols:
 		rbound  = col + radius + 1 
@@ -33,17 +29,50 @@ def get_neighborhood(array, agent_index, radius=1):
 	
 	if row - radius >= 0:
 		lobound = row - radius
-		agent_to_remove_row = radius
 	else:
 		lobound = 0
-		agent_to_remove_row = row
-	
+
 	if row + radius + 1 <= array_rows:
  		hibound = row + radius + 1
 	else:
 		hibound = array_rows
 
+	neighborhood = array[lobound:hibound, lbound:rbound]
+	return neighborhood
 
-	neighborhood = array[lobound:hibound, lbound:rbound].tolist()
+
+def get_neighborhood_exclusive(array, agent_index, radius=1):
+	"""Get neighborhood of agent with specified radius.
+	Neighboorhood a square with side 2*radius + 1 and center at agent_index.
+	The retured neighborhood is a 2d list with agent excluded -- structure is not preserved.	
+	
+	Args:
+	    array (ndarray): array of agents
+	    agent_index (tuple(int, int)): index of agent
+	    radius (int, optional): radius of neighborhood
+	
+	Returns:
+	    list: 2d list of neighbors with agent excluded
+	"""
+
+	row = agent_index[0]
+	col = agent_index[1]
+
+	if col - radius >= 0:
+		agent_to_remove_col = radius
+	else:
+		agent_to_remove_col = col
+
+	if row - radius >= 0:
+		agent_to_remove_row = radius
+	else:
+		agent_to_remove_row = row
+
+
+	neighborhood = get_neighborhood(array, agent_index, radius).tolist()
 	neighborhood[agent_to_remove_row].pop(agent_to_remove_col)
 	return neighborhood
+
+
+# def get_unlike_neighbor_fraction(array, agent_index, radius=1):
+# 	neighborhood = get_neighborhood()
