@@ -1,6 +1,6 @@
 import unittest
 from numpy import array, array_equal
-from ..get_neighborhood import get_neighborhood, get_neighborhood_exclusive
+from ..get_neighborhood import get_neighborhood, get_neighborhood_exclusive, get_unlike_neighbor_fraction
 
 
 class GetNeighborhoodTest(unittest.TestCase):
@@ -14,7 +14,13 @@ class GetNeighborhoodTest(unittest.TestCase):
 				[4, 5, 6, 7, 8, 9],
 			])
 
-
+		self.frac_test_array = array([
+				[0, 1, 1, 0],
+				[1, 1, 0, 1],
+				[0, 2, 2, 0],
+				[0, 1, 2, 0]
+			])
+		
 
 	def check_get_neighborhood_expected_output(self, parameters, radius, exclusive=False):
 		for agent_index, expected_output in parameters:
@@ -95,6 +101,24 @@ class GetNeighborhoodTest(unittest.TestCase):
 
 		self.check_get_neighborhood_expected_output(parameters, 2)
 
+
+	def test_get_unlike_agent_fraction(self):
+		agent_fractions = [
+			((0,1), 0),
+			((0,2), 0),
+			((1,0), 1/5),
+			((1,1), 2/8),
+			((1,3), 1/5),
+			((2,1), 3/8),
+			((2,2), 3/8),
+			((3,1), 3/5),
+			((3,2), 1/5),
+		]
+
+		for agent_index, expected_output in agent_fractions:
+			with self.subTest(name='unlike_fraction', index=agent_index):
+				output = get_unlike_neighbor_fraction(self.frac_test_array, agent_index)
+				self.assertAlmostEqual(output, expected_output)
 
 
 if __name__ == '__main__':

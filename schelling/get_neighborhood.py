@@ -1,3 +1,5 @@
+import numpy as np
+
 def get_neighborhood(array, agent_index, radius=1):
 	"""Get neighborhood of agent with specified radius.
 	Neighboorhood a square with side 2*radius + 1 and center at agent_index.
@@ -73,5 +75,15 @@ def get_neighborhood_exclusive(array, agent_index, radius=1):
 	neighborhood[agent_to_remove_row].pop(agent_to_remove_col)
 	return neighborhood
 
-# def get_unlike_neighbor_fraction(array, agent_index, radius=1):
-# 	neighborhood = get_neighborhood()
+
+def get_unlike_neighbor_fraction(array, agent_index, radius=1):
+	agent_type = array[agent_index]
+	neighborhood = get_neighborhood(array, agent_index, radius)
+
+	unlike_agent_count = np.count_nonzero(np.logical_and(neighborhood != 0, neighborhood != agent_type))
+
+	unlike_agent_fraction = unlike_agent_count / (neighborhood.size - 1) # size excluding agent
+
+	return unlike_agent_fraction
+
+
