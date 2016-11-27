@@ -1,5 +1,6 @@
 import numpy as np
 
+# TODO test with size 38
 
 def create_array(size, agent_type_fractions):
 	"""Creates a square 2d numpy array representing a 2d grid randomly populated by agents.
