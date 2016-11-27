@@ -1,7 +1,7 @@
 import unittest
-from ..segregation_measures import entropy, switch_rate
+from ..segregation_measures import entropy, switch_rate, entropy_average, switch_rate_average
 from ..get_neighborhood import get_neighborhood
-from numpy import array
+from numpy import array, mean
 from math import log
 
 class SegregationMeasureTest(unittest.TestCase):
@@ -21,6 +21,36 @@ class SegregationMeasureTest(unittest.TestCase):
 			with self.subTest(name='entropy_r'+str(radius), index=agent_index):
 				output = entropy(self.test_array, agent_index, radius)
 				self.assertAlmostEqual(output, -expected_output)
+
+
+	def check_average_expected_output(self, measure, measure_average):
+		agent_indices= array([
+			(0,1),
+			(0,2),
+			(1,0),
+			(1,1),
+			(1,3),
+			(2,1),
+			(2,2),
+			(3,1),
+			(3,2),
+		])
+
+		agent_values = map(lambda a_i: measure(self.test_array, tuple(a_i)), agent_indices)
+		expected_output = sum(agent_values) / len(agent_indices)
+
+		output = measure_average(self.test_array, agent_indices)
+
+		self.assertEqual(expected_output, output)
+
+
+
+	def test_entropy_average(self):
+		self.check_average_expected_output(entropy, entropy_average)
+
+
+	def test_switch_rate_average(self):
+		self.check_average_expected_output(switch_rate, switch_rate_average)
 
 
 
