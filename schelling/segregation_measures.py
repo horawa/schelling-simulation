@@ -1,10 +1,10 @@
 from math import log
 from itertools import chain
-from numpy import unique
-from .get_neighborhood import get_neighborhood
+import numpy as np
+from .get_neighborhood import get_neighborhood, get_neighborhood_exclusive
 
 
-def _get_measure_average(array, measure_func):
+def _get_measure_average(array, agent_indices, measure_func):
 	"""Get average of fuction results for each index in array
 	
 	Args:
@@ -17,37 +17,39 @@ def _get_measure_average(array, measure_func):
 	array_rows = array.shape[0]
 	array_cols = array.shape[1]
 
-	indexes = zip(range(array_rows), range(array_cols))
-	total = sum(measure_func(array, index) for index in indexes)
 
-	return total / array.size
+	total = sum(measure_func(array, tuple(index)) for index in agent_indices)
+
+	return total / agent_indices.shape[0]
 
 
-def entropy_average(array, radius=1):
+def entropy_average(array, agent_indices, radius=1):
 	"""Returns average of entropies for all agents in array.
 	See entropy
 	
 	Args:
 	    array (ndarray): array of agents
+	   	agent_indices (ndarray): indices of agents in the format [[row, col], [row, col], ...]
 	    radius (int, optional): radius of neighborhood
 	
 	Returns:
 	    float: average entropy
 	"""
-	return _get_measure_average(array, lambda a, i: entropy(a, i, radius))
+	return _get_measure_average(array, agent_indices, lambda a, i: entropy(a, i, radius))
 
 
-def switch_rate_average(array, radius=1):
+def switch_rate_average(array, agent_indices):
 	"""Returns average of switch rates for all agents in array.
-	
+	See switch_rate
+
 	Args:
 	    array (ndarray): array of agents
-	    radius (int, optional): radius of neighborhood
+	   	agent_indices (ndarray): indices of agents in the format [[row, col], [row, col], ...]
 	
 	Returns:
 	    float: average switch rate
 	"""
-	return _get_measure_average(array, switch_rate)
+	return _get_measure_average(array, agent_indices, switch_rate)
 
 
 
@@ -67,7 +69,7 @@ def switch_rate(array, agent_index):
 	row = agent_index[0]
 	col = agent_index[1]
 
-	neighborhood = get_neighborhood(array, agent_index)
+	neighborhood = get_neighborhood_exclusive(array, agent_index)
 
 	if len(neighborhood) == 3:
 		top = neighborhood[0]
@@ -106,18 +108,28 @@ def entropy(array, agent_index, radius=1):
 	Returns:
 	    float: Entropy of agent's neighborhood
 	"""
+	# TODO should I include agent?; should I include vacancies?
+	agent_type = array[agent_index]
 	neighborhood = get_neighborhood(array, agent_index, radius)
+	total_neighbors = neighborhood.size - 1 # excluding agent
 
-	neighbors = list(chain.from_iterable(neighborhood))
-	total_neighbors = len(neighbors)
+	neighbor_types = np.unique(neighborhood)
+	if 0 in neighbor_types:
+		neighbor_types = neighbor_types[1:] # exclude vacancies
 
-	agent_types = set(neighbors)
-	if 0 in agent_types:
-		agent_types.remove(0)
+	entropy = 0
+	for neighbor_type in neighbor_types:
+		neighbor_type_count = np.count_nonzero(neighborhood == neighbor_type)
+		# exclude agent
+		if neighbor_type == agent_type:
+			neighbor_type_count -= 1
+			# if agent is the only one of its type, do not include
+			if neighbor_type_count == 0:
+				continue
 
+		p_neighbor_type = neighbor_type_count / total_neighbors
 
-	# entropy = -sum_i(p_i * ln pi)
-	p_agent_type = (neighbors.count(agent_type) / total_neighbors for agent_type in agent_types)
-	entropy = -sum(p_a * log(p_a, 2) for p_a in p_agent_type)
+		# entropy = -sum_i(p_i * log2 p_i)
+		entropy -= (p_neighbor_type * log(p_neighbor_type, 2))
 
 	return entropy
