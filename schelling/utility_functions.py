@@ -1,5 +1,7 @@
 from functools import wraps
 from math import isclose
+from .get_neighborhood import get_unlike_neighbor_fraction
+
 
 def range_check_0_1(function):
 	"""Raises value error, if range of first argument is not in [0, 1]"""
@@ -106,5 +108,12 @@ def create_spiked_utility(spike):
 			return 0.0
 
 	return spiked_utility
+
+
+def get_utility_for_array(utility_function, array):
+	def utility(index):
+		return utility_function(get_unlike_neighbor_fraction(array, index))
+	return utility
+
 
 
