@@ -1,5 +1,5 @@
 import unittest
-from ..simulation import _get_unsatisfied_agent_indices
+from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index
 import numpy as np
 import schelling.utility_functions as ut
 from ..array_utils import get_agent_indices
@@ -55,6 +55,20 @@ class SimulationTestCase(unittest.TestCase):
 				self.assertTrue(np.array_equal(output, expected_output))
 
 
+	def test_get_random_agent_index(self):
+		agent_indices = get_agent_indices(self.test_array)
+		unsatisfied_agent_indices = [0, 1, 2, 3, 5, 6, 7, 8]
+
+		for unsatisfied_agent_index in unsatisfied_agent_indices:
+			random_chooser = lambda *args: (unsatisfied_agent_index,)
+			
+			chosen_index = random_chooser()
+			expected_agent_index = tuple(agent_indices[chosen_index])
+			
+			agent_index = _get_random_agent_index(agent_indices, unsatisfied_agent_indices, random_chooser)
+
+			with self.subTest(out=agent_index, expected=expected_agent_index):
+				self.assertEqual(expected_agent_index, agent_index)
 
 
 

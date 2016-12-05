@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.random import randint, choice
+import numpy.random as rand
 from .array_utils import get_agent_indices, get_vacancy_indices
 from .get_neighborhood import get_unlike_neighbor_fraction
 from .utility_functions import get_utility_for_array
@@ -29,7 +29,7 @@ def update_array(array, utility_function):
 		return
 
 	## get random agent utility
-	random_agent_index = tuple(agent_indices[choice(unsatisfied_agent_indices, 1)[0]])
+	random_agent_index = tuple(agent_indices[rand.choice(unsatisfied_agent_indices, 1)[0]])
 	agent_utility = utility(random_agent_index)
 	## / grau
 
@@ -46,7 +46,7 @@ def update_array(array, utility_function):
 
 	## move to rand better vacancy
 	if better_vacancies.size != 0:
-		i = tuple(choice(better_vacancies, 1))
+		i = tuple(rand.choice(better_vacancies, 1))
 		rand_better_vacancy_index = vacancies[i]
 
 		_move(array, random_agent_index, rand_better_vacancy_index)
@@ -71,6 +71,13 @@ def _get_unsatisfied_agent_indices(utility, agent_indices):
 
 	unsatisfied_agent_indices = np.nonzero(np.apply_along_axis(is_unsatisfied, 1, agent_indices))[0]
 	return unsatisfied_agent_indices
+
+
+def _get_random_agent_index(agent_indices, unsatisfied_agent_indices, random_chooser=rand.choice):
+	# random chooser is a parameter only for testing
+	random_agent_index = tuple(agent_indices[random_chooser(unsatisfied_agent_indices, 1)[0]])
+	return random_agent_index
+
 
 
 def _move(array, agent_index, vacancy_index):
