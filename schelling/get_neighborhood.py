@@ -1,4 +1,5 @@
 import numpy as np
+from .array_utils import get_agent_indices
 
 def get_neighborhood(array, agent_index, radius=1):
 	"""Get neighborhood of agent with specified radius.
@@ -77,12 +78,15 @@ def get_neighborhood_exclusive(array, agent_index, radius=1):
 
 
 def get_unlike_neighbor_fraction(array, agent_index, radius=1):
-	agent_type = array[agent_index]
+	agent_type = array[tuple(agent_index)]
 	neighborhood = get_neighborhood(array, agent_index, radius)
 
-	unlike_agent_count = np.count_nonzero(np.logical_and(neighborhood != 0, neighborhood != agent_type))
+	not_vacant = neighborhood != 0
+	neighbor_count = np.count_nonzero(not_vacant) - 1 # excluding agent
 
-	unlike_agent_fraction = unlike_agent_count / (neighborhood.size - 1) # size excluding agent
+	unlike_agent_count = np.count_nonzero(np.logical_and(not_vacant, neighborhood != agent_type))
+
+	unlike_agent_fraction = unlike_agent_count / neighbor_count # size excluding agent
 
 	return unlike_agent_fraction
 
