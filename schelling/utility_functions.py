@@ -11,7 +11,7 @@ def range_check_0_1(function):
 
 		value=args[0]
 		if value < 0.0 or value > 1.0:
-			raise ValueError("Argument must be between 0.0 and 1.0")
+			raise ValueError("Argument must be between 0.0 and 1.0. Given: "+str(value))
 
 		return function(*args, **kwargs)
 
