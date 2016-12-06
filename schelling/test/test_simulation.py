@@ -1,5 +1,5 @@
 import unittest
-from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index, _get_better_vacancies, _get_random_better_vacancy_index
+from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index, _get_better_vacancies, _get_random_better_vacancy_index, _move
 import numpy as np
 import schelling.utility_functions as ut
 from ..array_utils import get_agent_indices, get_vacancy_indices
@@ -98,6 +98,35 @@ class SimulationTestCase(unittest.TestCase):
 		with self.subTest(name="Empty vacancy list should return none."):
 			output = _get_random_better_vacancy_index(np.array([]), np.array([[0, 0], [1, 1]]))
 			self.assertTrue(output is None)
+
+
+	def test_move(self):
+		parameters = [
+			((0, 1), (0, 0), np.array([
+					[1, 0, 1, 0],
+					[1, 1, 0, 1],
+					[0, 2, 2, 0],
+					[0, 1, 2, 0]
+				])),
+			((2, 1), (0, 3), np.array([
+					[0, 1, 1, 2],
+					[1, 1, 0, 1],
+					[0, 0, 2, 0],
+					[0, 1, 2, 0]
+				])),
+			((1, 3), (2, 3), np.array([
+					[0, 1, 1, 0],
+					[1, 1, 0, 0],
+					[0, 2, 2, 1],
+					[0, 1, 2, 0]
+				])),
+		]
+
+		for agent_index, vacancy_index, expected_result in parameters:
+			array = np.copy(self.test_array)
+			_move(array, agent_index, vacancy_index)
+			with self.subTest():
+				self.assertTrue(np.array_equal(array, expected_result))
 
 
 if __name__ == '__main__':

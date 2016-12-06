@@ -102,10 +102,7 @@ def _get_random_better_vacancy_index(better_vancancy_indices, vacancy_indices, r
 	return None
 
 
-
 def _move(array, agent_index, vacancy_index):
-	#agents move to first better vacancy on list
-	print('move ', agent_index, ' ', vacancy_index)
 	agent_index = tuple(agent_index)
 	vacancy_index = tuple(vacancy_index)
 
