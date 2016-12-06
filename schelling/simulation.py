@@ -94,6 +94,15 @@ def _get_better_vacancies(array, agent_index, utility, vacancy_indices):
 	return better_vacancies
 
 
+def _get_random_better_vacancy_index(better_vancancy_indices, vacancy_indices, random_chooser=rand.choice):
+	if better_vancancy_indices.size != 0:
+		i = random_chooser(better_vancancy_indices, 1)
+		rand_better_vacancy_index = vacancy_indices[i]
+		return rand_better_vacancy_index
+	return None
+
+
+
 def _move(array, agent_index, vacancy_index):
 	#agents move to first better vacancy on list
 	print('move ', agent_index, ' ', vacancy_index)

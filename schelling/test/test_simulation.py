@@ -1,5 +1,5 @@
 import unittest
-from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index, _get_better_vacancies
+from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index, _get_better_vacancies, _get_random_better_vacancy_index
 import numpy as np
 import schelling.utility_functions as ut
 from ..array_utils import get_agent_indices, get_vacancy_indices
@@ -20,24 +20,6 @@ class SimulationTestCase(unittest.TestCase):
 
 
 	def test_get_unsatisfied_agent_indices(self):
-		# parameters =[
-		# 	(0, 0), []
-		# 	(0, 1),
-		# 	(0, 2),
-		# 	(0, 3),
-		# 	(1, 0),
-		# 	(1, 1),
-		# 	(1, 2),
-		# 	(1, 3),
-		# 	(2, 0),
-		# 	(2, 1),
-		# 	(2, 2),
-		# 	(2, 3),
-		# 	(3, 0),
-		# 	(3, 1),
-		# 	(3, 2),
-		# 	(3, 3),
-		# ]
 
 		parameters = [
 			(ut.create_flat_utility(0.5), [5, 6, 7]),
@@ -90,6 +72,33 @@ class SimulationTestCase(unittest.TestCase):
 
 			with self.subTest(out=output, expected=expected_output):
 				self.assertTrue(np.array_equal(output, expected_output))
+
+
+	def test_get_random_better_vacancy(self):
+		parameters = [
+			(5, np.array([4, 5, 6])),
+			(6, np.array([4, 5, 6])),
+			(7, np.array([0, 1, 2, 3, 5]))
+		]
+
+		vacancies = get_vacancy_indices(self.test_array)
+
+		for agent_index, better_vacancies in parameters:
+			for chosen_vacancy_index in range(len(better_vacancies)):
+				random_chooser = lambda *args: (chosen_vacancy_index)
+
+				output = _get_random_better_vacancy_index(better_vacancies, vacancies, random_chooser)
+				expected_output = vacancies[chosen_vacancy_index]
+
+				with self.subTest(out=output, expected=expected_output):
+					self.assertTrue(np.array_equal(output, expected_output))
+
+
+		# Empty vacancy list
+		with self.subTest(name="Empty vacancy list should return none."):
+			output = _get_random_better_vacancy_index(np.array([]), np.array([[0, 0], [1, 1]]))
+			self.assertTrue(output is None)
+
 
 if __name__ == '__main__':
 	unittest.main()
