@@ -111,8 +111,8 @@ def create_spiked_utility(spike):
 
 
 def get_utility_for_array(utility_function, array):
-	def utility(index):
-		return utility_function(get_unlike_neighbor_fraction(array, index))
+	def utility(index, agent_type=None):
+		return utility_function(get_unlike_neighbor_fraction(array, index, agent_type=agent_type))
 	return utility
 
 
