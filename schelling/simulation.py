@@ -79,8 +79,23 @@ def _get_random_agent_index(agent_indices, unsatisfied_agent_indices, random_cho
 	return random_agent_index
 
 
+def _get_better_vacancies(array, agent_index, utility, vacancy_indices):
+
+	# TODO - when considering a vacancy, agents will include themselves in utility calculations:
+	# if an agent moves to a vacancy in its own neighborhood, the utility of the spot he/she moved to
+	# will change after the move. Currently the agent considers the pre-move 
+	agent_utility = utility(agent_index)
+	agent_type = array[tuple(agent_index)]
+
+	def has_higher_utility(vacancy_index):
+		return utility(tuple(vacancy_index), agent_type=agent_type) > agent_utility
+
+	better_vacancies = np.nonzero(np.apply_along_axis(has_higher_utility, 1, vacancy_indices))[0]
+	return better_vacancies
+
 
 def _move(array, agent_index, vacancy_index):
+	#agents move to first better vacancy on list
 	print('move ', agent_index, ' ', vacancy_index)
 	agent_index = tuple(agent_index)
 	vacancy_index = tuple(vacancy_index)

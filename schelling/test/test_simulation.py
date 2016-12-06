@@ -1,9 +1,10 @@
 import unittest
-from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index
+from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index, _get_better_vacancies
 import numpy as np
 import schelling.utility_functions as ut
-from ..array_utils import get_agent_indices
+from ..array_utils import get_agent_indices, get_vacancy_indices
 from ..get_neighborhood import get_unlike_neighbor_fraction
+from ..utility_functions import get_utility_for_array, create_flat_utility
 
 
 class SimulationTestCase(unittest.TestCase):
@@ -71,6 +72,24 @@ class SimulationTestCase(unittest.TestCase):
 				self.assertEqual(expected_agent_index, agent_index)
 
 
+	def test_get_better_vacancies(self):
+		utility = get_utility_for_array(create_flat_utility(0.5), self.test_array)
+
+		agent_indices = get_agent_indices(self.test_array)
+		vacancy_indices = get_vacancy_indices(self.test_array)
+
+		parameters = [
+			(5, np.array([4, 5, 6])),
+			(6, np.array([4, 5, 6])),
+			(7, np.array([0, 1, 2, 3, 5]))
+		]
+
+		for unsatisfied_agent_index, expected_output in parameters:
+			i = agent_indices[unsatisfied_agent_index]
+			output = _get_better_vacancies(self.test_array, i, utility, vacancy_indices)
+
+			with self.subTest(out=output, expected=expected_output):
+				self.assertTrue(np.array_equal(output, expected_output))
 
 if __name__ == '__main__':
 	unittest.main()
