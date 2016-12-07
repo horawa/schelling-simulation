@@ -54,5 +54,12 @@ class CreateArrayTest(unittest.TestCase):
 				with self.assertRaises(ValueError):
 					create_array(*parameters)					
 
+
+	def test_correct_array_sizes(self):
+		for size in range(50):
+			with self.subTest(name="array_size", size=size):
+				arr = create_array(size, (0.2, 0.4, 0.4))
+				self.assertEqual(arr.size, size*size)
+
 if __name__ == '__main__':
 	unittest.main()

@@ -34,10 +34,10 @@ def create_array(size, agent_type_fractions):
 	for agent_type_index, agent_type_count in enumerate(agent_type_counts):
 		array_data += ([agent_type_index] * agent_type_count)
 
-	# The number of cells could be one less than 
+	# The number of cells could be less than 
 	# size*size due to rounding down floats.
-	# In that case, append an additional vacant slot.
-	if len(array_data) != n_cells:
+	# In that case, append additional vacant slots.
+	while len(array_data) != n_cells:
 		array_data += [0]
 
 	array = np.array(array_data)
