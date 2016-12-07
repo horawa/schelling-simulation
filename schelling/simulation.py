@@ -4,10 +4,9 @@ from .array_utils import get_agent_indices, get_vacancy_indices
 from .neighborhood import get_unlike_neighbor_fraction
 from .utility_functions import get_utility_for_array
 
-def run_simulation(array, utility_function, iterations, satisficers=False, callback=lambda arr, i: None):
+def run_simulation(array, utility_function, iterations, callback=lambda arr, i: None):
 	for i in range(iterations):
 		update_array(array, utility_function)
-		if array is None: print('none')
 		callback(array, i)
 
 
@@ -98,12 +97,9 @@ if __name__ == '__main__':
 	import time
 	from .arr_to_img import *
 
-	np.set_printoptions(threshold=np.nan)
-
-
 	# 0.4 sec/iteration on core i5-3427U
 	# simulation should take ~ 1h 6min
-	array_size = 100
+	array_size = 50
 	agent_fractions = (0.2, 0.4, 0.4)
 
 	save_period = 100
