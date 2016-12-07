@@ -6,7 +6,7 @@ from .utility_functions import get_utility_for_array
 
 def run_simulation(array, utility_function, iterations, satisficers=False, callback=lambda arr, i: None):
 	for i in range(iterations):
-		array = update_array(array, utility_function)
+		update_array(array, utility_function)
 		if array is None: print('none')
 		callback(array, i)
 
@@ -16,44 +16,25 @@ def update_array(array, utility_function):
 	utility = get_utility_for_array(utility_function, array)
 
 	agent_indices = get_agent_indices(array)
+	
+	unsatisfied_agent_indices = _get_unsatisfied_agent_indices(utility, agent_indices)
 
-	## f1
-	def is_unsatisfied(index):
-		return utility(tuple(index)) < 1.0
-
-	unsatisfied_agent_indices = np.nonzero(np.apply_along_axis(is_unsatisfied, 1, agent_indices))[0]
-	## /f1
-
-	#print(unsatisfied_agent_indices)
 	if unsatisfied_agent_indices.size == 0:
 		return
 
-	## get random agent utility
-	random_agent_index = tuple(agent_indices[rand.choice(unsatisfied_agent_indices, 1)[0]])
+	random_agent_index = _get_random_agent_index(agent_indices, unsatisfied_agent_indices)
 	agent_utility = utility(random_agent_index)
-	## / grau
 
 	vacancies = get_vacancy_indices(array)
 
-	## get better vacancies
-	def has_higher_utility(vacancy_index):
-		return utility(tuple(vacancy_index)) > agent_utility
+	better_vacancies = _get_better_vacancies(array, random_agent_index, utility, vacancies)
 
-	better_vacancies = np.nonzero(np.apply_along_axis(has_higher_utility, 1, vacancies))[0]
-	## /gbv
+	if better_vacancies.size == 0:
+		return
 
-	print(better_vacancies)
+	random_better_vacancy = _get_random_better_vacancy_index(better_vacancies, vacancies)
 
-	## move to rand better vacancy
-	if better_vacancies.size != 0:
-		i = tuple(rand.choice(better_vacancies, 1))
-		rand_better_vacancy_index = vacancies[i]
-
-		_move(array, random_agent_index, rand_better_vacancy_index)
-
-	## /mtrbv
-
-	return array
+	_move(array, random_agent_index, random_better_vacancy)
 
 
 def _get_unsatisfied_agent_indices(utility, agent_indices):
@@ -97,7 +78,7 @@ def _get_better_vacancies(array, agent_index, utility, vacancy_indices):
 def _get_random_better_vacancy_index(better_vancancy_indices, vacancy_indices, random_chooser=rand.choice):
 	if better_vancancy_indices.size != 0:
 		i = random_chooser(better_vancancy_indices, 1)
-		rand_better_vacancy_index = vacancy_indices[i]
+		rand_better_vacancy_index = vacancy_indices[i][0]
 		return rand_better_vacancy_index
 	return None
 
@@ -106,35 +87,35 @@ def _move(array, agent_index, vacancy_index):
 	agent_index = tuple(agent_index)
 	vacancy_index = tuple(vacancy_index)
 
-	array[agent_index], array[vacancy_index] = array[vacancy_index], array[agent_index]
+	array[vacancy_index] = array[agent_index]
+	array[agent_index] = 0
 
 
-# if __name__ == '__main__':
-# 	from .create_array import create_array
-# 	from .utility_functions import *
-# 	import os
-# 	import time
-# 	from .arr_to_img import *
+if __name__ == '__main__':
+	from .create_array import create_array
+	from .utility_functions import *
+	import os
+	import time
+	from .arr_to_img import *
 
-# 	np.set_printoptions(threshold=np.nan)
-
-# 	def swap(arr):
-# 		arr[0, 0], arr[0, 1] = arr[0, 1], arr[0, 0]
+	np.set_printoptions(threshold=np.nan)
 
 
-# 	arr = create_array(20, (0.2, 0.4, 0.4))
-# 	print(arr)
-# 	swap(arr)
-# 	print(arr)
+	# 0.4 sec/iteration on core i5-3427U
+	# simulation should take ~ 1h 6min
+	array_size = 100
+	agent_fractions = (0.2, 0.4, 0.4)
+
+	save_period = 100
+	iterations = 10000
+
+	array = create_array(array_size, agent_fractions)
 
 
-# 	def pnt(a, i):
-# 			os.system("clear")
-# 			print(a, i)
+	def save(a, i):
+		if i%save_period == 0:
+			print(i)
+			image_save(to_image(a), '../out/out'+str(i).zfill(6)+'.png')
 
-# 	def save(a, i):
-# 		if i%100 == 0:
-# 			print(i)
-# 			image_save(to_image(a), '../out/out'+str(i).zfill(6)+'.png')
+	run_simulation(array, create_flat_utility(0.375), iterations, callback=save)
 
-# 	run_simulation(arr, create_flat_utility(0.9), 10000, callback=save)

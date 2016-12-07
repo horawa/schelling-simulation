@@ -85,11 +85,11 @@ class SimulationTestCase(unittest.TestCase):
 
 		for agent_index, better_vacancies in parameters:
 			for chosen_vacancy_index in range(len(better_vacancies)):
-				random_chooser = lambda *args: (chosen_vacancy_index)
+				random_chooser = lambda *args: chosen_vacancy_index
 
 				output = _get_random_better_vacancy_index(better_vacancies, vacancies, random_chooser)
-				expected_output = vacancies[chosen_vacancy_index]
-
+				expected_output = vacancies[chosen_vacancy_index][0]
+				
 				with self.subTest(out=output, expected=expected_output):
 					self.assertTrue(np.array_equal(output, expected_output))
 
