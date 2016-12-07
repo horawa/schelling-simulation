@@ -91,6 +91,10 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1):
 
 	unlike_agent_count = np.count_nonzero(np.logical_and(not_vacant, neighborhood != agent_type))
 
+	# if agent has no neighbors - unlike neighbor fraction = 0
+	if neighbor_count == 0:
+		return 0.0
+
 	unlike_agent_fraction = unlike_agent_count / neighbor_count # size excluding agent
 
 	return unlike_agent_fraction
