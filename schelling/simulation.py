@@ -104,7 +104,8 @@ if __name__ == '__main__':
 
 	save_period = 100
 	iterations = 10000
-
+	utility_function = create_flat_utility(0.375)
+	
 	array = create_array(array_size, agent_fractions)
 
 
@@ -113,5 +114,5 @@ if __name__ == '__main__':
 			print(i)
 			image_save(to_image(a), '../out/out'+str(i).zfill(6)+'.png')
 
-	run_simulation(array, create_flat_utility(0.375), iterations, callback=save)
+	run_simulation(array, utility_function, iterations, callback=save)
 
