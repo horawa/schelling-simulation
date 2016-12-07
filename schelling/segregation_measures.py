@@ -1,7 +1,7 @@
 from math import log
 from itertools import chain
 import numpy as np
-from .get_neighborhood import get_neighborhood, get_neighborhood_exclusive
+from .neighborhood import get_neighborhood, get_neighborhood_exclusive
 
 
 def _get_measure_average(array, agent_indices, measure_func):

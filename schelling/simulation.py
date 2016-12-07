@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.random as rand
 from .array_utils import get_agent_indices, get_vacancy_indices
-from .get_neighborhood import get_unlike_neighbor_fraction
+from .neighborhood import get_unlike_neighbor_fraction
 from .utility_functions import get_utility_for_array
 
 def run_simulation(array, utility_function, iterations, satisficers=False, callback=lambda arr, i: None):

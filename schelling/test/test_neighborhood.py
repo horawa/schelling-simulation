@@ -1,6 +1,6 @@
 import unittest
 from numpy import array, array_equal
-from ..get_neighborhood import get_neighborhood, get_neighborhood_exclusive, get_unlike_neighbor_fraction
+from ..neighborhood import get_neighborhood, get_neighborhood_exclusive, get_unlike_neighbor_fraction
 
 
 class GetNeighborhoodTest(unittest.TestCase):

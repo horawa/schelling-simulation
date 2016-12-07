@@ -3,7 +3,7 @@ from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index
 import numpy as np
 import schelling.utility_functions as ut
 from ..array_utils import get_agent_indices, get_vacancy_indices
-from ..get_neighborhood import get_unlike_neighbor_fraction
+from ..neighborhood import get_unlike_neighbor_fraction
 from ..utility_functions import get_utility_for_array, create_flat_utility
 
 

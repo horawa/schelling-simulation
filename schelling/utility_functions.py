@@ -1,6 +1,6 @@
 from functools import wraps
 from math import isclose
-from .get_neighborhood import get_unlike_neighbor_fraction
+from .neighborhood import get_unlike_neighbor_fraction
 
 
 def range_check_0_1(function):

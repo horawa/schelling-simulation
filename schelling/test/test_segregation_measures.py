@@ -1,6 +1,6 @@
 import unittest
 from ..segregation_measures import entropy, switch_rate, entropy_average, switch_rate_average
-from ..get_neighborhood import get_neighborhood
+from ..neighborhood import get_neighborhood
 from numpy import array, mean
 from math import log
 
