@@ -16,7 +16,7 @@ $ pip3 install -r requirements.txt
 ### Command Line Interface
 
 
-```
+```python
 Usage: python3 -m schelling.cli [OPTIONS]
 
 Options:
