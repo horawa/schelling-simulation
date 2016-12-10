@@ -10,7 +10,7 @@ def run_simulation(array, utility_function, iterations, callback=lambda arr, i: 
 		callback(array, i)
 
 
-def update_array(array, utility_function):
+def update_array(array, utility_function, satisficers=False):
 	# utility - function: (index) -> (0,1)
 	utility = get_utility_for_array(utility_function, array)
 
@@ -59,7 +59,7 @@ def _get_random_agent_index(agent_indices, unsatisfied_agent_indices, random_cho
 	return random_agent_index
 
 
-def _get_better_vacancies(array, agent_index, utility, vacancy_indices):
+def _get_better_vacancies(array, agent_index, utility, vacancy_indices, satisficers=False):
 
 	# TODO - when considering a vacancy, agents will include themselves in utility calculations:
 	# if an agent moves to a vacancy in its own neighborhood, the utility of the spot he/she moved to
@@ -70,7 +70,14 @@ def _get_better_vacancies(array, agent_index, utility, vacancy_indices):
 	def has_higher_utility(vacancy_index):
 		return utility(tuple(vacancy_index), agent_type=agent_type) > agent_utility
 
-	better_vacancies = np.nonzero(np.apply_along_axis(has_higher_utility, 1, vacancy_indices))[0]
+	def has_higher_or_equal_utility(vacancy_index):
+		return utility(tuple(vacancy_index), agent_type=agent_type) >= agent_utility
+
+	if satisficers:
+		better_vacancies = np.nonzero(np.apply_along_axis(has_higher_or_equal_utility, 1, vacancy_indices))[0]
+	else:
+		better_vacancies = np.nonzero(np.apply_along_axis(has_higher_utility, 1, vacancy_indices))[0]
+	
 	return better_vacancies
 
 
@@ -99,12 +106,12 @@ if __name__ == '__main__':
 
 	# 0.4 sec/iteration on core i5-3427U
 	# simulation should take ~ 1h 6min
-	array_size = 50
+	array_size = 100
 	agent_fractions = (0.2, 0.4, 0.4)
 
 	save_period = 100
-	iterations = 10000
-	utility_function = create_flat_utility(0.375)
+	iterations = 1000
+	utility_function = create_flat_utility(0.625)
 	
 	array = create_array(array_size, agent_fractions)
 
