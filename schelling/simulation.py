@@ -1,25 +1,34 @@
 import numpy as np
 import numpy.random as rand
+
 from .array_utils import get_agent_indices, get_vacancy_indices
 from .neighborhood import get_unlike_neighbor_fraction
 from .utility_functions import get_utility_for_array
 from .create_array import create_array
+from .simulation_result import SimulationResult
+import schelling.segregation_measures as sm
 
 
-def run_simulation(settings, callback=lambda arr, i: None):
+def run_simulation(settings, callback=lambda arr, res, i: None):
 	settings.validate()
+	result = SimulationResult()
+
 	array = create_array(settings.grid_size, settings.get_agent_type_proportions())
 
 	for i in range(settings.iterations):
-		update_array(array, settings.utility_function, settings.satisficers)
-		callback(array, i)
+		update_array(array, settings.utility_function, result, satisficers=settings.satisficers)
+		callback(array, result, i)
+
+	return result
 
 
-def update_array(array, utility_function, satisficers=False):
+def update_array(array, utility_function, result, satisficers=False):
 	# utility - function: (index) -> (0,1)
 	utility = get_utility_for_array(utility_function, array)
 
 	agent_indices = get_agent_indices(array)
+
+	_update_result(result, array, agent_indices)
 	
 	unsatisfied_agent_indices = _get_unsatisfied_agent_indices(utility, agent_indices)
 
@@ -102,6 +111,14 @@ def _move(array, agent_index, vacancy_index):
 	array[agent_index] = 0
 
 
+def _update_result(result, array, agent_indices):
+	switch_rate_average = sm.switch_rate_average(array, agent_indices)
+	entropy_average = sm.entropy_average(array, agent_indices)
+
+	result.switch_rate_average.append(switch_rate_average)
+	result.entropy_average.append(entropy_average)
+
+
 if __name__ == '__main__':
 	from .utility_functions import *
 	from .arr_to_img import *
@@ -117,9 +134,10 @@ if __name__ == '__main__':
 
 	save_period = 100
 
-	def save(a, i):
+	def save(a, res, i):
 		if i%save_period == 0:
 			print(i)
+			print(res)
 			image_save(to_image(a), '../out/out'+str(i).zfill(6)+'.png')
 
 	run_simulation(settings, callback=save)

@@ -116,4 +116,3 @@ def get_utility_for_array(utility_function, array):
 	return utility
 
 
-
