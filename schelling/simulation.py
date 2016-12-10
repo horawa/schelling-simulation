@@ -120,12 +120,20 @@ def _update_result(result, array, agent_indices):
 
 
 if __name__ == '__main__':
-	from .utility_functions import *
-	from .arr_to_img import *
-	from .simulation_settings import SimulationsSettings
+	"""
+	This will run the Schelling Model simulation for 10000 iterations.
+	Every 100 iterations the state will be printed to console  and the array 
+	will be saved as an image.
+	The simulation result, containing segregation measures for each iteration
+	will be saved as JSON.
+	"""
+	from schelling.utility_functions import create_flat_utility
+	from schelling.arr_to_img import image_save, to_image
+	from schelling.simulation_settings import SimulationsSettings
+	import os
 
 	settings = SimulationsSettings(
-			grid_size=100,
+			grid_size=40,
 			vacancy_proportion=0.2,
 			agent_proportions=(0.5, 0.5),
 			utility_function=create_flat_utility(5/8),
@@ -134,11 +142,15 @@ if __name__ == '__main__':
 
 	save_period = 100
 
-	def save(a, res, i):
-		if i%save_period == 0:
-			print(i)
-			print(res)
-			image_save(to_image(a), '../out/out'+str(i).zfill(6)+'.png')
+	def save(array, result, iteration):
+		if iteration%save_period == 0:
+			# print status to console
+			print(iteration)
+			print(result)
 
-	run_simulation(settings, callback=save)
+			# save output image (assuming ./image/ exists and is a directory)
+			output_file = os.path.join('./image/', str(iteration).zfill(4)+'.png')
+			image_save(to_image(array), output_file)
 
+	simulation_result = run_simulation(settings, callback=save)
+	simulation_result.save_JSON('result.json')
