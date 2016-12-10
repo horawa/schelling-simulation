@@ -3,10 +3,15 @@ import numpy.random as rand
 from .array_utils import get_agent_indices, get_vacancy_indices
 from .neighborhood import get_unlike_neighbor_fraction
 from .utility_functions import get_utility_for_array
+from .create_array import create_array
 
-def run_simulation(array, utility_function, iterations, callback=lambda arr, i: None):
-	for i in range(iterations):
-		update_array(array, utility_function)
+
+def run_simulation(settings, callback=lambda arr, i: None):
+	settings.validate()
+	array = create_array(settings.grid_size, settings.get_agent_type_proportions())
+
+	for i in range(settings.iterations):
+		update_array(array, settings.utility_function, settings.satisficers)
 		callback(array, i)
 
 
@@ -98,28 +103,24 @@ def _move(array, agent_index, vacancy_index):
 
 
 if __name__ == '__main__':
-	from .create_array import create_array
 	from .utility_functions import *
-	import os
-	import time
 	from .arr_to_img import *
+	from .simulation_settings import SimulationsSettings
 
-	# 0.4 sec/iteration on core i5-3427U
-	# simulation should take ~ 1h 6min
-	array_size = 100
-	agent_fractions = (0.2, 0.4, 0.4)
+	settings = SimulationsSettings(
+			grid_size=100,
+			vacancy_proportion=0.2,
+			agent_proportions=(0.5, 0.5),
+			utility_function=create_flat_utility(5/8),
+			iterations=10000
+		)
 
 	save_period = 100
-	iterations = 1000
-	utility_function = create_flat_utility(0.625)
-	
-	array = create_array(array_size, agent_fractions)
-
 
 	def save(a, i):
 		if i%save_period == 0:
 			print(i)
 			image_save(to_image(a), '../out/out'+str(i).zfill(6)+'.png')
 
-	run_simulation(array, utility_function, iterations, callback=save)
+	run_simulation(settings, callback=save)
 
