@@ -16,7 +16,7 @@ $ pip3 install -r requirements.txt
 ### Command Line Interface
 
 
-```python
+```
 Usage: python3 -m schelling.cli [OPTIONS]
 
 Options:
@@ -62,7 +62,7 @@ Options:
 
 ### Example Code
 
-```
+```python
 """
 This will run the Schelling Model simulation for 10000 iterations.
 Every 100 iterations the state will be printed to console  and the array 
