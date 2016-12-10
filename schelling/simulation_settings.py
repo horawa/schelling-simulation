@@ -20,31 +20,32 @@ class SimulationsSettings:
 		self.iterations = iterations
 
 	def validate(self):
-		if grid_size < 1:
+		if self.grid_size < 1:
 			raise ValueError("Grid size must be > 1")
 
-		if vacancy_proportion < 0.0 or vacancy_proportion > 1.0:
+		if self.vacancy_proportion < 0.0 or self.vacancy_proportion > 1.0:
 			raise ValueError("Vacancy proportion must be in [0, 1]")
 
-		if sum(agent_proportions) != 1.0:
+		if sum(self.agent_proportions) != 1.0:
 			raise ValueError("Agent proportions must sum up to 1")
 
-		if initial_random_allocation != True or initial_random_allocation != False:
+		if self.initial_random_allocation != True and self.initial_random_allocation != False:
+			print(type(self.initial_random_allocation))
 			raise ValueError("Initial random allocation must be true or false")
 
-		if not callable(utility_function):
+		if not callable(self.utility_function):
 			raise ValueError("Utility function must be callable")
 
-		if move_to_random != True or move_to_random != False:
+		if self.move_to_random != True and self.move_to_random != False:
 			raise ValueError("Move to random must be true or false")
 
-		if iterations < 1:
+		if self.iterations < 1:
 			raise ValueError("Iterations must be > 1")
 
 
 	def get_agent_type_proportions(self):
-		agent_proportion = 1.0 - vacancy_proportion
-		agent_type_proporitons = [p * agent_proportion for p in agent_proportions]
-		agent_type_proporitons = [vacancy_proportion] + agent_type_proporitons
+		agent_proportion = 1.0 - self.vacancy_proportion
+		agent_type_proporitons = [p * agent_proportion for p in self.agent_proportions]
+		agent_type_proporitons = [self.vacancy_proportion] + agent_type_proporitons
 		return tuple(agent_type_proporitons)
 
