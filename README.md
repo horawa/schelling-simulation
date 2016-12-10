@@ -1,4 +1,4 @@
-# schelling-simulation# schelling-simulation
+# schelling-simulation
 
 ## Description
 A simulation of the Schelling Model of Segregation. 
