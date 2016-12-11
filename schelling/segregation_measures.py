@@ -29,13 +29,16 @@ def entropy_average(array, agent_indices, radius=1):
 	
 	Args:
 	    array (ndarray): array of agents
-	   	agent_indices (ndarray): indices of agents in the format [[row, col], [row, col], ...]
+	   	agent_indices (ndarray): indices of agents in the format 
+	   		[[row, col], [row, col], ...]
 	    radius (int, optional): radius of neighborhood
 	
 	Returns:
 	    float: average entropy
 	"""
-	return _get_measure_average(array, agent_indices, lambda a, i: entropy(a, i, radius))
+	measure_average = _get_measure_average(array, agent_indices, 
+		lambda a, i: entropy(a, i, radius))
+	return measure_average
 
 
 def switch_rate_average(array, agent_indices):
@@ -44,7 +47,8 @@ def switch_rate_average(array, agent_indices):
 
 	Args:
 	    array (ndarray): array of agents
-	   	agent_indices (ndarray): indices of agents in the format [[row, col], [row, col], ...]
+	   	agent_indices (ndarray): indices of agents in the format 
+	   		[[row, col], [row, col], ...]
 	
 	Returns:
 	    float: average switch rate
@@ -55,7 +59,8 @@ def switch_rate_average(array, agent_indices):
 
 def switch_rate(array, agent_index):
 	"""Calculates switch rate for agent at specified index in array
-	Switch rate: Turn around an agent. How many times does the type of neighbor switch
+	Switch rate: Turn around an agent full circle. 
+		How many times does the type of neighbor switch?
 	Args:
 	    array (ndarray): array of agents
 	    agent_index (tuple(int, int)): index of agent

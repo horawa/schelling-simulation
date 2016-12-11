@@ -1,9 +1,8 @@
 import numpy as np
 
-# TODO test with size 38
-
 def create_array(size, agent_type_fractions, random_allocation=True):
-	"""Creates a square 2d numpy array representing a 2d grid randomly populated by agents.
+	"""Creates a square 2d numpy array representing a 2d grid randomly 
+		populated by agents.
 	Nodes with value 0 are vacant
 	Nodes with value n are occupied by agent of type n (n - integer value)
 	If random_allocation is false, agents will be segregated in clusters

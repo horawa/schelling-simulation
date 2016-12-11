@@ -96,7 +96,7 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1):
 		agent_type = array[tuple(agent_index)]
 
 	if array[tuple(agent_index)] != 0:
-		neighbor_count = -1 # agent will be excluded from neighbor count
+		neighbor_count = -1 # agent gwill be excluded from neighbor count
 	else:
 		neighbor_count = 0
 

@@ -1,5 +1,6 @@
 import unittest
-from ..segregation_measures import entropy, switch_rate, entropy_average, switch_rate_average
+from ..segregation_measures import (entropy, switch_rate, 
+	entropy_average, switch_rate_average)
 from ..neighborhood import get_neighborhood
 from numpy import array, mean
 from math import log
@@ -36,7 +37,8 @@ class SegregationMeasureTest(unittest.TestCase):
 			(3,2),
 		])
 
-		agent_values = map(lambda a_i: measure(self.test_array, tuple(a_i)), agent_indices)
+		agent_values = map(lambda a_i: measure(self.test_array, tuple(a_i)), 
+			agent_indices)
 		expected_output = sum(agent_values) / len(agent_indices)
 
 		output = measure_average(self.test_array, agent_indices)

@@ -11,7 +11,8 @@ def range_check_0_1(function):
 
 		value=args[0]
 		if value < 0.0 or value > 1.0:
-			raise ValueError("Argument must be between 0.0 and 1.0. Given: "+str(value))
+			raise ValueError("Argument must be between 0.0 and 1.0. Given: " + 
+				str(value))
 
 		return function(*args, **kwargs)
 
@@ -20,7 +21,8 @@ def range_check_0_1(function):
 
 @range_check_0_1
 def create_flat_utility(threshold):
-	"""Creates a flat utility function with the specified threshold of unlike neighbors
+	"""Creates a flat utility function with the specified threshold of unlike 
+		neighbors.
 	Flat utility: u(t) = 1, if t <= threshold; 0, if t > threshold
 	
 	Args:
@@ -46,7 +48,8 @@ def create_peaked_utility(peak, cutoff=False):
 	"""Creates peaked utility function with 
 	peak value at specified fraction of unlike neighbors and optional cutoff
 	Peaked utility without cutoff:
-		u(t) = (1 / peak) * t, if t < peak; 1 - (1/(1-peak))*(t - peak), if t >= peak
+		u(t) = (1 / peak) * t, if t < peak; 
+				1 - (1/(1-peak))*(t - peak), if t >= peak
 
 	Peaked utility with cutoff:
 		u(t) = (1 / peak) * t, if t <= peak; 0, if t >= peak
@@ -91,7 +94,8 @@ def create_peaked_utility(peak, cutoff=False):
 
 @range_check_0_1
 def create_spiked_utility(spike):
-	"""Create spiked utility function with spike at specified fraction of unlike neighbors
+	"""Create spiked utility function with spike at specified fraction of 
+		unlike neighbors
 	u(t) = 1, if t = spike; 0, otherwise
 	
 	Args:
@@ -113,7 +117,8 @@ def create_spiked_utility(spike):
 def get_utility_for_array(utility_function, array):
 	"""A wrapper for utility functions.
 	The returned function gets unlike neighbor fraction for specified index
-	in array and optionally agent type and returns the value to the utility function.
+	in array and optionally agent type and returns the value to the utility 
+		function.
 	
 	Args:
 	    utility_function (callable): function to wrap - (0, 1) -> (0, 1)
@@ -123,7 +128,9 @@ def get_utility_for_array(utility_function, array):
 	    function: wrapped utility function
 	"""
 	def utility(index, agent_type=None):
-		return utility_function(get_unlike_neighbor_fraction(array, index, agent_type=agent_type))
+		return utility_function(get_unlike_neighbor_fraction(array, index, 
+			agent_type=agent_type))
+	
 	return utility
 
 

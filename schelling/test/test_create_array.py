@@ -29,7 +29,9 @@ class CreateArrayTest(unittest.TestCase):
 			arr = create_array(arr_size, agent_proportions)
 
 			for agent_index, agent_proportion in enumerate(agent_proportions):
-				with self.subTest(arr_size=arr_size, agent_proportions=agent_proportions, agent_index=agent_index):			
+				with self.subTest(arr_size=arr_size, 
+						agent_proportions=agent_proportions, 
+						agent_index=agent_index):			
 					expected_count = int((arr_size**2) * agent_proportion)
 					if agent_index == 0 and has_rounding_error: 
 						expected_count += 1
@@ -84,7 +86,8 @@ class CreateArrayTest(unittest.TestCase):
 			]
 
 		for arr_size, agent_fractions, expected_output in parameters:
-			output = create_array(arr_size, agent_fractions, random_allocation=False)
+			output = create_array(arr_size, agent_fractions, 
+				random_allocation=False)
 			
 			with self.subTest(out=output, expected=expected_output):
 				self.assertTrue(np.array_equal(output, expected_output))

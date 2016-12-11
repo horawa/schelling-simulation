@@ -34,7 +34,9 @@ def to_image(array, size=800):
 	    ndarray: array representing image
 	"""
 	if unique(array).size > 8:
-		raise ValueError("Array contains more than 8 unique elements. Only 8 colors are currently supported")
+		raise ValueError(
+			"Array contains more than 8 unique elements. "
+			"Only 8 colors are currently supported")
 
 	if amax(array) > 7:
 		raise ValueError("Array contains value >7.")
@@ -46,7 +48,8 @@ def to_image(array, size=800):
 	# zip the arrays along new third axis
 	image_array = dstack(rgb_arrays).astype('uint8')
 
-	image_array = resize(image_array, (size, size), order=0, preserve_range=True).astype('uint8')
+	image_array = resize(image_array, (size, size), order=0, 
+		preserve_range=True).astype('uint8')
 
 	return image_array
 
@@ -58,5 +61,6 @@ def image_save(image_array, output):
 	    image_array (ndarray): 3d array representing rgb image
 	    output (file): file to save
 	"""
-	# TODO convert this to use either scipy or skimage, so matplotlib requirement can be removed.
+	# TODO convert this to use either scipy or skimage, so matplotlib 
+	# requirement can be removed.
 	imsave(output, image_array)

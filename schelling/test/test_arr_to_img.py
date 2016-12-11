@@ -22,7 +22,8 @@ class ArrToImgTest(unittest.TestCase):
 		]
 		parameters = [
 			(array([[0, 1], [0, 1]]), array([[c[0], c[1]], [c[0], c[1]]])),
-			(array([[0, 1, 6], [0, 1, 6], [0, 1, 6]]), array([[c[0], c[1], c[6]], [c[0], c[1], c[6]], [c[0], c[1], c[6]]])),
+			(array([[0, 1, 6], [0, 1, 6], [0, 1, 6]]), array([[c[0], c[1], 
+				c[6]], [c[0], c[1], c[6]], [c[0], c[1], c[6]]])),
 			(
 				array(list(range(8))*8).reshape(8,8),
 				array([c[x] for x in range(8)] * 8).reshape(8,8,3),

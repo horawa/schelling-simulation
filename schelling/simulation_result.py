@@ -19,7 +19,8 @@ class SimulationResult:
 	def __str__(self):
 		output = ""
 		for seg_name, seg_values in self.__dict__.items():
-			output += seg_name + ": " + str(round(seg_values[-1], 4)) + os.linesep
+			output += (seg_name + ": " + 
+				str(round(seg_values[-1], 4)) + os.linesep)
 
 		return output
 

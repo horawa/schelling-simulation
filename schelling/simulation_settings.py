@@ -60,7 +60,9 @@ class SimulationSettings:
 
 	def get_agent_type_proportions(self):
 		agent_proportion = 1.0 - self.vacancy_proportion
-		agent_type_proporitons = [p * agent_proportion for p in self.agent_proportions]
-		agent_type_proporitons = [self.vacancy_proportion] + agent_type_proporitons
+		agent_type_proporitons = \
+			[p * agent_proportion for p in self.agent_proportions]
+		agent_type_proporitons = \
+			[self.vacancy_proportion] + agent_type_proporitons
 		return tuple(agent_type_proporitons)
 
