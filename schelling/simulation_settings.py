@@ -46,10 +46,10 @@ class SimulationSettings:
 		if not callable(self.utility_function):
 			raise ValueError("Utility function must be callable")
 
-		if is_not_bool(pick_random):
+		if is_not_bool(self.pick_random):
 			raise ValueError("Pick random must be true or false")
 
-		if is_not_bool(move_to_random):
+		if is_not_bool(self.move_to_random):
 			raise ValueError("Move to random must be true or false")
 
 		if self.radius < 1:
