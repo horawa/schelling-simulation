@@ -73,7 +73,7 @@ will be saved as JSON.
 
 from schelling.utility_functions import create_flat_utility
 from schelling.arr_to_img import image_save, to_image
-from schelling.simulation_settings import SimulationsSettings
+from schelling.simulation_settings import SimulationSettings
 import os
 
 settings = SimulationSettings(
