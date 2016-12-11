@@ -76,7 +76,7 @@ from schelling.arr_to_img import image_save, to_image
 from schelling.simulation_settings import SimulationsSettings
 import os
 
-settings = SimulationsSettings(
+settings = SimulationSettings(
 		grid_size=40,
 		vacancy_proportion=0.2,
 		agent_proportions=(0.5, 0.5),
