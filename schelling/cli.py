@@ -52,8 +52,8 @@ _utility_function_creators = {
 @click.option('--iterations', '-i', default=10000,
 	help='Number of iterations. One agent moves during an iteration. '
 	'Default = 10000')
-@click.option('--save-to', type=click.Path(dir_okay=True), default='./out',
-	help='Directory to save simulation output. Default = ./out')
+@click.option('--save-to', type=click.Path(dir_okay=True), default='../out',
+	help='Directory to save simulation output. Default = ../out')
 @click.option('--save-period', type=click.IntRange(0, None), default=100,
 	help='Save output array image every given number of iterations. '
 	'If -v, also print status to console. Default = 100')
