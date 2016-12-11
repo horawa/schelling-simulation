@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.random as rand
+import math
 
 from .array_utils import get_agent_indices, get_vacancy_indices
 from .neighborhood import get_unlike_neighbor_fraction
@@ -71,7 +72,7 @@ def update_array(array, utility_function, radius, result, satisficers=False):
 	_move(array, random_agent_index, random_better_vacancy)
 
 
-def _get_unsatisfied_agent_indices(utility, agent_indices):
+def _get_unsatisfied_agent_indices(utility, agent_indices, satisficers=False):
 	"""Returns indices of unsatisfied agents - utility less than 1
 
 	Args:
@@ -84,7 +85,11 @@ def _get_unsatisfied_agent_indices(utility, agent_indices):
 	def is_unsatisfied(index):
 		return utility(tuple(index)) < 1.0
 
-	unsatisfied_agent_indices = np.nonzero(np.apply_along_axis(is_unsatisfied, 1, agent_indices))[0]
+	if satisficers:
+		# if satisficers all agents are potentially unsatisfied
+		unsatisfied_agent_indices = np.arange(0, agent_indices.shape[0])
+	else:
+		unsatisfied_agent_indices = np.nonzero(np.apply_along_axis(is_unsatisfied, 1, agent_indices))[0]
 	return unsatisfied_agent_indices
 
 
@@ -127,13 +132,14 @@ def _get_better_vacancies(array, agent_index, utility, vacancy_indices, satisfic
 	def has_higher_utility(vacancy_index):
 		return utility(tuple(vacancy_index), agent_type=agent_type) > agent_utility
 
-	def has_higher_or_equal_utility(vacancy_index):
-		return utility(tuple(vacancy_index), agent_type=agent_type) >= agent_utility
+	def has_equal_utility(vacancy_index):
+		return math.isclose(utility(tuple(vacancy_index), agent_type=agent_type), agent_utility)
+	
+	better_vacancies = np.nonzero(np.apply_along_axis(has_higher_utility, 1, vacancy_indices))[0]
 
-	if satisficers:
-		better_vacancies = np.nonzero(np.apply_along_axis(has_higher_or_equal_utility, 1, vacancy_indices))[0]
-	else:
-		better_vacancies = np.nonzero(np.apply_along_axis(has_higher_utility, 1, vacancy_indices))[0]
+	# if satisficers, and no better vacancy exists
+	if better_vacancies.size == 0 and satisficers:
+		better_vacancies = np.nonzero(np.apply_along_axis(has_equal_utility, 1, vacancy_indices))[0]
 	
 	return better_vacancies
 

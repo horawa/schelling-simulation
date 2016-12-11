@@ -27,12 +27,28 @@ class SimulationTestCase(unittest.TestCase):
 			(ut.create_spiked_utility(0.5), [0, 1, 2, 3, 5, 6, 7, 8]),
 		]
 
+		self.check_get_unsatisfied_agent_indices_expected_output(parameters, False)
+
+
+
+	def test_get_unsatisfied_agent_indices_satisficers(self):
+
+		parameters = [
+			(ut.create_flat_utility(0.5), [0, 1, 2, 3, 4, 5, 6, 7, 8]),
+			(ut.create_peaked_utility(0.5), [0, 1, 2, 3, 4, 5, 6, 7, 8]),
+			(ut.create_spiked_utility(0.5), [0, 1, 2, 3, 4, 5, 6, 7, 8]),
+		]
+
+		self.check_get_unsatisfied_agent_indices_expected_output(parameters, True)
+
+
+	def check_get_unsatisfied_agent_indices_expected_output(self, parameters, satisficers):
 		agent_indices = get_agent_indices(self.test_array)
 
 		for utility_function, expected_output in parameters:
 			utility = ut.get_utility_for_array(utility_function, self.test_array)
 
-			output = _get_unsatisfied_agent_indices(utility, agent_indices)
+			output = _get_unsatisfied_agent_indices(utility, agent_indices, satisficers=satisficers)
 			expected_output = np.array(expected_output)
 			with self.subTest(ut=utility_function, out=output, expected=expected_output):
 				self.assertTrue(np.array_equal(output, expected_output))
@@ -55,23 +71,45 @@ class SimulationTestCase(unittest.TestCase):
 
 
 	def test_get_better_vacancies(self):
-		utility = get_utility_for_array(create_flat_utility(0.5), self.test_array)
-
-		agent_indices = get_agent_indices(self.test_array)
-		vacancy_indices = get_vacancy_indices(self.test_array)
-
 		parameters = [
 			(5, np.array([4, 5, 6])),
 			(6, np.array([4, 5, 6])),
 			(7, np.array([0, 1, 2, 3, 5]))
 		]
 
+		self.check_better_vacancy_expected_output(parameters, False)
+
+
+	def test_get_better_vacancies_satisficers(self):
+
+		parameters = [
+			(0, np.array([0, 1, 2, 3, 5])),
+			(1, np.array([0, 1, 2, 3, 5])),
+			(2, np.array([0, 1, 2, 3, 5])),
+			(3, np.array([0, 1, 2, 3, 5])),
+			(5, np.array([4, 5, 6])),
+			(6, np.array([4, 5, 6])),
+			(7, np.array([0, 1, 2, 3, 5])),
+			(8, np.array([4, 5, 6])),
+			]
+
+		self.check_better_vacancy_expected_output(parameters, True)
+
+
+	def check_better_vacancy_expected_output(self, parameters, satisficers):
+		utility = get_utility_for_array(create_flat_utility(0.5), self.test_array)
+
+		agent_indices = get_agent_indices(self.test_array)
+		vacancy_indices = get_vacancy_indices(self.test_array)
+
 		for unsatisfied_agent_index, expected_output in parameters:
 			i = agent_indices[unsatisfied_agent_index]
-			output = _get_better_vacancies(self.test_array, i, utility, vacancy_indices)
 
-			with self.subTest(out=output, expected=expected_output):
+			output = _get_better_vacancies(self.test_array, i, utility, vacancy_indices, satisficers=satisficers)
+
+			with self.subTest(i= unsatisfied_agent_index, out=output, expected=expected_output):
 				self.assertTrue(np.array_equal(output, expected_output))
+
 
 
 	def test_get_random_better_vacancy(self):
