@@ -216,10 +216,12 @@ def _update_result(result, array, agent_indices):
 	switch_rate_average = sm.switch_rate_average(array, agent_indices)
 	entropy_average = sm.entropy_average(array, agent_indices)
 	ghetto_rate = sm.ghetto_rate(array, agent_indices)
+	clusters = sm.clusters(array)
 
 	result.switch_rate_average.append(switch_rate_average)
 	result.entropy_average.append(entropy_average)
 	result.ghetto_rate.append(ghetto_rate)
+	result.clusters.append(clusters)
 
 
 def _first_picker(array_1D):

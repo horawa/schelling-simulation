@@ -12,6 +12,7 @@ class SimulationResult:
 		self.switch_rate_average = []
 		self.entropy_average = []
 		self.ghetto_rate = []
+		self.clusters = []
 
 
 	def save_JSON(self, output_path):
