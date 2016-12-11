@@ -1,7 +1,8 @@
-from math import log
+from math import log, isclose
 from itertools import chain
 import numpy as np
-from .neighborhood import get_neighborhood, get_neighborhood_exclusive
+from .neighborhood import (get_neighborhood, get_neighborhood_exclusive, 
+	get_unlike_neighbor_fraction)
 
 
 def _get_measure_average(array, agent_indices, measure_func):
@@ -138,3 +139,16 @@ def entropy(array, agent_index, radius=1):
 		entropy -= (p_neighbor_type * log(p_neighbor_type, 2))
 
 	return entropy
+
+
+def ghetto_rate(array, agent_indices, radius=1):
+	agents_in_ghettos = 0
+	for agent_index in agent_indices:
+		is_in_ghetto = isclose(
+			get_unlike_neighbor_fraction(array, agent_index), 0.0)
+		if is_in_ghetto:
+			agents_in_ghettos += 1
+
+	ghetto_rate = agents_in_ghettos / agent_indices.shape[0]
+	
+	return ghetto_rate

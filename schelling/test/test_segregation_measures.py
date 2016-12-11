@@ -1,6 +1,6 @@
 import unittest
 from ..segregation_measures import (entropy, switch_rate, 
-	entropy_average, switch_rate_average)
+	entropy_average, switch_rate_average, ghetto_rate)
 from ..neighborhood import get_neighborhood
 from numpy import array, mean
 from math import log
@@ -104,6 +104,30 @@ class SegregationMeasureTest(unittest.TestCase):
 				output = switch_rate(self.test_array, agent_index)
 				self.assertEqual(output, expected_output)
 
+
+	def test_ghetto_rate(self):
+		parameters = [ 
+			(array([
+				[1, 1, 1, 1],
+				[1, 1, 1, 1],
+				[2, 2, 2, 2],
+				[2, 2, 2, 2],
+			]), 0.5),
+			(array([
+				[1, 1, 1, 1],
+				[1, 1, 0, 1],
+				[2, 2, 2, 2],
+				[2, 2, 0, 2],
+			]), 7/16),			
+		]
+
+		agent_indices = array(
+			[[row, col] for row in range(4) for col in range(4)])
+
+		for test_array, expected_output in parameters:
+			output = ghetto_rate(test_array, agent_indices)
+			with self.subTest(array=test_array):
+				self.assertAlmostEqual(output, expected_output)
 
 
 if __name__ == '__main__':
