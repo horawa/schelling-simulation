@@ -1,5 +1,7 @@
 import unittest
-from ..simulation import _get_unsatisfied_agent_indices, _get_random_agent_index, _get_better_vacancies, _get_random_better_vacancy_index, _move
+from ..simulation import (_get_unsatisfied_agent_indices, 
+	_pick_agent_index_to_move, _get_better_vacancies, 
+	_pick_better_vacancy_index, _move, _random_picker, _first_picker)
 import numpy as np
 import schelling.utility_functions as ut
 from ..array_utils import get_agent_indices, get_vacancy_indices
@@ -17,8 +19,6 @@ class SimulationTestCase(unittest.TestCase):
 			])
 
 
-
-
 	def test_get_unsatisfied_agent_indices(self):
 
 		parameters = [
@@ -27,8 +27,8 @@ class SimulationTestCase(unittest.TestCase):
 			(ut.create_spiked_utility(0.5), [0, 1, 2, 3, 5, 6, 7, 8]),
 		]
 
-		self.check_get_unsatisfied_agent_indices_expected_output(parameters, False)
-
+		self.check_get_unsatisfied_agent_indices_expected_output(parameters, 
+			False)
 
 
 	def test_get_unsatisfied_agent_indices_satisficers(self):
@@ -39,32 +39,37 @@ class SimulationTestCase(unittest.TestCase):
 			(ut.create_spiked_utility(0.5), [0, 1, 2, 3, 4, 5, 6, 7, 8]),
 		]
 
-		self.check_get_unsatisfied_agent_indices_expected_output(parameters, True)
+		self.check_get_unsatisfied_agent_indices_expected_output(parameters, 
+			True)
 
 
-	def check_get_unsatisfied_agent_indices_expected_output(self, parameters, satisficers):
+	def check_get_unsatisfied_agent_indices_expected_output(self, parameters, 
+			satisficers):
 		agent_indices = get_agent_indices(self.test_array)
 
 		for utility_function, expected_output in parameters:
-			utility = ut.get_utility_for_array(utility_function, self.test_array)
+			utility = ut.get_utility_for_array(utility_function, 
+				self.test_array)
 
-			output = _get_unsatisfied_agent_indices(utility, agent_indices, satisficers=satisficers)
+			output = _get_unsatisfied_agent_indices(utility, agent_indices, 
+				satisficers=satisficers)
 			expected_output = np.array(expected_output)
-			with self.subTest(ut=utility_function, out=output, expected=expected_output):
+			with self.subTest(ut=utility_function, out=output, 
+					expected=expected_output):
 				self.assertTrue(np.array_equal(output, expected_output))
 
 
-	def test_get_random_agent_index(self):
+	def test_pick_agent_index_to_move(self):
 		agent_indices = get_agent_indices(self.test_array)
 		unsatisfied_agent_indices = [0, 1, 2, 3, 5, 6, 7, 8]
 
 		for unsatisfied_agent_index in unsatisfied_agent_indices:
-			random_chooser = lambda *args: (unsatisfied_agent_index,)
 			
-			chosen_index = random_chooser()
+			chosen_index = _first_picker(unsatisfied_agent_indices)
 			expected_agent_index = tuple(agent_indices[chosen_index])
 			
-			agent_index = _get_random_agent_index(agent_indices, unsatisfied_agent_indices, random_chooser)
+			agent_index = _pick_agent_index_to_move(agent_indices, 
+				unsatisfied_agent_indices, _first_picker)
 
 			with self.subTest(out=agent_index, expected=expected_agent_index):
 				self.assertEqual(expected_agent_index, agent_index)
@@ -97,7 +102,8 @@ class SimulationTestCase(unittest.TestCase):
 
 
 	def check_better_vacancy_expected_output(self, parameters, satisficers):
-		utility = get_utility_for_array(create_flat_utility(0.5), self.test_array)
+		utility = get_utility_for_array(create_flat_utility(0.5), 
+			self.test_array)
 
 		agent_indices = get_agent_indices(self.test_array)
 		vacancy_indices = get_vacancy_indices(self.test_array)
@@ -105,14 +111,15 @@ class SimulationTestCase(unittest.TestCase):
 		for unsatisfied_agent_index, expected_output in parameters:
 			i = agent_indices[unsatisfied_agent_index]
 
-			output = _get_better_vacancies(self.test_array, i, utility, vacancy_indices, satisficers=satisficers)
+			output = _get_better_vacancies(self.test_array, i, utility, 
+				vacancy_indices, satisficers=satisficers)
 
-			with self.subTest(i= unsatisfied_agent_index, out=output, expected=expected_output):
+			with self.subTest(i= unsatisfied_agent_index, out=output, 
+					expected=expected_output):
 				self.assertTrue(np.array_equal(output, expected_output))
 
 
-
-	def test_get_random_better_vacancy(self):
+	def test_pick_better_vacancy_index(self):
 		parameters = [
 			(5, np.array([4, 5, 6])),
 			(6, np.array([4, 5, 6])),
@@ -123,18 +130,22 @@ class SimulationTestCase(unittest.TestCase):
 
 		for agent_index, better_vacancies in parameters:
 			for chosen_vacancy_index in range(len(better_vacancies)):
-				random_chooser = lambda *args: chosen_vacancy_index
+				def picker(array_1D):
+					return array_1D[chosen_vacancy_index]
 
-				output = _get_random_better_vacancy_index(better_vacancies, vacancies, random_chooser)
-				expected_output = vacancies[chosen_vacancy_index][0]
+				output = _pick_better_vacancy_index(better_vacancies, 
+					vacancies, picker)
+				vacancy_index_index = better_vacancies[chosen_vacancy_index]
+				expected_output = vacancies[vacancy_index_index]
 				
-				with self.subTest(out=output, expected=expected_output):
+				with self.subTest(chosen_index=chosen_vacancy_index,
+						out=output, expected=expected_output):
 					self.assertTrue(np.array_equal(output, expected_output))
-
 
 		# Empty vacancy list
 		with self.subTest(name="Empty vacancy list should return none."):
-			output = _get_random_better_vacancy_index(np.array([]), np.array([[0, 0], [1, 1]]))
+			output = _pick_better_vacancy_index(np.array([]), 
+				np.array([[0, 0], [1, 1]]), _first_picker)
 			self.assertTrue(output is None)
 
 
@@ -165,6 +176,30 @@ class SimulationTestCase(unittest.TestCase):
 			_move(array, agent_index, vacancy_index)
 			with self.subTest():
 				self.assertTrue(np.array_equal(array, expected_result))
+
+
+	def test_random_picker(self):
+		data = [1, 2, 3, 4, 5]
+
+		array = np.array(data)
+		for i in range(20):
+			picked = _random_picker(array)
+			with self.subTest(data=data, picked=picked):
+				self.assertTrue(picked in data)
+
+
+	def test_first_picker(self):
+		parameters = [
+			[1, 2, 3, 4, 5],
+			[2, 3, 4, 5, 6],
+			[4, 5, 6, 7, 8],
+		]
+
+		for data in parameters:
+			array = np.array(data)
+			picked = _first_picker(array)
+			with self.subTest(data=data, picked=picked):
+				self.assertEqual(picked, data[0])
 
 
 if __name__ == '__main__':
