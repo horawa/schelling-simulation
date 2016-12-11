@@ -11,6 +11,7 @@ class SimulationSettings:
 		initial_random_allocation=True,
 		utility_function=None,
 		satisficers=False,
+		pick_random=True,
 		move_to_random=True,
 		radius=1,
 		iterations=10000):
@@ -21,11 +22,15 @@ class SimulationSettings:
 		self.initial_random_allocation = initial_random_allocation
 		self.utility_function = utility_function
 		self.satisficers = satisficers
+		self.pick_random = pick_random
 		self.move_to_random = move_to_random
 		self.radius = radius
 		self.iterations = iterations
 
 	def validate(self):
+		def is_not_bool(val):
+			return val != True and val != False:
+
 		if self.grid_size < 1:
 			raise ValueError("Grid size must be > 1")
 
@@ -35,14 +40,16 @@ class SimulationSettings:
 		if sum(self.agent_proportions) != 1.0:
 			raise ValueError("Agent proportions must sum up to 1")
 
-		if self.initial_random_allocation != True and self.initial_random_allocation != False:
-			print(type(self.initial_random_allocation))
+		if is_not_bool(self.initial_random_allocation):
 			raise ValueError("Initial random allocation must be true or false")
 
 		if not callable(self.utility_function):
 			raise ValueError("Utility function must be callable")
 
-		if self.move_to_random != True and self.move_to_random != False:
+		if is_not_bool(pick_random):
+			raise ValueError("Pick random must be true or false")
+
+		if is_not_bool(move_to_random):
 			raise ValueError("Move to random must be true or false")
 
 		if self.radius < 1:
@@ -50,6 +57,10 @@ class SimulationSettings:
 
 		if self.iterations < 1:
 			raise ValueError("Iterations must be > 1")
+
+
+
+
 
 
 	def get_agent_type_proportions(self):
