@@ -1,6 +1,6 @@
 import unittest
 from ..segregation_measures import (entropy, switch_rate, 
-	entropy_average, switch_rate_average, ghetto_rate)
+	entropy_average, switch_rate_average, ghetto_rate, clusters)
 from ..neighborhood import get_neighborhood
 from numpy import array, mean
 from math import log
@@ -128,6 +128,46 @@ class SegregationMeasureTest(unittest.TestCase):
 			output = ghetto_rate(test_array, agent_indices)
 			with self.subTest(array=test_array):
 				self.assertAlmostEqual(output, expected_output)
+
+
+	def test_clusters(self):
+		parameters = [ 
+			(array([
+				[1, 1, 1, 1],
+				[0, 0, 0, 0],
+				[2, 2, 2, 2],
+				[2, 2, 2, 2],
+			]), 2),
+			(array([
+				[1, 1, 0, 1],
+				[1, 1, 0, 1],
+				[2, 2, 0, 2],
+				[2, 2, 0, 2],
+			]), 4),		
+			(array([
+				[1, 0, 1, 0],
+				[0, 1, 0, 1],
+				[2, 2, 0, 2],
+				[2, 2, 0, 2],
+			]), 6),
+			(array([
+				[1, 1, 1, 1],
+				[2, 1, 2, 1],
+				[2, 1, 1, 1],
+				[2, 2, 0, 2],
+			]), 4),		
+			(array([
+				[1, 1, 0, 1],
+				[0, 1, 0, 1],
+				[2, 1, 0, 1],
+				[2, 1, 1, 1],
+			]), 2),
+		]
+		
+		for test_array, expected_output in parameters:
+			output = clusters(test_array)
+			with self.subTest(array=test_array):
+				self.assertEqual(output, expected_output)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 from math import log, isclose
-from itertools import chain
 import numpy as np
+from scipy.ndimage.measurements import label
+
 from .neighborhood import (get_neighborhood, get_neighborhood_exclusive, 
 	get_unlike_neighbor_fraction)
 
@@ -150,5 +151,17 @@ def ghetto_rate(array, agent_indices, radius=1):
 			agents_in_ghettos += 1
 
 	ghetto_rate = agents_in_ghettos / agent_indices.shape[0]
-	
+
 	return ghetto_rate
+
+
+def clusters(array):
+	agent_types = np.unique(array)[1:]
+	total_clusters = 0
+	for agent_type in agent_types:
+		labelled, cluster_count = label(np.where(array == agent_type, 1, 0))
+		total_clusters += cluster_count
+
+	return total_clusters
+
+	
