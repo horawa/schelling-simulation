@@ -16,13 +16,13 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	array = create_array(settings.grid_size, settings.get_agent_type_proportions())
 
 	for i in range(settings.iterations):
-		update_array(array, settings.utility_function, result, satisficers=settings.satisficers)
+		update_array(array, settings.utility_function, settings.radius, result, satisficers=settings.satisficers)
 		callback(array, result, i)
 
 	return result
 
 
-def update_array(array, utility_function, result, satisficers=False):
+def update_array(array, utility_function, radius, result, satisficers=False):
 	# utility - function: (index) -> (0,1)
 	utility = get_utility_for_array(utility_function, array)
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 	from schelling.simulation_settings import SimulationsSettings
 	import os
 
-	settings = SimulationsSettings(
+	settings = SimulationSettings(
 			grid_size=40,
 			vacancy_proportion=0.2,
 			agent_proportions=(0.5, 0.5),

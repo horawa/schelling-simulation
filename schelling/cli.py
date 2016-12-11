@@ -29,6 +29,8 @@ _utility_function_creators = {
 	help='Satisficer relocation regime. Agents move to vacancies of equal utility instead of only moving to vacancies of greater utility. Off by default.')
 @click.option('--move-to-random/--move-to-first', default=True,
 	help='Relocation regime - agents move to random better vacancy or to first better vacancy. Random by default.')
+@click.option('--radius', '-r', default=1,
+	help='Radius of neighborhood that agents will consider. Default = 1 (only directly adjacent neighbors).')
 @click.option('--iterations', '-i', default=10000,
 	help='Number of iterations. One agent moves during an iteration. Default = 10000')
 @click.option('--save-to', type=click.Path(dir_okay=True), default='./out',
@@ -38,7 +40,7 @@ _utility_function_creators = {
 @click.option('--verbose', '-v', is_flag=True, default=False,
 	help='Periodically print iteration number and segregation measures to console. Off by default.')
 def simulation(grid_size, vacancy_proportion, agent_proportion, initial_random_allocation,
-	utility_function, satisficers, move_to_random, iterations, save_to, save_period, verbose):
+	utility_function, satisficers, move_to_random, radius, iterations, save_to, save_period, verbose):
 
 	ut_name = utility_function[0]
 	ut_arg = utility_function[1]
@@ -47,7 +49,7 @@ def simulation(grid_size, vacancy_proportion, agent_proportion, initial_random_a
 
 	utility = create_utility(ut_arg)
 
-	settings = SimulationsSettings(
+	settings = SimulationSettings(
 			grid_size=grid_size,
 			vacancy_proportion=vacancy_proportion,
 			agent_proportions=agent_proportion,

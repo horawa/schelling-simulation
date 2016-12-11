@@ -1,4 +1,4 @@
-class SimulationsSettings:
+class SimulationSettings:
 	def __init__(
 		self,
 		grid_size=10,
@@ -8,6 +8,7 @@ class SimulationsSettings:
 		utility_function=None,
 		satisficers=False,
 		move_to_random=True,
+		radius=1,
 		iterations=10000):
 
 		self.grid_size = grid_size
@@ -17,6 +18,7 @@ class SimulationsSettings:
 		self.utility_function = utility_function
 		self.satisficers = satisficers
 		self.move_to_random = move_to_random
+		self.radius = radius
 		self.iterations = iterations
 
 	def validate(self):
@@ -38,6 +40,9 @@ class SimulationsSettings:
 
 		if self.move_to_random != True and self.move_to_random != False:
 			raise ValueError("Move to random must be true or false")
+
+		if self.radius < 1:
+			raise ValueError("Radius must be > 1")
 
 		if self.iterations < 1:
 			raise ValueError("Iterations must be > 1")
