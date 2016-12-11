@@ -164,4 +164,3 @@ def clusters(array):
 
 	return total_clusters
 
-	
