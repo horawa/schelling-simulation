@@ -41,9 +41,9 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 		vacancy_picker = _first_picker
 
 	for i in range(settings.iterations):
+		callback(array, result, i)
 		update_array(array, settings.utility_function, settings.radius, result, 
 			agent_picker, vacancy_picker, satisficers=settings.satisficers)
-		callback(array, result, i)
 
 	return result
 
