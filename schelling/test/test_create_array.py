@@ -61,5 +61,33 @@ class CreateArrayTest(unittest.TestCase):
 				arr = create_array(size, (0.2, 0.4, 0.4))
 				self.assertEqual(arr.size, size*size)
 
+
+	def test_segregated_allocation(self):
+		parameters = [
+			(5, (0.2, 0.4, 0.4), 
+				np.array([
+				[0]*5, 
+				[1]*5,
+				[1]*5,
+				[2]*5,
+				[2]*5,
+				])),
+			(6, (0.2, 0.4, 0.4), 
+				np.array([
+				[0]*6,
+				[0, 0] + [1]*4,
+				[1] * 6,
+				([1] * 4) + ([2] * 2),
+				[2] * 6,
+				[2] * 6,
+				])) # 8, 14, 14 
+			]
+
+		for arr_size, agent_fractions, expected_output in parameters:
+			output = create_array(arr_size, agent_fractions, random_allocation=False)
+			
+			with self.subTest(out=output, expected=expected_output):
+				self.assertTrue(np.array_equal(output, expected_output))
+
 if __name__ == '__main__':
 	unittest.main()
