@@ -1,12 +1,13 @@
 import unittest
 from ..simulation import (_get_unsatisfied_agent_indices, 
-	_pick_agent_index_to_move, _get_better_vacancies, 
+	_pick_agent_index_to_move, _get_better_vacancies, run_simulation,
 	_pick_better_vacancy_index, _move, _random_picker, _first_picker)
 import numpy as np
 import schelling.utility_functions as ut
 from ..array_utils import get_agent_indices, get_vacancy_indices
 from ..neighborhood import get_unlike_neighbor_fraction
 from ..utility_functions import get_utility_for_array, create_flat_utility
+from ..simulation_settings import SimulationSettings
 
 
 class SimulationTestCase(unittest.TestCase):
@@ -200,6 +201,78 @@ class SimulationTestCase(unittest.TestCase):
 			picked = _first_picker(array)
 			with self.subTest(data=data, picked=picked):
 				self.assertEqual(picked, data[0])
+
+
+	def test_run_simulation(self):
+		iteration_states = [
+			np.array([
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[2, 2, 2, 2],
+				[3, 3, 3, 3]
+			]),
+			np.array([
+				[1, 0, 0, 0],
+				[0, 1, 1, 1],
+				[2, 2, 2, 2],
+				[3, 3, 3, 3]
+			]),
+			np.array([
+				[1, 1, 0, 0],
+				[0, 0, 1, 1],
+				[2, 2, 2, 2],
+				[3, 3, 3, 3]
+			]),
+			np.array([
+				[1, 1, 1, 0],
+				[0, 0, 0, 1],
+				[2, 2, 2, 2],
+				[3, 3, 3, 3]
+			]),
+			np.array([
+				[1, 1, 1, 1],
+				[0, 0, 0, 0],
+				[2, 2, 2, 2],
+				[3, 3, 3, 3]
+			]),
+		] + ([np.array([
+				[1, 1, 1, 1],
+				[2, 0, 0, 0],
+				[0, 2, 2, 2],
+				[3, 3, 3, 3]
+			]),							
+			np.array([
+				[1, 1, 1, 1],
+				[0, 2, 0, 0],
+				[0, 2, 2, 2],
+				[3, 3, 3, 3]
+			])] * 100) # here it starts oscillating forever
+		
+
+		def callback(array, result, iteration):
+			expected_output = iteration_states[iteration]
+			with self.subTest(i=iteration, out=array, expected=expected_output):	
+				self.assertTrue(np.array_equal(array, expected_output))
+
+
+		settings = SimulationSettings(		
+			grid_size=4,
+			vacancy_proportion=0.25,
+			agent_proportions=(1/3, 1/3, 1/3),
+			initial_random_allocation=False,
+			utility_function=create_flat_utility(0.5),
+			satisficers=False,
+			pick_random=False,
+			move_to_random=False,
+			radius=1,
+			iterations=len(iteration_states)
+		)
+
+		result = run_simulation(settings, callback)
+
+		clusters = [3, 4, 4, 4, 3] + ([4, 3] * 100)
+		with self.subTest():
+			self.assertEqual(result.clusters, clusters)
 
 
 if __name__ == '__main__':
