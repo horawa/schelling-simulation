@@ -215,9 +215,11 @@ def _update_result(result, array, agent_indices):
 	"""
 	switch_rate_average = sm.switch_rate_average(array, agent_indices)
 	entropy_average = sm.entropy_average(array, agent_indices)
+	ghetto_rate = sm.ghetto_rate(array, agent_indices)
 
 	result.switch_rate_average.append(switch_rate_average)
 	result.entropy_average.append(entropy_average)
+	result.ghetto_rate.append(ghetto_rate)
 
 
 def _first_picker(array_1D):
@@ -234,7 +236,7 @@ if __name__ == '__main__':
 	Every 100 iterations the state will be printed to console  and the array 
 	will be saved as an image.
 	The simulation result, containing segregation measures for each iteration
-	will be saved as JSON.
+	will be saved as JSON and a plot will be shown.
 	"""
 	from schelling.utility_functions import create_flat_utility
 	from schelling.arr_to_img import image_save, to_image
@@ -264,3 +266,4 @@ if __name__ == '__main__':
 
 	simulation_result = run_simulation(settings, callback=save)
 	simulation_result.save_JSON('result.json')
+	simulation_result.plot_measures()
