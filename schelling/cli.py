@@ -1,5 +1,5 @@
 from .simulation import run_simulation
-from .simulation_settings import SimulationsSettings
+from .simulation_settings import SimulationSettings
 import schelling.utility_functions as ut
 from .arr_to_img import to_image, image_save
 
