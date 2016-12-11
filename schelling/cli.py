@@ -27,6 +27,8 @@ _utility_function_creators = {
 	help='Utility function name and parameter. Functions are: "flat", "peaked", "peaked_cutoff", "spiked". E. g. *-u flat 0.5* for flat utility with threshold 0.5. Default = flat 0.625.')
 @click.option('--satisficers/--no-satisficers', default=False,
 	help='Satisficer relocation regime. Agents move to vacancies of equal utility instead of only moving to vacancies of greater utility. Off by default.')
+@click.option('--pick-random/--pick-first', default=True,
+	help='Relocation regime - agent to relocate picked at random, or first on list. Random by default.')
 @click.option('--move-to-random/--move-to-first', default=True,
 	help='Relocation regime - agents move to random better vacancy or to first better vacancy. Random by default.')
 @click.option('--radius', '-r', default=1,
@@ -40,7 +42,7 @@ _utility_function_creators = {
 @click.option('--verbose', '-v', is_flag=True, default=False,
 	help='Periodically print iteration number and segregation measures to console. Off by default.')
 def simulation(grid_size, vacancy_proportion, agent_proportion, initial_random_allocation,
-	utility_function, satisficers, move_to_random, radius, iterations, save_to, save_period, verbose):
+	utility_function, satisficers, pick_random, move_to_random, radius, iterations, save_to, save_period, verbose):
 	"""Command line interface for the Schelling simulation."""
 	
 	ut_name = utility_function[0]
@@ -57,6 +59,7 @@ def simulation(grid_size, vacancy_proportion, agent_proportion, initial_random_a
 			initial_random_allocation=initial_random_allocation,
 			utility_function=utility,
 			satisficers=satisficers,
+			pick_random=pick_random,
 			move_to_random=move_to_random,
 			iterations=iterations
 		)
