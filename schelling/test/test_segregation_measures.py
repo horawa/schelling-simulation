@@ -1,6 +1,6 @@
 import unittest
-from ..segregation_measures import (entropy, switch_rate, 
-	entropy_average, switch_rate_average, ghetto_rate, clusters)
+from ..segregation_measures import (entropy, switch_rate, distance_average,
+	entropy_average, switch_rate_average, ghetto_rate, clusters, distance)
 from ..neighborhood import get_neighborhood
 from numpy import array, mean
 from math import log
@@ -46,7 +46,6 @@ class SegregationMeasureTest(unittest.TestCase):
 		self.assertEqual(expected_output, output)
 
 
-
 	def test_entropy_average(self):
 		self.check_average_expected_output(entropy, entropy_average)
 
@@ -55,6 +54,8 @@ class SegregationMeasureTest(unittest.TestCase):
 		self.check_average_expected_output(switch_rate, switch_rate_average)
 
 
+	def test_distance_average(self):
+		self.check_average_expected_output(distance, distance_average)
 
 
 	def test_entropy_radius1(self):
@@ -168,6 +169,49 @@ class SegregationMeasureTest(unittest.TestCase):
 			output = clusters(test_array)
 			with self.subTest(array=test_array):
 				self.assertEqual(output, expected_output)
+
+
+	def test_distance(self):
+		def check_output(test_array, parameters):
+			for agent_index, expected_output in parameters:
+				output = distance(test_array, agent_index)
+				with self.subTest(array=test_array, index=agent_index):
+					self.assertEqual(output, expected_output)
+
+		parameters = [
+			((0, 1), 2),
+			((0, 2), 2),
+			((1, 0), 1),
+			((1, 1), 1),
+			((1, 2), 1),
+			((2, 1), 1),
+			((2, 2), 1),
+			((3, 1), 1),
+			((3, 2), 1),
+		]
+
+		check_output(self.test_array, parameters)
+
+		test_array1 = array([
+				[1, 1, 1, 1],
+				[1, 1, 1, 1],
+				[0, 0, 0, 0],
+				[0, 0, 0, 2]
+			])
+
+		parameters1 = [
+			((0, 0), 3),
+			((0, 1), 3),
+			((0, 2), 3),
+			((0, 3), 3),
+			((1, 0), 3),
+			((1, 1), 2),
+			((1, 2), 2),
+			((1, 3), 2),
+			((3, 3), 2),
+		]
+
+		check_output(test_array1, parameters1)
 
 
 if __name__ == '__main__':

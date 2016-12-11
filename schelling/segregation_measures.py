@@ -16,10 +16,6 @@ def _get_measure_average(array, agent_indices, measure_func):
 	Returns:
 	    number: average function value
 	"""
-	array_rows = array.shape[0]
-	array_cols = array.shape[1]
-
-
 	total = sum(measure_func(array, tuple(index)) for index in agent_indices)
 
 	return total / agent_indices.shape[0]
@@ -57,6 +53,9 @@ def switch_rate_average(array, agent_indices):
 	"""
 	return _get_measure_average(array, agent_indices, switch_rate)
 
+
+def distance_average(array, agent_indices):
+	return _get_measure_average(array, agent_indices, distance)
 
 
 def switch_rate(array, agent_index):
@@ -156,6 +155,7 @@ def ghetto_rate(array, agent_indices, radius=1):
 
 
 def clusters(array):
+	#TODO cache agent types
 	agent_types = np.unique(array)[1:]
 	total_clusters = 0
 	for agent_type in agent_types:
@@ -163,4 +163,18 @@ def clusters(array):
 		total_clusters += cluster_count
 
 	return total_clusters
+
+
+def distance(array, agent_index):
+	agent_type = array[tuple(agent_index)]
+
+	distance = 1
+	while distance <= array.shape[0]:
+		neighborhood = get_neighborhood(array, agent_index, radius=distance)
+		if np.any(
+				np.logical_and(neighborhood != agent_type, neighborhood != 0)):
+			break
+		distance += 1
+
+	return distance
 
