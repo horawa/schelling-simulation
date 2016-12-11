@@ -58,11 +58,6 @@ class SimulationSettings:
 		if self.iterations < 1:
 			raise ValueError("Iterations must be > 1")
 
-
-
-
-
-
 	def get_agent_type_proportions(self):
 		agent_proportion = 1.0 - self.vacancy_proportion
 		agent_type_proporitons = [p * agent_proportion for p in self.agent_proportions]
