@@ -10,10 +10,22 @@ import schelling.segregation_measures as sm
 
 
 def run_simulation(settings, callback=lambda arr, res, i: None):
+	"""Run simulation with specified settings.
+	Call the optional callback function after each iteration,
+	passing the current array state, current result, and iteration number.
+	Returns simulation result - segregation measures before each iteration.
+	
+	Args:
+	    settings (SimulationSettings): settings
+	    callback (callable, optional): Function to call after each iteration
+	
+	Returns:
+	    SimulationResult: Result - segregation measures for each iteration
+	"""
 	settings.validate()
 	result = SimulationResult()
 
-	array = create_array(settings.grid_size, settings.get_agent_type_proportions())
+	array = create_array(settings.grid_size, settings.get_agent_type_proportions(), settings.initial_random_allocation)
 
 	for i in range(settings.iterations):
 		update_array(array, settings.utility_function, settings.radius, result, satisficers=settings.satisficers)
@@ -23,6 +35,15 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 
 def update_array(array, utility_function, radius, result, satisficers=False):
+	"""Do a single iteration of the simulation.
+	
+	Args:
+	    array (ndarray): array
+	    utility_function (callable): utility function - (0, 1) -> (0, 1)
+	    radius (int): neighborhood radius
+	    result (SimulationResult): result object to store segregation measures before updating array
+	    satisficers (bool, optional): satisficer behavior setting
+	"""
 	# utility - function: (index) -> (0,1)
 	utility = get_utility_for_array(utility_function, array)
 
@@ -54,11 +75,11 @@ def _get_unsatisfied_agent_indices(utility, agent_indices):
 	"""Returns indices of unsatisfied agents - utility less than 1
 
 	Args:
-	    utility (Callable): functions to return utility given agent index
+	    utility (callable): functions to return utility given agent index
 	    agent_indices (ndarray): 2d array with shape (x,2)
 
 	Returns:
-	    TYPE: indices of indices in agent_indices which point to unsatisfied agents
+	    ndarray: indices of rows in agent_indices which point to unsatisfied agents
 	"""
 	def is_unsatisfied(index):
 		return utility(tuple(index)) < 1.0
@@ -68,13 +89,35 @@ def _get_unsatisfied_agent_indices(utility, agent_indices):
 
 
 def _get_random_agent_index(agent_indices, unsatisfied_agent_indices, random_chooser=rand.choice):
+	"""Get index of random unsatisfied agent in agent indices.
+	
+	Args:
+	    agent_indices (ndarray): indices of agents in array
+	    unsatisfied_agent_indices (ndarray): indices of rows in agent_indices pointing to unsatisfied agents
+	    random_chooser (callable, optional): function to return random number from array - keep default except when testing only.
+	
+	Returns:
+	    tuple: Index of random unsatisfied agent
+	"""
 	# random chooser is a parameter only for testing
 	random_agent_index = tuple(agent_indices[random_chooser(unsatisfied_agent_indices, 1)[0]])
 	return random_agent_index
 
 
 def _get_better_vacancies(array, agent_index, utility, vacancy_indices, satisficers=False):
-
+	"""Get vacancies of higher utility for agent at agent_index.
+	If satisficers is True, also returns vacancies of equal utility.
+	
+	Args:
+	    array (ndarray): array
+	    agent_index (tuple): index of agent
+	    utility (callable): utility function - index -> (0, 1)
+	    vacancy_indices (ndarray): indices vacancies in array
+	    satisficers (bool, optional): satisficers setting
+	
+	Returns:
+	    ndarray: array containtig incices of rows in vacancy_indices pointing to vacancies of higher utility.
+	"""
 	# TODO - when considering a vacancy, agents will include themselves in utility calculations:
 	# if an agent moves to a vacancy in its own neighborhood, the utility of the spot he/she moved to
 	# will change after the move. Currently the agent considers the pre-move 
@@ -96,6 +139,16 @@ def _get_better_vacancies(array, agent_index, utility, vacancy_indices, satisfic
 
 
 def _get_random_better_vacancy_index(better_vancancy_indices, vacancy_indices, random_chooser=rand.choice):
+	"""Get random index of row in vacancy indices pointing to better vacancy
+	
+	Args:
+	    better_vancancy_indices (ndarray): indices of rows in vacancy indices pointing to better vacancies
+	    vacancy_indices (ndarray): indices of vacancies
+	    random_chooser (callable, optional):  function to return random number from array - keep default except when testing only.
+	
+	Returns:
+	    tuple: random better vacancy index
+	"""
 	if better_vancancy_indices.size != 0:
 		i = random_chooser(better_vancancy_indices, 1)
 		rand_better_vacancy_index = vacancy_indices[i][0]
@@ -104,6 +157,7 @@ def _get_random_better_vacancy_index(better_vancancy_indices, vacancy_indices, r
 
 
 def _move(array, agent_index, vacancy_index):
+	"""Swap agent at agent_index and vacancy at vacancy_index in array"""
 	agent_index = tuple(agent_index)
 	vacancy_index = tuple(vacancy_index)
 
@@ -112,6 +166,13 @@ def _move(array, agent_index, vacancy_index):
 
 
 def _update_result(result, array, agent_indices):
+	"""Store current segregation measures in segregation result object
+	
+	Args:
+	    result (SegregationResult): result object
+	    array (ndarray): array
+	    agent_indices (ndarray): indices of agents in array
+	"""
 	switch_rate_average = sm.switch_rate_average(array, agent_indices)
 	entropy_average = sm.entropy_average(array, agent_indices)
 

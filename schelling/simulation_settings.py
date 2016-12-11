@@ -1,4 +1,8 @@
 class SimulationSettings:
+	"""
+	This class stores settings for simulation.
+	Pass to the run_simulation function.
+	"""
 	def __init__(
 		self,
 		grid_size=10,

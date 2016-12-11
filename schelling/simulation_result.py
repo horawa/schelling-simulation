@@ -1,7 +1,11 @@
 import json
 import os
 
-class SimulationResult():
+class SimulationResult:
+	"""
+	This class stores the values of segregation measures 
+	calculated for each iteration of simulation
+	"""
 	def __init__(self):
 		self.switch_rate_average = []
 		self.entropy_average = []

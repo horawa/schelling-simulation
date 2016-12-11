@@ -111,6 +111,17 @@ def create_spiked_utility(spike):
 
 
 def get_utility_for_array(utility_function, array):
+	"""A wrapper for utility functions.
+	The returned function gets unlike neighbor fraction for specified index
+	in array and optionally agent type and returns the value to the utility function.
+	
+	Args:
+	    utility_function (callable): function to wrap - (0, 1) -> (0, 1)
+	    array (ndarray): array
+	
+	Returns:
+	    function: wrapped utility function
+	"""
 	def utility(index, agent_type=None):
 		return utility_function(get_unlike_neighbor_fraction(array, index, agent_type=agent_type))
 	return utility

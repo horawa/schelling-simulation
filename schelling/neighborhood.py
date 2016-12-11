@@ -3,7 +3,7 @@ from .array_utils import get_agent_indices
 
 def get_neighborhood(array, agent_index, radius=1):
 	"""Get neighborhood of agent with specified radius.
-	Neighboorhood a square with side 2*radius + 1 and center at agent_index.
+	Neighboorhood is a square with side 2*radius + 1 and center at agent_index.
 	The retured neighborhood is a 2d array.	
 	
 	Args:
@@ -46,7 +46,7 @@ def get_neighborhood(array, agent_index, radius=1):
 
 def get_neighborhood_exclusive(array, agent_index, radius=1):
 	"""Get neighborhood of agent with specified radius.
-	Neighboorhood a square with side 2*radius + 1 and center at agent_index.
+	Neighboorhood is a square with side 2*radius + 1 and center at agent_index.
 	The retured neighborhood is a 2d list with agent excluded -- structure is not preserved.	
 	
 	Args:
@@ -78,6 +78,19 @@ def get_neighborhood_exclusive(array, agent_index, radius=1):
 
 
 def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1):
+	"""Get the fraction neighbors not of specified agent type in the 
+	neighborhood  of the specified index. If agent type, is not given, 
+	the agent type at specifed index will be used.
+	
+	Args:
+	    array (ndarray): array
+	    agent_index (tuple): index of agent in array
+	    agent_type (int, optional): Type of agent
+	    radius (int, optional): Radius of neighborhood
+	
+	Returns:
+	    TYPE: The fraction of neighbors not of specified type
+	"""
 	if agent_type is None:
 		agent_type = array[tuple(agent_index)]
 		neighbor_count = -1 # agent will be excluded from neighbor count

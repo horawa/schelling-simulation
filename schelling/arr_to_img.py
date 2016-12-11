@@ -4,6 +4,7 @@ from skimage.transform import resize
 
 
 def _get_color(color_index):
+	"""Get color in W, R, G, B, C, M, Y, K for indices 0-7"""
 	try:
 		return _get_color.colors[color_index]
 	except AttributeError:

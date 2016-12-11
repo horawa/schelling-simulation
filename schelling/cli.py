@@ -41,7 +41,8 @@ _utility_function_creators = {
 	help='Periodically print iteration number and segregation measures to console. Off by default.')
 def simulation(grid_size, vacancy_proportion, agent_proportion, initial_random_allocation,
 	utility_function, satisficers, move_to_random, radius, iterations, save_to, save_period, verbose):
-
+	"""Command line interface for the Schelling simulation."""
+	
 	ut_name = utility_function[0]
 	ut_arg = utility_function[1]
 
