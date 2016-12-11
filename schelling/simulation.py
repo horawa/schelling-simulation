@@ -232,7 +232,7 @@ def _random_picker(array_1D):
 	return rand.choice(array_1D, 1)[0]
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
 	"""
 	This will run the Schelling Model simulation for 10000 iterations.
 	Every 100 iterations the state will be printed to console  and the array 
