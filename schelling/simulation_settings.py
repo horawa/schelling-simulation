@@ -29,7 +29,7 @@ class SimulationSettings:
 
 	def validate(self):
 		def is_not_bool(val):
-			return val != True and val != False:
+			return val != True and val != False
 
 		if self.grid_size < 1:
 			raise ValueError("Grid size must be > 1")
