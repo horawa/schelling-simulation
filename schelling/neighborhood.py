@@ -47,7 +47,8 @@ def get_neighborhood(array, agent_index, radius=1):
 def get_neighborhood_exclusive(array, agent_index, radius=1):
 	"""Get neighborhood of agent with specified radius.
 	Neighboorhood is a square with side 2*radius + 1 and center at agent_index.
-	The retured neighborhood is a 2d list with agent excluded -- structure is not preserved.	
+	The retured neighborhood is a 2d list with agent excluded -- structure is 
+		not preserved.	
 	
 	Args:
 	    array (ndarray): array of agents
@@ -93,6 +94,8 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1):
 	"""
 	if agent_type is None:
 		agent_type = array[tuple(agent_index)]
+
+	if array[tuple(agent_index)] != 0:
 		neighbor_count = -1 # agent will be excluded from neighbor count
 	else:
 		neighbor_count = 0
@@ -102,13 +105,14 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1):
 	not_vacant = neighborhood != 0
 	neighbor_count += np.count_nonzero(not_vacant)
 
-	unlike_agent_count = np.count_nonzero(np.logical_and(not_vacant, neighborhood != agent_type))
+	unlike_agent_count = np.count_nonzero(np.logical_and(not_vacant, 
+		neighborhood != agent_type))
 
 	# if agent has no neighbors - unlike neighbor fraction = 0
 	if neighbor_count == 0:
 		return 0.0
 
-	unlike_agent_fraction = unlike_agent_count / neighbor_count # size excluding agent
+	unlike_agent_fraction = unlike_agent_count / neighbor_count
 
 	return unlike_agent_fraction
 
