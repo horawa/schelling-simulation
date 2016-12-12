@@ -54,9 +54,9 @@ class SimulationResult:
 		output = ""
 		for measure_name, measure_values in self.__dict__.items():
 			if measure_values:
-				seg_final_value = str(round(measure_values[-1], 4))
+				seg_last_value = str(round(measure_values[-1], 4))
 			else:
-				seg_final_value = ""
-			output += (measure_name + ": " + seg_final_value + os.linesep)
+				seg_last_value = ""
+			output += (measure_name + ": " + seg_last_value + os.linesep)
 
 		return output
