@@ -13,6 +13,8 @@ class SimulationResult:
 		self.entropy_average = []
 		self.ghetto_rate = []
 		self.clusters = []
+		self.distance_average = []
+		self.mix_deviation_average = []
 
 
 	def save_JSON(self, output_path):

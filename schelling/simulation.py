@@ -240,11 +240,15 @@ def _update_result(result, array, agent_indices):
 	entropy_average = sm.entropy_average(array, agent_indices)
 	ghetto_rate = sm.ghetto_rate(array, agent_indices)
 	clusters = sm.clusters(array)
+	distance_average = sm.distance_average(array)
+	mix_deviation_average = sm.mix_deviation_average(array, agent_indices)
 
 	result.switch_rate_average.append(switch_rate_average)
 	result.entropy_average.append(entropy_average)
 	result.ghetto_rate.append(ghetto_rate)
 	result.clusters.append(clusters)
+	result.distance_average.append(distance_average)
+	result.mix_deviation_average.append(mix_deviation_average)
 
 
 def _first_picker(array_1D):
