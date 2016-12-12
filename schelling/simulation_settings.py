@@ -1,3 +1,5 @@
+from .agent_distributions import get_distribution_including_vacancies
+
 class SimulationSettings:
 	"""
 	This class stores settings for simulation.
@@ -59,10 +61,6 @@ class SimulationSettings:
 			raise ValueError("Iterations must be > 1")
 
 	def get_agent_type_proportions(self):
-		agent_proportion = 1.0 - self.vacancy_proportion
-		agent_type_proporitons = \
-			[p * agent_proportion for p in self.agent_proportions]
-		agent_type_proporitons = \
-			[self.vacancy_proportion] + agent_type_proporitons
-		return tuple(agent_type_proporitons)
+		return get_distribution_including_vacancies(self.vacancy_proportion, 
+			self.agent_proportions)
 
