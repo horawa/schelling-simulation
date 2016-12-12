@@ -54,7 +54,7 @@ def to_image(array, size=800):
 	return image_array
 
 
-def image_save(image_array, output):
+def image_save(image_array, output): # pragma: nocover
 	"""Save image to file
 	
 	Args:
