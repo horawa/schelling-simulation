@@ -29,7 +29,7 @@ class SimulationResult:
 		self.__dict__ = json_data
 
 
-	def plot_measures(self):
+	def plot_measures(self): # pragma: nocover
 		measures = self.__dict__.items()
 		plots = len(measures)
 
