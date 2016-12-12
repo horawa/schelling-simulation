@@ -1,6 +1,7 @@
 import unittest
 from ..segregation_measures import (entropy, switch_rate, distance_average,
-	entropy_average, switch_rate_average, ghetto_rate, clusters, distance)
+	entropy_average, switch_rate_average, ghetto_rate, clusters, distance,
+	mix_deviation, mix_deviation_average)
 from ..neighborhood import get_neighborhood
 from numpy import array, mean
 from math import log
@@ -56,6 +57,12 @@ class SegregationMeasureTest(unittest.TestCase):
 
 	def test_distance_average(self):
 		self.check_average_expected_output(distance, distance_average)
+
+
+	def test_mix_deviation_averate(self):
+		self.check_average_expected_output(
+			mix_deviation, mix_deviation_average)
+
 
 
 	def test_entropy_radius1(self):
@@ -183,7 +190,7 @@ class SegregationMeasureTest(unittest.TestCase):
 			((0, 2), 2),
 			((1, 0), 1),
 			((1, 1), 1),
-			((1, 2), 1),
+			((1, 3), 1),
 			((2, 1), 1),
 			((2, 2), 1),
 			((3, 1), 1),
@@ -212,6 +219,25 @@ class SegregationMeasureTest(unittest.TestCase):
 		]
 
 		check_output(test_array1, parameters1)
+
+
+	def test_mix_deviation(self):
+		parameters = [
+			((0, 1), 0.5),
+			((0, 2), 0.5),
+			((1, 0), 1/6),
+			((1, 1), 0.1),
+			((1, 3), 0.0),
+			((2, 1), 0.1),
+			((2, 2), 0.1),
+			((3, 1), 0.5),
+			((3, 2), 1/6),
+		]
+
+		for agent_index, expected_output in parameters:
+			output = mix_deviation(self.test_array, agent_index)
+			with self.subTest(i=agent_index):
+				self.assertAlmostEqual(output, expected_output)
 
 
 if __name__ == '__main__':
