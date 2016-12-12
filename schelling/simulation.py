@@ -42,8 +42,13 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 	for i in range(settings.iterations):
 		callback(array, result, i)
-		update_array(array, settings.utility_function, settings.radius, result, 
-			agent_picker, vacancy_picker, satisficers=settings.satisficers)
+		is_simulation_halted = update_array(array, settings.utility_function, 
+			settings.radius, result, agent_picker, vacancy_picker, 
+			satisficers=settings.satisficers)
+
+		# if no further moves are possible, exit simulation early
+		if is_simulation_halted:
+			break
 
 	return result
 
@@ -70,8 +75,9 @@ def update_array(array, utility_function, radius, result, agent_picker,
 	unsatisfied_agent_indices = _get_unsatisfied_agent_indices(utility, 
 		agent_indices)
 
+	# if all agents satisfied, end simulation
 	if unsatisfied_agent_indices.size == 0:
-		return
+		return True
 
 	agent_index = _pick_agent_index_to_move(agent_indices, 
 		unsatisfied_agent_indices, agent_picker)
@@ -83,12 +89,29 @@ def update_array(array, utility_function, radius, result, agent_picker,
 		utility, vacancies)
 
 	if better_vacancies.size == 0:
-		return
+		# if relocation regime is move first, and the first agent has no better
+		# vacancy, the simulation will halt. If this happens, try all
+		# unsatisfied agents in list and pick the first one which can find a
+		# better vacancy. If none have a better vacancy, end the simulation.
+		if agent_picker is _first_picker:
+			for index in unsatisfied_agent_indices:
+				agent_index = agent_indices[index]
+				better_vacancies = _get_better_vacancies(array, agent_index, 
+					utility, vacancies)
+
+				if better_vacancies.size != 0:
+					break
+			else:
+				return True
+		else:
+			return False
 
 	better_vacancy = _pick_better_vacancy_index(better_vacancies, 
 		vacancies, vacancy_picker)
 
 	_move(array, agent_index, better_vacancy)
+
+	return False
 
 
 def _get_unsatisfied_agent_indices(utility, agent_indices, satisficers=False):
