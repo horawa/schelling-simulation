@@ -240,7 +240,7 @@ def _update_result(result, array, agent_indices):
 	entropy_average = sm.entropy_average(array, agent_indices)
 	ghetto_rate = sm.ghetto_rate(array, agent_indices)
 	clusters = sm.clusters(array)
-	distance_average = sm.distance_average(array)
+	distance_average = sm.distance_average(array, agent_indices)
 	mix_deviation_average = sm.mix_deviation_average(array, agent_indices)
 
 	result.switch_rate_average.append(switch_rate_average)
