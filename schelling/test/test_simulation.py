@@ -1,5 +1,5 @@
 import unittest
-from ..simulation import (_get_unsatisfied_agent_indices, 
+from ..simulation import (_get_unsatisfied_agent_indices, update_array,
 	_pick_agent_index_to_move, _get_better_vacancies, run_simulation,
 	_pick_better_vacancy_index, _move, _random_picker, _first_picker)
 import numpy as np
@@ -8,6 +8,7 @@ from ..array_utils import get_agent_indices, get_vacancy_indices
 from ..neighborhood import get_unlike_neighbor_fraction
 from ..utility_functions import get_utility_for_array, create_flat_utility
 from ..simulation_settings import SimulationSettings
+from ..simulation_result import SimulationResult
 
 
 class SimulationTestCase(unittest.TestCase):
@@ -273,6 +274,264 @@ class SimulationTestCase(unittest.TestCase):
 		clusters = [3, 4, 4, 4, 3] + ([4, 3] * 100)
 		with self.subTest():
 			self.assertEqual(result.clusters, clusters)
+
+
+	def test_simulation_halted(self):
+		all_satisfied_array = np.array([
+				[0, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 1, 1],
+			])
+		
+		callback_count = [0]
+		expected_callback_count = 1
+
+		def callback(array, result, iteration):
+			expected_output = all_satisfied_array
+			with self.subTest():	
+				self.assertTrue(np.array_equal(array, expected_output))
+			callback_count[0] += 1
+
+		settings = SimulationSettings(		
+			grid_size=4,
+			vacancy_proportion=0.5,
+			agent_proportions=(1.0,),
+			initial_random_allocation=False,
+			utility_function=create_flat_utility(0.5),
+			satisficers=False,
+			pick_random=False,
+			move_to_random=False,
+			radius=1,
+			iterations=100
+		)
+
+		result = run_simulation(settings, callback)
+
+		clusters = [1]
+		with self.subTest():
+			self.assertEqual(result.clusters, clusters)
+
+		with self.subTest():
+			self.assertEqual(callback_count[0], expected_callback_count)
+
+
+	def test_simulation_random_agent_picker(self):
+		array = [
+			np.array([
+				[0, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 2, 2]
+			]),
+		]
+
+		possible_states = [
+			np.array([
+				[1, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 0, 1],
+				[1, 1, 2, 2]
+			]),
+			np.array([
+				[1, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 0],
+				[1, 1, 2, 2]
+			]),
+			np.array([
+				[2, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 0, 2]
+			]),
+			np.array([
+				[2, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 2, 0]
+			]),
+		]
+
+		possible_states_reached = set()
+		
+		def callback(array, result, iteration):
+			if iteration == 1:
+				with self.subTest(out=np.copy(array)):
+					is_possible_state = False
+					for i, state in enumerate(possible_states):
+						if np.array_equal(array, state):
+							is_possible_state = True
+							possible_states_reached.add(i)
+							break
+					self.assertTrue(is_possible_state)
+
+
+		settings = SimulationSettings(		
+			grid_size=4,
+			vacancy_proportion=0.5,
+			agent_proportions=(0.75, 0.25),
+			initial_random_allocation=False,
+			utility_function=create_flat_utility(3/8),
+			satisficers=False,
+			pick_random=True,
+			move_to_random=False,
+			radius=1,
+			iterations=2
+		)
+
+		# Assume all states should be reached in 30 tries
+		for i in range(30):
+			run_simulation(settings, callback)
+
+		with self.subTest():
+			self.assertEqual(len(possible_states_reached), len(possible_states))
+			
+
+	def test_simulation_random_vacancy_picker(self):
+		array = [
+			np.array([
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 1, 1],
+				[1, 1, 2, 2]
+			]),
+		]
+
+		possible_states = [
+			np.array([
+				[1, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 0, 1],
+				[1, 1, 2, 2]
+			]),
+			np.array([
+				[0, 1, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 0, 1],
+				[1, 1, 2, 2]
+			]),
+			np.array([
+				[0, 0, 1, 0],
+				[1, 1, 1, 1],
+				[1, 1, 0, 1],
+				[1, 1, 2, 2]
+			]),
+			np.array([
+				[0, 0, 0, 1],
+				[1, 1, 1, 1],
+				[1, 1, 0, 1],
+				[1, 1, 2, 2]
+			]),
+		]
+
+		possible_states_reached = set()
+		
+		def callback(array, result, iteration):
+			if iteration == 1:
+				with self.subTest(out=np.copy(array)):
+					is_possible_state = False
+					for i, state in enumerate(possible_states):
+						if np.array_equal(array, state):
+							is_possible_state = True
+							possible_states_reached.add(i)
+							break
+					self.assertTrue(is_possible_state)
+
+
+		settings = SimulationSettings(		
+			grid_size=4,
+			vacancy_proportion=0.25,
+			agent_proportions=(10/12, 2/12),
+			initial_random_allocation=False,
+			utility_function=create_flat_utility(1/8),
+			satisficers=False,
+			pick_random=False,
+			move_to_random=True,
+			radius=1,
+			iterations=2
+		)
+
+		# Assume all states should be reached in 30 tries
+		for i in range(30):
+			run_simulation(settings, callback)
+
+		with self.subTest():
+			self.assertEqual(len(possible_states_reached), len(possible_states))
+
+
+	def test_update_array_all_agents_satisfied_should_end_simulation(self):
+		all_satisfied_array = np.array([
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 1, 1],
+				[0, 0, 0, 0]
+			])
+		result = SimulationResult()
+
+		expected_output = True
+
+		output = update_array(all_satisfied_array, create_flat_utility(0.5), 
+			1, result, _first_picker, _first_picker, False)
+
+		self.assertEqual(output, expected_output)
+
+	
+	def test_update_array_no_better_vacancies_first_picker(self):
+		no_better_vacancies_array = np.array([
+				[0, 2, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 1, 1],
+				[0, 2, 0, 2]
+			])
+		result = SimulationResult()
+
+		expected_output = True
+
+		output = update_array(no_better_vacancies_array, 
+			create_flat_utility(0.5), 1, result, _first_picker, 
+			_first_picker, False)
+
+		self.assertEqual(output, expected_output)
+
+
+	def test_update_array_no_better_vacancies_for_first_agent(self):
+		no_better_vacancies_for_first_agent_array = np.array([
+				[1, 1, 2, 0],
+				[2, 2, 2, 1],
+				[1, 1, 1, 1],
+				[1, 2, 1, 2]
+			])
+		result = SimulationResult()
+
+		expected_output = False
+
+		output = update_array(no_better_vacancies_for_first_agent_array, 
+			create_flat_utility(0.5), 1, result, _first_picker, 
+			_first_picker, False)
+
+		self.assertEqual(output, expected_output)
+
+
+	def test_no_better_vacancies_not_first_picker(self):
+		def custom_first_picker(array_1D):
+			return _first_picker(array_1D)
+
+		no_better_vacancies_array = np.array([
+				[0, 2, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 1, 1],
+				[0, 2, 0, 2]
+			])
+		result = SimulationResult()
+
+		expected_output = False
+
+		output = update_array(no_better_vacancies_array, 
+			create_flat_utility(0.5), 1, result, custom_first_picker, 
+			custom_first_picker, False)
+
+		self.assertEqual(output, expected_output)
 
 
 if __name__ == '__main__':
