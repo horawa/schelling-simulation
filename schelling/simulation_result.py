@@ -27,6 +27,7 @@ class SimulationResult:
 	def parse_JSON(self, input_path):
 		file = open(input_path)
 		data = file.read()
+		file.close()
 		json_data = json.loads(data)
 		self.__dict__ = json_data
 
