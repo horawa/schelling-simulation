@@ -6,17 +6,17 @@ class SimulationSettings:
 	Pass to the run_simulation function.
 	"""
 	def __init__(
-		self,
-		grid_size=10,
-		vacancy_proportion=0.2,
-		agent_proportions=(0.5, 0.5),
-		initial_random_allocation=True,
-		utility_function=None,
-		satisficers=False,
-		pick_random=True,
-		move_to_random=True,
-		radius=1,
-		iterations=10000):
+			self,
+			grid_size=10,
+			vacancy_proportion=0.2,
+			agent_proportions=(0.5, 0.5),
+			initial_random_allocation=True,
+			utility_function=(lambda f: 0.0),
+			satisficers=False,
+			pick_random=True,
+			move_to_random=True,
+			radius=1,
+			iterations=10000):
 
 		self.grid_size = grid_size
 		self.vacancy_proportion = vacancy_proportion
@@ -47,6 +47,9 @@ class SimulationSettings:
 
 		if not callable(self.utility_function):
 			raise ValueError("Utility function must be callable")
+
+		if is_not_bool(self.satisficers):
+			raise ValueError("Satisficers must be true or false")
 
 		if is_not_bool(self.pick_random):
 			raise ValueError("Pick random must be true or false")
