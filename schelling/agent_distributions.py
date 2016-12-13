@@ -71,6 +71,25 @@ def get_normal_distribution(std_dev):
 	return agent_fractions
 
 
+def get_linear_distribution(agent_count):
+	if agent_count < 1 or agent_count > 7:
+		raise ValueError(
+			"Only agent counts between 1 and 7 currently supported.")
+		
+	def linear_func(x):
+		# 1 = agent_count * h / 2
+		h = 2 / agent_count
+		gradient = -h / agent_count
+		return gradient * x + h
+
+	agent_fractions = []
+	for agent in range(agent_count):
+		fraction = integrate.quad(linear_func, agent, agent + 1)[0]
+		agent_fractions.append(fraction)
+
+	return agent_fractions
+
+
 def get_distribution_including_vacancies(vacancy_proportion, distribution):
 	agent_proportion = 1.0 - vacancy_proportion
 	agent_type_proporitons = \
