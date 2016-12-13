@@ -16,6 +16,7 @@ class SimulationSettings:
 			pick_random=True,
 			move_to_random=True,
 			radius=1,
+			count_vacancies=False,
 			iterations=10000):
 
 		self.grid_size = grid_size
@@ -27,6 +28,7 @@ class SimulationSettings:
 		self.pick_random = pick_random
 		self.move_to_random = move_to_random
 		self.radius = radius
+		self.count_vacancies = count_vacancies
 		self.iterations = iterations
 
 	def validate(self):
@@ -59,6 +61,9 @@ class SimulationSettings:
 
 		if self.radius < 1:
 			raise ValueError("Radius must be > 1")
+
+		if is_not_bool(self.count_vacancies):
+			raise ValueError("Count vacancies must be true or false")
 
 		if self.iterations < 1:
 			raise ValueError("Iterations must be > 1")

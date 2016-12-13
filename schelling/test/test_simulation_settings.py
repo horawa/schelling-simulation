@@ -17,6 +17,7 @@ class SettingsTestCase(unittest.TestCase):
 			("move_to_random", 'asdf'),
 			("radius", 0),
 			("radius", -100),
+			("count_vacancies", 'asdf'),
 			("iterations", -1)
 		]
 
