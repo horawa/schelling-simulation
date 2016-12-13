@@ -78,7 +78,8 @@ def get_neighborhood_exclusive(array, agent_index, radius=1):
 	return neighborhood
 
 
-def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1):
+def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1, 
+		count_vacancies=False):
 	"""Get the fraction neighbors not of specified agent type in the 
 	neighborhood  of the specified index. If agent type, is not given, 
 	the agent type at specifed index will be used.
@@ -95,15 +96,21 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1):
 	if agent_type is None:
 		agent_type = array[tuple(agent_index)]
 
-	if array[tuple(agent_index)] != 0:
-		neighbor_count = -1 # agent gwill be excluded from neighbor count
-	else:
-		neighbor_count = 0
+	# if array[tuple(agent_index)] != 0:
+	# 	neighbor_count = -1 # agent will be excluded from neighbor count
+	# else:
+	# 	neighbor_count = 0
 
 	neighborhood = get_neighborhood(array, tuple(agent_index), radius)
 
 	not_vacant = neighborhood != 0
-	neighbor_count += np.count_nonzero(not_vacant)
+
+	if count_vacancies:
+		neighbor_count = (2*radius + 1)**2 - 1
+	else:
+		neighbor_count = np.count_nonzero(not_vacant)
+		if array[tuple(agent_index)] != 0:
+			neighbor_count -= 1 # agent will be excluded from neighbor count
 
 	unlike_agent_count = np.count_nonzero(np.logical_and(not_vacant, 
 		neighborhood != agent_type))

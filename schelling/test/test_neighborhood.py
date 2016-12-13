@@ -130,5 +130,24 @@ class GetNeighborhoodTest(unittest.TestCase):
 				self.assertAlmostEqual(output, expected_output)
 
 
+	def test_get_unlike_agent_fraction_count_vacancies(self):
+		agent_fractions = [
+			((0,1), 0),
+			((0,2), 0),
+			((1,0), 1/8),
+			((1,1), 2/8),
+			((1,3), 1/8),
+			((2,1), 3/8),
+			((2,2), 3/8),
+			((3,1), 3/8),
+			((3,2), 1/8),
+		]
+
+		for agent_index, expected_output in agent_fractions:
+			with self.subTest(name='unlike_fraction', index=agent_index):
+				output = get_unlike_neighbor_fraction(self.frac_test_array, 
+					agent_index, count_vacancies=True)
+				self.assertAlmostEqual(output, expected_output)
+
 if __name__ == '__main__':
 	unittest.main()
