@@ -76,6 +76,7 @@ def switch_rate(array, agent_index):
 	Returns:
 	    int: Switch rate
 	"""
+	# TODO reimplement to get rid of get_neighborhood_exclusive
 	array_rows = array.shape[0]
 	array_cols = array.shape[1]
 
