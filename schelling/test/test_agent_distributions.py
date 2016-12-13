@@ -90,6 +90,19 @@ class DistributionsTestCase(unittest.TestCase):
 					self.assertTrue(vals_close)				
 
 
+	def test_validation(self):
+		parameters = [
+			(get_uniform_distribution, [(0,), (-10,), (8,), (100,)]),
+			(get_normal_distribution, [(0,), (-10,), (-50,), (-100,)]),
+			(get_exponential_distribution, [(0,), (-10,), (-50,), (-100,)]),
+		]
+
+		for function, params_list in parameters:
+			for params in params_list:
+				with self.subTest(f=function, p=params):
+					with self.assertRaises(ValueError):
+						function(*params)
+						
 
 	def test_get_distribution_including_vacancies(self):
 		parameters = [
