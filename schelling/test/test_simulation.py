@@ -1,8 +1,11 @@
 import unittest
+import math
+import numpy as np
+
 from ..simulation import (_get_unsatisfied_agent_indices, update_array,
 	_pick_agent_index_to_move, _get_better_vacancies, run_simulation,
-	_pick_better_vacancy_index, _move, _random_picker, _first_picker)
-import numpy as np
+	_pick_better_vacancy_index, _move, _random_picker, _first_picker, 
+	_create_roulette_picker)
 import schelling.utility_functions as ut
 from ..array_utils import get_agent_indices, get_vacancy_indices
 from ..neighborhood import get_unlike_neighbor_fraction
@@ -217,6 +220,108 @@ class SimulationTestCase(unittest.TestCase):
 			picked = _first_picker(array)
 			with self.subTest(data=data, picked=picked):
 				self.assertEqual(picked, data[0])
+
+
+	def test_roulette_picker_weight0(self):
+		agent_indices = [
+			(1, 2),
+			(7, 8),
+			(4, 5),
+			(8, 9),
+		]
+
+		agent_indices_sorted = [
+			(8, 9),
+			(7, 8),
+			(4, 5),
+			(1, 2),
+		]
+
+		agent_utilities = [
+			0.75, 0.25, 0.5, 0.1,
+		]
+
+		def utility(agent_index):
+			i = agent_indices.index(tuple(agent_index))
+			return agent_utilities[i]
+
+
+
+		agent_probabilities = [
+			0.25 / 2.4, 0.75 / 2.4, 0.5/2.4, 0.9/2.4,
+		]
+
+		agent_inv_utilities = [0.25, 0.75, 0.5, 0.9]
+		
+		agent_cum_inv_utilities = [0.9, 1.65, 2.15, 2.4]
+
+		picked_values = np.arange(0, 2.6, 0.2)
+
+		for picked_value in picked_values:
+			def uniform_dist(hibound):
+				return picked_value
+
+			roulette_picker = _create_roulette_picker(0.0, utility, 
+				uniform_dist)
+
+			index = -1
+			for i in range(len(agent_cum_inv_utilities)):
+				if picked_value <= agent_cum_inv_utilities[i]:
+					index = i
+					break
+			
+			expected_output = agent_indices_sorted[index]
+			output = roulette_picker(np.array(agent_indices))
+			with self.subTest(picked_value=picked_value):
+				self.assertEqual(output, expected_output)
+
+	def test_roulette_picker_weight01(self):
+		agent_indices = [
+			(1, 2),
+			(7, 8),
+			(4, 5),
+			(8, 9),
+			(3, 4),
+		]
+
+		agent_indices_sorted = [
+			(8, 9),
+			(7, 8),
+			(4, 5),
+			(1, 2),
+			(3, 4),
+		]
+
+		agent_utilities = [
+			0.75, 0.25, 0.5, 0.1, 1.0,
+		]
+
+		def utility(agent_index):
+			i = agent_indices.index(tuple(agent_index))
+			return agent_utilities[i]
+		
+		agent_cum_weights = [1.0, 1.85, 2.45, 2.8, 2.9]
+
+		picked_values = np.arange(0, 3.0, 0.1)
+
+		for picked_value in picked_values:
+			def uniform_dist(hibound):
+				return picked_value
+
+			roulette_picker = _create_roulette_picker(0.1, utility, 
+				uniform_dist)
+
+			index = -1
+			for i in range(len(agent_cum_weights)):
+				if picked_value < agent_cum_weights[i] or math.isclose(
+						picked_value,agent_cum_weights[i]):
+					index = i
+					break
+			
+			expected_output = agent_indices_sorted[index]
+			output = roulette_picker(np.array(agent_indices))
+			with self.subTest(picked_value=picked_value):
+				self.assertEqual(output, expected_output)
 
 
 	def test_run_simulation(self):

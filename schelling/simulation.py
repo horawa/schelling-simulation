@@ -259,6 +259,31 @@ def _random_picker(agent_indices):
 	rand_index_index = rand.randint(0, agent_indices.shape[0])
 	return tuple(agent_indices[rand_index_index])
 
+def _create_roulette_picker(base_weight, utility, uniform_dist=rand.uniform):
+	"""Agents will be assigned the weight of 1 - utility + base_weight"""
+
+	def roulette_picker(agent_indices):
+		agent_utilities = np.apply_along_axis(utility, 1, agent_indices)
+		total_utilities = np.sum(agent_utilities)
+		
+		sorted_utility_indices = np.argsort(agent_utilities)
+
+		total_inverse_utilities = (
+			len(agent_utilities) * (1 + base_weight)) - total_utilities
+		picked_total = uniform_dist(total_inverse_utilities)
+
+		current_total_weight = 0
+		for index in sorted_utility_indices:
+			agent_weight = 1 - agent_utilities[index] + base_weight
+			current_total_weight += agent_weight
+
+			if current_total_weight >= picked_total:
+				return tuple(agent_indices[index])
+
+		# if picked value out of range (float error), pick last agent index
+		return tuple(agent_indices[sorted_utility_indices[-1]])
+
+	return roulette_picker
 
 def get_save_state_callback(save_directory, save_period, 
 		iterations, verbose=False):
