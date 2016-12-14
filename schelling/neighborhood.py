@@ -91,15 +91,10 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1,
 	    radius (int, optional): Radius of neighborhood
 	
 	Returns:
-	    TYPE: The fraction of neighbors not of specified type
+	    float: The fraction of neighbors not of specified type
 	"""
 	if agent_type is None:
 		agent_type = array[tuple(agent_index)]
-
-	# if array[tuple(agent_index)] != 0:
-	# 	neighbor_count = -1 # agent will be excluded from neighbor count
-	# else:
-	# 	neighbor_count = 0
 
 	neighborhood = get_neighborhood(array, tuple(agent_index), radius)
 
