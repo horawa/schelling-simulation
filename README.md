@@ -53,6 +53,9 @@ Options:
   -r, --radius INTEGER            Radius of neighborhood that agents will
                                   consider. Default = 1 (only directly
                                   adjacent neighbors).
+  --count-vacancies               Defines, if vacancies should be counted as
+                                  neighbors, when calculating the fraction of
+                                  unlike neighbors.
   -i, --iterations INTEGER        Number of iterations. One agent moves during
                                   an iteration. Default = 10000
   --save-to PATH                  Directory to save simulation output. Default
@@ -70,40 +73,34 @@ Options:
 ### Example Code
 
 ```python
-  """
-  This will run the Schelling Model simulation for 10000 iterations.
-  Every 100 iterations the state will be printed to console  and the array 
-  will be saved as an image.
-  The simulation result, containing segregation measures for each iteration
-  will be saved as JSON and a plot will be shown.
-  """
-  from schelling.utility_functions import create_flat_utility
-  from schelling.arr_to_img import image_save, to_image
-  from schelling.simulation_settings import SimulationSettings
-  import os
+"""
+This will run the Schelling Model simulation for 10000 iterations.
+Every 100 iterations the state will be printed to console  and the array 
+will be saved as an image.
+The simulation result, containing segregation measures for each iteration
+will be saved as JSON and a plot will be shown.
+"""
+from schelling.simulation import run_simulation, get_save_state_callback
+from schelling.utility_functions import create_flat_utility
+from schelling.arr_to_img import image_save, to_image
+from schelling.simulation_settings import SimulationSettings
+import os
 
-  settings = SimulationSettings(
-      grid_size=40,
-      vacancy_proportion=0.2,
-      agent_proportions=(0.5, 0.5),
-      utility_function=create_flat_utility(5/8),
-      iterations=10000
-    )
+settings = SimulationSettings(
+    grid_size=40,
+    vacancy_proportion=0.2,
+    agent_proportions=(0.5, 0.5),
+    utility_function=create_flat_utility(5/8),
+    iterations=10000
+  )
 
-  save_period = 100
+save_period = 100
 
-  def save(array, result, iteration):
-    if iteration%save_period == 0:
-      # print status to console
-      print(iteration)
-      print(result)
+# assuming ./image/ directory exists
+save_callback = get_save_state_callback('./image/', save_period, 
+  settings.iterations, verbose=True)
 
-      # save output image (assuming ./image/ exists and is a directory)
-      output_file = os.path.join('./image/', 
-        str(iteration).zfill(4)+'.png')
-      image_save(to_image(array), output_file)
-
-  simulation_result = run_simulation(settings, callback=save)
-  simulation_result.save_JSON('result.json')
-  simulation_result.plot_measures()
+simulation_result = run_simulation(settings, callback=save_callback)
+simulation_result.save_JSON('result.json')
+simulation_result.plot_measures()
 ```
