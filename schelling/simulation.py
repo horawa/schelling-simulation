@@ -283,6 +283,7 @@ if __name__ == '__main__': # pragma: no cover
 	The simulation result, containing segregation measures for each iteration
 	will be saved as JSON and a plot will be shown.
 	"""
+	from schelling.simulation import run_simulation, get_save_state_callback
 	from schelling.utility_functions import create_flat_utility
 	from schelling.arr_to_img import image_save, to_image
 	from schelling.simulation_settings import SimulationSettings
