@@ -135,7 +135,7 @@ class SimulationTestCase(unittest.TestCase):
 
 		for agent_index, better_vacancy_indices in parameters:
 			for chosen_vacancy_index in range(len(better_vacancy_indices)):
-				def picker(array):
+				def picker(array, i=None):
 					return array[chosen_vacancy_index]
 
 				better_vacancies = vacancies[better_vacancy_indices]
@@ -591,7 +591,10 @@ class SimulationTestCase(unittest.TestCase):
 
 		expected_output = True
 
-		output = update_array(all_satisfied_array, create_flat_utility(0.5), 
+		utility = get_utility_for_array(create_flat_utility(0.5), 
+			all_satisfied_array)
+
+		output = update_array(all_satisfied_array, utility, 
 			1, result, _first_picker, _first_picker, False)
 
 		self.assertEqual(output, expected_output)
@@ -608,9 +611,11 @@ class SimulationTestCase(unittest.TestCase):
 
 		expected_output = True
 
+		utility = get_utility_for_array(create_flat_utility(0.5), 
+			no_better_vacancies_array)
+
 		output = update_array(no_better_vacancies_array, 
-			create_flat_utility(0.5), 1, result, _first_picker, 
-			_first_picker, False)
+			utility, 1, result, _first_picker, _first_picker, False)
 
 		self.assertEqual(output, expected_output)
 
@@ -626,8 +631,11 @@ class SimulationTestCase(unittest.TestCase):
 
 		expected_output = False
 
+		utility = get_utility_for_array(create_flat_utility(0.5), 
+			no_better_vacancies_for_first_agent_array)
+
 		output = update_array(no_better_vacancies_for_first_agent_array, 
-			create_flat_utility(0.5), 1, result, _first_picker, 
+			utility, 1, result, _first_picker, 
 			_first_picker, False)
 
 		self.assertEqual(output, expected_output)
@@ -647,8 +655,11 @@ class SimulationTestCase(unittest.TestCase):
 
 		expected_output = False
 
+		utility = get_utility_for_array(create_flat_utility(0.5),  
+			no_better_vacancies_array)
+
 		output = update_array(no_better_vacancies_array, 
-			create_flat_utility(0.5), 1, result, custom_first_picker, 
+			utility, 1, result, custom_first_picker, 
 			custom_first_picker, False)
 
 		self.assertEqual(output, expected_output)

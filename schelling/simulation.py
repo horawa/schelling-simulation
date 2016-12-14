@@ -32,6 +32,10 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 		settings.get_agent_type_proportions(), 
 		settings.initial_random_allocation)
 
+	# utility - function: (index) -> (0,1)
+	utility = get_utility_for_array(settings.utility_function, array, 
+		count_vacancies=settings.count_vacancies)
+
 	if settings.pick_random:
 		agent_picker=_random_picker
 	else:
@@ -44,7 +48,7 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 	for i in range(settings.iterations):
 		callback(array, result, i)
-		is_simulation_halted = update_array(array, settings.utility_function, 
+		is_simulation_halted = update_array(array, utility, 
 			settings.radius, result, agent_picker, vacancy_picker, 
 			satisficers=settings.satisficers)
 
@@ -55,21 +59,18 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	return result
 
 
-def update_array(array, utility_function, radius, result, agent_picker, 
+def update_array(array, utility, radius, result, agent_picker, 
 	vacancy_picker, satisficers=False):
 	"""Do a single iteration of the simulation.
 	
 	Args:
 	    array (ndarray): array
-	    utility_function (callable): utility function - (0, 1) -> (0, 1)
+	    utility (callable): utility function - (agent index) -> (0, 1)
 	    radius (int): neighborhood radius
 	    result (SimulationResult): result object to store segregation measures 
 	    	before updating array
 	    satisficers (bool, optional): satisficer behavior setting
 	"""
-	# utility - function: (index) -> (0,1)
-	utility = get_utility_for_array(utility_function, array)
-
 	agent_indices = get_agent_indices(array)
 
 	_update_result(result, array, agent_indices)
@@ -107,9 +108,9 @@ def update_array(array, utility_function, radius, result, agent_picker,
 				return True
 		else:
 			return False
-
+	agent_type = array[agent_index]	
 	better_vacancy = _pick_better_vacancy_index(better_vacancy_indices, 
-		vacancy_picker)
+		vacancy_picker, agent_type)
 
 	_move(array, agent_index, better_vacancy)
 
@@ -200,7 +201,7 @@ def _get_better_vacancies(array, agent_index, utility, vacancy_indices,
 
 
 def _pick_better_vacancy_index(better_vancancy_indices, 
-		vacancy_picker):
+		vacancy_picker, agent_type=None):
 	"""Get random index of row in vacancy indices pointing to better vacancy
 	
 	Args:
@@ -214,7 +215,8 @@ def _pick_better_vacancy_index(better_vancancy_indices,
 	    tuple: random better vacancy index
 	"""
 	if better_vancancy_indices.size != 0:
-		better_vacancy_index = vacancy_picker(better_vancancy_indices)
+		better_vacancy_index = vacancy_picker(better_vancancy_indices, 
+			agent_type)
 		return better_vacancy_index
 	return None
 
@@ -251,26 +253,29 @@ def _update_result(result, array, agent_indices):
 	result.mix_deviation_average.append(mix_deviation_average)
 
 
-def _first_picker(agent_indices):
+def _first_picker(agent_indices, agent_type=None):
 	return tuple(agent_indices[0])
 
 
-def _random_picker(agent_indices):
+def _random_picker(agent_indices, agent_type=None):
 	rand_index_index = rand.randint(0, agent_indices.shape[0])
 	return tuple(agent_indices[rand_index_index])
 
 def _create_roulette_picker(base_weight, utility, uniform_dist=rand.uniform):
 	"""Agents will be assigned the weight of 1 - utility + base_weight"""
 
-	def roulette_picker(agent_indices):
+	def roulette_picker(agent_indices, agent_type=None):
+		utility_f = lambda agent_index: utility(agent_index, 
+			agent_type=agent_type)
+		
 		agent_utilities = np.apply_along_axis(utility, 1, agent_indices)
 		total_utilities = np.sum(agent_utilities)
 		
 		sorted_utility_indices = np.argsort(agent_utilities)
 
-		total_inverse_utilities = (
+		total_weights = (
 			len(agent_utilities) * (1 + base_weight)) - total_utilities
-		picked_total = uniform_dist(total_inverse_utilities)
+		picked_total = uniform_dist(total_weights)
 
 		current_total_weight = 0
 		for index in sorted_utility_indices:
@@ -282,8 +287,8 @@ def _create_roulette_picker(base_weight, utility, uniform_dist=rand.uniform):
 
 		# if picked value out of range (float error), pick last agent index
 		return tuple(agent_indices[sorted_utility_indices[-1]])
-
 	return roulette_picker
+
 
 def get_save_state_callback(save_directory, save_period, 
 		iterations, verbose=False):
