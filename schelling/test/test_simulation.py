@@ -55,7 +55,7 @@ class SimulationTestCase(unittest.TestCase):
 
 			output = _get_unsatisfied_agent_indices(utility, agent_indices, 
 				satisficers=satisficers)
-			expected_output = np.array(expected_output)
+			expected_output = agent_indices[np.array(expected_output)]
 			with self.subTest(ut=utility_function, out=output, 
 					expected=expected_output):
 				self.assertTrue(np.array_equal(output, expected_output))
@@ -63,18 +63,17 @@ class SimulationTestCase(unittest.TestCase):
 
 	def test_pick_agent_index_to_move(self):
 		agent_indices = get_agent_indices(self.test_array)
-		unsatisfied_agent_indices = [0, 1, 2, 3, 5, 6, 7, 8]
+		unsatisfied_agent_index_indices = [0, 1, 2, 3, 5, 6, 7, 8]
+		unsatisfied_agent_indices = \
+			agent_indices[unsatisfied_agent_index_indices]
 
-		for unsatisfied_agent_index in unsatisfied_agent_indices:
-			
-			chosen_index = _first_picker(unsatisfied_agent_indices)
-			expected_agent_index = tuple(agent_indices[chosen_index])
-			
-			agent_index = _pick_agent_index_to_move(agent_indices, 
-				unsatisfied_agent_indices, _first_picker)
+		expected_agent_index = _first_picker(unsatisfied_agent_indices)		
 
-			with self.subTest(out=agent_index, expected=expected_agent_index):
-				self.assertEqual(expected_agent_index, agent_index)
+		agent_index = _pick_agent_index_to_move(unsatisfied_agent_indices, 
+			_first_picker)
+
+		with self.subTest(out=agent_index, expected=expected_agent_index):
+			self.assertEqual(expected_agent_index, agent_index)
 
 
 	def test_get_better_vacancies(self):
@@ -98,7 +97,7 @@ class SimulationTestCase(unittest.TestCase):
 			(6, np.array([4, 5, 6])),
 			(7, np.array([0, 1, 2, 3, 5])),
 			(8, np.array([4, 5, 6])),
-			]
+		]
 
 		self.check_better_vacancy_expected_output(parameters, True)
 
@@ -110,7 +109,8 @@ class SimulationTestCase(unittest.TestCase):
 		agent_indices = get_agent_indices(self.test_array)
 		vacancy_indices = get_vacancy_indices(self.test_array)
 
-		for unsatisfied_agent_index, expected_output in parameters:
+		for unsatisfied_agent_index, expected_output_indices in parameters:
+			expected_output = vacancy_indices[expected_output_indices]
 			i = agent_indices[unsatisfied_agent_index]
 
 			output = _get_better_vacancies(self.test_array, i, utility, 
@@ -130,24 +130,24 @@ class SimulationTestCase(unittest.TestCase):
 
 		vacancies = get_vacancy_indices(self.test_array)
 
-		for agent_index, better_vacancies in parameters:
-			for chosen_vacancy_index in range(len(better_vacancies)):
-				def picker(array_1D):
-					return array_1D[chosen_vacancy_index]
+		for agent_index, better_vacancy_indices in parameters:
+			for chosen_vacancy_index in range(len(better_vacancy_indices)):
+				def picker(array):
+					return array[chosen_vacancy_index]
 
-				output = _pick_better_vacancy_index(better_vacancies, 
-					vacancies, picker)
-				vacancy_index_index = better_vacancies[chosen_vacancy_index]
-				expected_output = vacancies[vacancy_index_index]
+				better_vacancies = vacancies[better_vacancy_indices]
+
+				output = _pick_better_vacancy_index(better_vacancies, picker)
+				expected_output = better_vacancies[chosen_vacancy_index]
 				
-				with self.subTest(chosen_index=chosen_vacancy_index,
+				with self.subTest(chosen_index=chosen_vacancy_index, 
+						agent=agent_index,
 						out=output, expected=expected_output):
 					self.assertTrue(np.array_equal(output, expected_output))
 
 		# Empty vacancy list
 		with self.subTest(name="Empty vacancy list should return none."):
-			output = _pick_better_vacancy_index(np.array([]), 
-				np.array([[0, 0], [1, 1]]), _first_picker)
+			output = _pick_better_vacancy_index(np.array([]), _first_picker)
 			self.assertTrue(output is None)
 
 
@@ -181,7 +181,15 @@ class SimulationTestCase(unittest.TestCase):
 
 
 	def test_random_picker(self):
-		data = [1, 2, 3, 4, 5]
+		data = [
+			(1, 2,), 
+			(3, 4,), 
+			(2, 3,),
+			(4, 5,),
+			(4, 5,),
+			(6, 7,),
+		]
+
 
 		array = np.array(data)
 		for i in range(20):
@@ -192,9 +200,16 @@ class SimulationTestCase(unittest.TestCase):
 
 	def test_first_picker(self):
 		parameters = [
-			[1, 2, 3, 4, 5],
-			[2, 3, 4, 5, 6],
-			[4, 5, 6, 7, 8],
+			[
+				(1, 2,), 
+				(3, 4,), 
+				(2, 3,),
+			],
+			[
+				(4, 5,),
+				(4, 5,),
+				(6, 7,),
+			],
 		]
 
 		for data in parameters:
