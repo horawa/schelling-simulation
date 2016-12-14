@@ -1,12 +1,14 @@
 import numpy as np
 import numpy.random as rand
 import math
+import os
 
 from .array_utils import get_agent_indices, get_vacancy_indices
 from .neighborhood import get_unlike_neighbor_fraction
 from .utility_functions import get_utility_for_array
 from .create_array import create_array
 from .simulation_result import SimulationResult
+from .arr_to_img import to_image, image_save
 import schelling.segregation_measures as sm
 
 
@@ -259,6 +261,20 @@ def _random_picker(array_1D):
 	return rand.choice(array_1D, 1)[0]
 
 
+def get_save_state_callback(save_directory, save_period, 
+		iterations, verbose=False):
+	iter_order_of_magnitude = int(math.log10(iterations))
+	def save_state(array, result, iteration):
+		if iteration % save_period == 0:
+			file_name = str(iteration).zfill(iter_order_of_magnitude) + '.png'
+			image_save(to_image(array), 
+				os.path.join(save_directory, file_name))
+			if verbose:
+				print(iteration)
+				print(result)
+	return save_state
+
+
 if __name__ == '__main__': # pragma: no cover
 	"""
 	This will run the Schelling Model simulation for 10000 iterations.
@@ -282,17 +298,10 @@ if __name__ == '__main__': # pragma: no cover
 
 	save_period = 100
 
-	def save(array, result, iteration):
-		if iteration%save_period == 0:
-			# print status to console
-			print(iteration)
-			print(result)
+	# assuming ./image/ directory exists
+	save_callback = get_save_state_callback('./image/', save_period, 
+		settings.iterations, verbose=True)
 
-			# save output image (assuming ./image/ exists and is a directory)
-			output_file = os.path.join('./image/', 
-				str(iteration).zfill(4)+'.png')
-			image_save(to_image(array), output_file)
-
-	simulation_result = run_simulation(settings, callback=save)
+	simulation_result = run_simulation(settings, callback=save_callback)
 	simulation_result.save_JSON('result.json')
 	simulation_result.plot_measures()

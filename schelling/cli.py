@@ -1,11 +1,10 @@
-from .simulation import run_simulation
+from .simulation import run_simulation, get_save_state_callback
 from .simulation_settings import SimulationSettings
 import schelling.utility_functions as ut
 from .arr_to_img import to_image, image_save
 
 import click
 import os
-from math import log10
 
 _utility_function_creators = {
 		'flat': ut.create_flat_utility,
@@ -49,6 +48,9 @@ _utility_function_creators = {
 @click.option('--radius', '-r', default=1,
 	help='Radius of neighborhood that agents will consider. '
 	'Default = 1 (only directly adjacent neighbors).')
+@click.option('--count-vacancies', is_flag=True, default=False,
+	help='Defines, if vacancies should be counted as neighbors, when '
+	'calculating the fraction of unlike neighbors.')
 @click.option('--iterations', '-i', default=10000,
 	help='Number of iterations. One agent moves during an iteration. '
 	'Default = 10000')
@@ -62,7 +64,8 @@ _utility_function_creators = {
 	'console. Off by default.')
 def simulation(grid_size, vacancy_proportion, agent_proportion, 
 	initial_random_allocation, utility_function, satisficers, pick_random, 
-	move_to_random, radius, iterations, save_to, save_period, verbose):
+	move_to_random, radius, count_vacancies, iterations, save_to, save_period, 
+	verbose):
 	"""Command line interface for the Schelling simulation."""
 	
 	ut_name = utility_function[0]
@@ -81,6 +84,8 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 			satisficers=satisficers,
 			pick_random=pick_random,
 			move_to_random=move_to_random,
+			radius=radius,
+			count_vacancies=count_vacancies,
 			iterations=iterations
 		)
 
@@ -92,18 +97,10 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 	else:
 		os.mkdir(save_to)
 
-
-	order_of_magnitude = int(log10(iterations))
-	def save_state(array, result, iteration):
-		if iteration % save_period == 0:
-			file_name = str(iteration).zfill(order_of_magnitude) + '.png'
-			image_save(to_image(array), os.path.join(save_to, file_name))
-			if verbose:
-				print(iteration)
-				print(result)
-
+	save_callback = get_save_state_callback(save_to, save_period, 
+		iterations, verbose)
 	
-	result = run_simulation(settings, save_state)
+	result = run_simulation(settings, save_callback)
 
 	result.save_JSON(os.path.join(save_to, 'result.json'))
 
