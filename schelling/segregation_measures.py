@@ -77,6 +77,7 @@ def switch_rate(array, agent_index):
 	    int: Switch rate
 	"""
 	# TODO reimplement to get rid of get_neighborhood_exclusive
+	# TODO count vacancies ?
 	array_rows = array.shape[0]
 	array_cols = array.shape[1]
 
@@ -109,7 +110,7 @@ def switch_rate(array, agent_index):
 	return switch_count
 
 
-def entropy(array, agent_index, radius=1):
+def entropy(array, agent_index, radius=1, count_vacancies=False):
 	"""Calculates the entropy in the neighborhood of specified agent
 	Entropy = sum of pi * log2pi
 	Where i - agent type, pi = (agents of type i)/(all agents in neighborhood)
@@ -125,10 +126,17 @@ def entropy(array, agent_index, radius=1):
 	# TODO should I include agent?; should I include vacancies?
 	agent_type = array[agent_index]
 	neighborhood = get_neighborhood(array, agent_index, radius)
-	total_neighbors = neighborhood.size - 1 # excluding agent
+
+
+	if count_vacancies:
+		total_neighbors = neighborhood.size - 1 # excluding agent
+	else:
+		total_neighbors = np.count_nonzero(neighborhood != 0)
+		if agent_type != 0:
+			total_neighbors -= 1
 
 	neighbor_types = np.unique(neighborhood)
-	if 0 in neighbor_types:
+	if not count_vacancies and 0 in neighbor_types:
 		neighbor_types = neighbor_types[1:] # exclude vacancies
 
 	entropy = 0
