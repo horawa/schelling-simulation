@@ -48,9 +48,9 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 	for i in range(settings.iterations):
 		callback(array, result, i)
-		is_simulation_halted = update_array(array, utility, 
-			settings.radius, result, agent_picker, vacancy_picker, 
-			satisficers=settings.satisficers)
+		is_simulation_halted = update_array(array, utility, settings.radius, 
+			result, agent_picker, vacancy_picker, settings.count_vacancies, 
+			settings.satisficers)
 
 		# if no further moves are possible, exit simulation early
 		if is_simulation_halted:
@@ -60,7 +60,7 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 
 def update_array(array, utility, radius, result, agent_picker, 
-	vacancy_picker, satisficers=False):
+	vacancy_picker, count_vacancies, satisficers=False):
 	"""Do a single iteration of the simulation.
 	
 	Args:
@@ -73,7 +73,7 @@ def update_array(array, utility, radius, result, agent_picker,
 	"""
 	agent_indices = get_agent_indices(array)
 
-	_update_result(result, array, agent_indices)
+	_update_result(result, array, agent_indices, count_vacancies)
 	
 	unsatisfied_agent_indices = _get_unsatisfied_agent_indices(utility, 
 		agent_indices, satisficers=satisficers)
@@ -230,7 +230,7 @@ def _move(array, agent_index, vacancy_index):
 	array[agent_index] = 0
 
 
-def _update_result(result, array, agent_indices):
+def _update_result(result, array, agent_indices, count_vacancies):
 	"""Store current segregation measures in segregation result object
 	
 	Args:
@@ -239,7 +239,8 @@ def _update_result(result, array, agent_indices):
 	    agent_indices (ndarray): indices of agents in array
 	"""
 	switch_rate_average = sm.switch_rate_average(array, agent_indices)
-	entropy_average = sm.entropy_average(array, agent_indices)
+	entropy_average = sm.entropy_average(array, agent_indices, 
+		count_vacancies=count_vacancies)
 	ghetto_rate = sm.ghetto_rate(array, agent_indices)
 	clusters = sm.clusters(array)
 	distance_average = sm.distance_average(array, agent_indices)
