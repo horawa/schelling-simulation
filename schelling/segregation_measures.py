@@ -21,7 +21,7 @@ def _get_measure_average(array, agent_indices, measure_func):
 	return total / agent_indices.shape[0]
 
 
-def entropy_average(array, agent_indices, radius=1):
+def entropy_average(array, agent_indices, radius=1, count_vacancies=False):
 	"""Returns average of entropies for all agents in array.
 	See entropy
 	
@@ -35,7 +35,7 @@ def entropy_average(array, agent_indices, radius=1):
 	    float: average entropy
 	"""
 	entropy_average = _get_measure_average(array, agent_indices, 
-		lambda a, i: entropy(a, i, radius))
+		lambda a, i: entropy(a, i, radius, count_vacancies))
 	return entropy_average
 
 
@@ -63,6 +63,13 @@ def mix_deviation_average(array, agent_indices, radius=1):
 		return mix_deviation(array, agent_index, radius)
 
 	return _get_measure_average(array, agent_indices, mix_deviation_for_radius)
+
+
+def share_average(array, agent_indices, radius=1):
+	def share_for_radius(array, agent_index):
+		return share(array, agent_index, radius)
+
+	return _get_measure_average(array, agent_indices, share_for_radius)
 
 
 def switch_rate(array, agent_index):
@@ -204,3 +211,10 @@ def mix_deviation(array, agent_index, radius=1):
 	mix_deviation = abs(mix_neigbbor_fraction - unlike_neighbor_fraction)
 
 	return mix_deviation
+
+
+def share(array, agent_index, radius=1):
+	unlike_neighbor_fraction = get_unlike_neighbor_fraction(
+		array, tuple(agent_index), radius=radius, count_vacancies=False)
+	return 1 - unlike_neighbor_fraction
+

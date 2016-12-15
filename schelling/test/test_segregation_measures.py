@@ -1,7 +1,7 @@
 import unittest
 from ..segregation_measures import (entropy, switch_rate, distance_average,
 	entropy_average, switch_rate_average, ghetto_rate, clusters, distance,
-	mix_deviation, mix_deviation_average)
+	mix_deviation, mix_deviation_average, share, share_average)
 from ..neighborhood import get_neighborhood
 from numpy import array, mean
 from math import log
@@ -15,7 +15,6 @@ class SegregationMeasureTest(unittest.TestCase):
 				[0, 2, 2, 0],
 				[0, 1, 2, 0]
 			])
-
 
 
 	def check_entropy_expected_output(self, parameters, radius, 
@@ -66,6 +65,8 @@ class SegregationMeasureTest(unittest.TestCase):
 		self.check_average_expected_output(
 			mix_deviation, mix_deviation_average)
 
+	def test_share_average(self):
+		self.check_average_expected_output(share, share_average)
 
 
 	def test_entropy_radius1(self):
@@ -95,6 +96,7 @@ class SegregationMeasureTest(unittest.TestCase):
 		]
 
 		self.check_entropy_expected_output(parameters, 2)
+
 
 	def test_entropy_count_vacancies(self):
 		parameters = [
@@ -254,6 +256,26 @@ class SegregationMeasureTest(unittest.TestCase):
 			output = mix_deviation(self.test_array, agent_index)
 			with self.subTest(i=agent_index):
 				self.assertAlmostEqual(output, expected_output)
+
+
+	def test_share(self):
+		parameters = [
+			((0, 1), 1.0),
+			((0, 2), 1.0),
+			((1, 0), 2/3),
+			((1, 1), 3/5),
+			((1, 3), 1/2),
+			((2, 1), 2/5),
+			((2, 2), 2/5),
+			((3, 1), 0.0),
+			((3, 2), 2/3),
+		]
+
+		for agent_index, expected_output in parameters:
+			output = share(self.test_array, agent_index)
+			with self.subTest(i=agent_index):
+				self.assertAlmostEqual(output, expected_output)
+
 
 
 if __name__ == '__main__':
