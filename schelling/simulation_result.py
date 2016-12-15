@@ -15,6 +15,7 @@ class SimulationResult:
 		self.clusters = []
 		self.distance_average = []
 		self.mix_deviation_average = []
+		self.share_average = []
 
 
 	def save_JSON(self, output_path):
