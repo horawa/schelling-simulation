@@ -101,7 +101,7 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1,
 	not_vacant = neighborhood != 0
 
 	if count_vacancies:
-		neighbor_count = (2*radius + 1)**2 - 1
+		neighbor_count = neighborhood.size - 1
 	else:
 		neighbor_count = np.count_nonzero(not_vacant)
 		if array[tuple(agent_index)] != 0:

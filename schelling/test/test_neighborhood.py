@@ -134,13 +134,13 @@ class GetNeighborhoodTest(unittest.TestCase):
 		agent_fractions = [
 			((0,1), 0),
 			((0,2), 0),
-			((1,0), 1/8),
+			((1,0), 1/5),
 			((1,1), 2/8),
-			((1,3), 1/8),
+			((1,3), 1/5),
 			((2,1), 3/8),
 			((2,2), 3/8),
-			((3,1), 3/8),
-			((3,2), 1/8),
+			((3,1), 3/5),
+			((3,2), 1/5),
 		]
 
 		for agent_index, expected_output in agent_fractions:
