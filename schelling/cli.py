@@ -39,12 +39,30 @@ _utility_function_creators = {
 	help='Satisficer relocation regime. '
 	'Agents move to vacancies of equal utility instead of only moving to '
 	'vacancies of greater utility. Off by default.')
-@click.option('--pick-random/--pick-first', default=True,
-	help='Relocation regime - agent to relocate picked at random, '
-	'or first on list. Random by default.')
-@click.option('--move-to-random/--move-to-first', default=True,
-	help='Relocation regime - agents move to random better vacancy, '
-	'or to first better vacancy. Random by default.')
+@click.option('--agent-picking-regime', default='random',
+	type=click.Choice(['random', 'first', 'roulette']),
+	help='Agent picking regime. '
+	'Agents to relocate are picked according to the specified regime.'
+	'Available regimes are: "random" - agents picked randomly, '
+	'"first" - first agent on list picked'
+	'"roulette" - agents picked according to roulette algorithm, in which '
+	'each agent is picked with a probability proportional to its weight '
+	'The weight of each agent is given by: '
+	'w = 1 - utility + base-weight; requires the --roulette-base-weight option'
+	'Default is random')
+@click.option('--vacancy-picking-regime', default='random',
+	type=click.Choice(['random', 'first', 'roulette']),
+	help='Vacancy picking regime. '
+	'Vacancies to relocate to are picked according to the specified regime.'
+	'Available regimes are: "random" - vacancies picked randomly, '
+	'"first" - first vacancy on list picked'
+	'"roulette" - vacancies picked according to roulette algorithm, in which '
+	'each vacancy is picked with a probability proportional to its weight'
+	'The weight of each vacancy is given by: '
+	'w = 1 - utility + base-weight; requires the --roulette-base-weight option'
+	'Default is random')
+@click.option('--roulette-base-weight', default=0.0, type=float,
+	help='The base weight used with roulette algorithm. Default is 0.0')
 @click.option('--radius', '-r', default=1,
 	help='Radius of neighborhood that agents will consider. '
 	'Default = 1 (only directly adjacent neighbors).')
@@ -63,9 +81,9 @@ _utility_function_creators = {
 	help='Periodically print iteration number and segregation measures to '
 	'console. Off by default.')
 def simulation(grid_size, vacancy_proportion, agent_proportion, 
-	initial_random_allocation, utility_function, satisficers, pick_random, 
-	move_to_random, radius, count_vacancies, iterations, save_to, save_period, 
-	verbose):
+	initial_random_allocation, utility_function, satisficers, 
+	agent_picking_regime, vacancy_picking_regime, roulette_base_weight, radius, 
+	count_vacancies, iterations, save_to, save_period, verbose):
 	"""Command line interface for the Schelling simulation."""
 	
 	ut_name = utility_function[0]
@@ -75,6 +93,9 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 
 	utility = create_utility(ut_arg)
 
+	if 'roulette' not in [agent_picking_regime, vacancy_picking_regime]:
+		roulette_base_weight = None
+
 	settings = SimulationSettings(
 			grid_size=grid_size,
 			vacancy_proportion=vacancy_proportion,
@@ -82,8 +103,9 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 			initial_random_allocation=initial_random_allocation,
 			utility_function=utility,
 			satisficers=satisficers,
-			pick_random=pick_random,
-			move_to_random=move_to_random,
+			agent_picking_regime=agent_picking_regime,
+			vacancy_picking_regime=vacancy_picking_regime,
+			roulette_base_weight=roulette_base_weight,
 			radius=radius,
 			count_vacancies=count_vacancies,
 			iterations=iterations
