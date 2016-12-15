@@ -477,67 +477,66 @@ class SimulationTestCase(unittest.TestCase):
 			self.assertEqual(result.clusters, clusters)	
 
 
-	# def test_run_simulation_vacancies_counted(self):
-	# 	iteration_states = [
-	# 		np.array([
-	# 			[0, 0, 0, 0],
-	# 			[0, 0, 0, 0],
-	# 			[1, 1, 1, 1],
-	# 			[2, 2, 2, 2],
-	# 		]),
-	# 		np.array([
-	# 			[2, 0, 0, 0],
-	# 			[0, 0, 0, 0],
-	# 			[1, 1, 1, 1],
-	# 			[0, 2, 2, 2],
-	# 		]),
-	# 		np.array([
-	# 			[2, 2, 0, 0],
-	# 			[0, 0, 0, 0],
-	# 			[1, 1, 1, 1],
-	# 			[0, 0, 2, 2],
-	# 		]),
-	# 		np.array([
-	# 			[2, 2, 2, 0],
-	# 			[0, 0, 0, 0],
-	# 			[1, 1, 1, 1],
-	# 			[0, 0, 0, 2],
-	# 		]),
-	# 		np.array([
-	# 			[2, 2, 2, 2],
-	# 			[0, 0, 0, 0],
-	# 			[1, 1, 1, 1],
-	# 			[0, 0, 0, 0],
-	# 		]),
-	# 		None
-	# 	] # simulation halted, should not fail at none
-		
+	def test_run_simulation_vacancies_counted(self):
+		iteration_states = [
+			np.array([
+				[0, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[2, 2, 2, 2],
+			]),
+			np.array([
+				[2, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 2, 2, 2],
+			]),
+			np.array([
+				[2, 2, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 0, 2, 2],
+			]),
+			np.array([
+				[2, 2, 2, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 0, 0, 2],
+			]),
+			np.array([
+				[2, 2, 2, 2],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 0, 0, 0],
+			]),
+			None
+		] # simulation halted, should not fail at none
 
-	# 	def callback(array, result, iteration):
-	# 		expected_output = iteration_states[iteration]
-	# 		with self.subTest(i=iteration, out=array, expected=expected_output):	
-	# 			self.assertTrue(np.array_equal(array, expected_output))
+		def callback(array, result, iteration):
+			expected_output = iteration_states[iteration]
+			with self.subTest(i=iteration, out=array, expected=expected_output):	
+				self.assertTrue(np.array_equal(array, expected_output))
 
 
-	# 	settings = SimulationSettings(		
-	# 		grid_size=4,
-	# 		vacancy_proportion=0.5,
-	# 		agent_proportions=(0.5, 0.5),
-	# 		initial_random_allocation=False,
-	# 		utility_function=create_flat_utility(0.5),
-	# 		satisficers=False,
-	# 		agent_picking_regime='first',
-	# 		vacancy_picking_regime='first',
-	# 		count_vacancies=True,
-	# 		radius=1,
-	# 		iterations=len(iteration_states)
-	# 	)
+		settings = SimulationSettings(		
+			grid_size=4,
+			vacancy_proportion=0.5,
+			agent_proportions=(0.5, 0.5),
+			initial_random_allocation=False,
+			utility_function=create_flat_utility(0.5),
+			satisficers=False,
+			agent_picking_regime='first',
+			vacancy_picking_regime='first',
+			count_vacancies=True,
+			radius=1,
+			iterations=len(iteration_states)
+		)
 
-	# 	result = run_simulation(settings, callback)
+		result = run_simulation(settings, callback)
 
-	# 	clusters = [2, 3, 3, 3, 2]
-	# 	with self.subTest():
-	# 		self.assertEqual(result.clusters, clusters)
+		clusters = [2, 3, 3, 3, 2]
+		with self.subTest():
+			self.assertEqual(result.clusters, clusters)
 
 
 
