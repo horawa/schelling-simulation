@@ -241,19 +241,11 @@ class SimulationTestCase(unittest.TestCase):
 			0.75, 0.25, 0.5, 0.1,
 		]
 
-		def utility(agent_index):
+		def utility(agent_index, agent_type=None):
 			i = agent_indices.index(tuple(agent_index))
 			return agent_utilities[i]
 
-
-
-		agent_probabilities = [
-			0.25 / 2.4, 0.75 / 2.4, 0.5/2.4, 0.9/2.4,
-		]
-
-		agent_inv_utilities = [0.25, 0.75, 0.5, 0.9]
-		
-		agent_cum_inv_utilities = [0.9, 1.65, 2.15, 2.4]
+		agent_cum_weights = [0.9, 1.65, 2.15, 2.4]
 
 		picked_values = np.arange(0, 2.6, 0.2)
 
@@ -265,8 +257,8 @@ class SimulationTestCase(unittest.TestCase):
 				uniform_dist)
 
 			index = -1
-			for i in range(len(agent_cum_inv_utilities)):
-				if picked_value <= agent_cum_inv_utilities[i]:
+			for i in range(len(agent_cum_weights)):
+				if picked_value <= agent_cum_weights[i]:
 					index = i
 					break
 			
@@ -296,7 +288,7 @@ class SimulationTestCase(unittest.TestCase):
 			0.75, 0.25, 0.5, 0.1, 1.0,
 		]
 
-		def utility(agent_index):
+		def utility(agent_index, agent_type=None):
 			i = agent_indices.index(tuple(agent_index))
 			return agent_utilities[i]
 		

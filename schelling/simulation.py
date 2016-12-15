@@ -244,6 +244,7 @@ def _update_result(result, array, agent_indices):
 	clusters = sm.clusters(array)
 	distance_average = sm.distance_average(array, agent_indices)
 	mix_deviation_average = sm.mix_deviation_average(array, agent_indices)
+	share_average = sm.share_average(array, agent_indices)
 
 	result.switch_rate_average.append(switch_rate_average)
 	result.entropy_average.append(entropy_average)
@@ -251,6 +252,7 @@ def _update_result(result, array, agent_indices):
 	result.clusters.append(clusters)
 	result.distance_average.append(distance_average)
 	result.mix_deviation_average.append(mix_deviation_average)
+	result.share_average.append(share_average)
 
 
 def _first_picker(agent_indices, agent_type=None):
@@ -265,10 +267,9 @@ def _create_roulette_picker(base_weight, utility, uniform_dist=rand.uniform):
 	"""Agents will be assigned the weight of 1 - utility + base_weight"""
 
 	def roulette_picker(agent_indices, agent_type=None):
-		utility_f = lambda agent_index: utility(agent_index, 
-			agent_type=agent_type)
 		
-		agent_utilities = np.apply_along_axis(utility, 1, agent_indices)
+		agent_utilities = np.apply_along_axis(utility, 1, agent_indices, 
+			agent_type=agent_type)
 		total_utilities = np.sum(agent_utilities)
 		
 		sorted_utility_indices = np.argsort(agent_utilities)
