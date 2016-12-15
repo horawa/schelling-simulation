@@ -37,7 +37,7 @@ _utility_function_creators = {
 	'Default = flat 0.625.')
 @click.option('--satisficers/--no-satisficers', default=False,
 	help='Satisficer relocation regime. '
-	'Agents move to vacancies of equal utility instead of only moving to '
+	'Agents can move to vacancies of equal utility instead of only moving to '
 	'vacancies of greater utility. Off by default.')
 @click.option('--agent-picking-regime', default='random',
 	type=click.Choice(['random', 'first', 'roulette']),
@@ -67,7 +67,7 @@ _utility_function_creators = {
 	help='Radius of neighborhood that agents will consider. '
 	'Default = 1 (only directly adjacent neighbors).')
 @click.option('--count-vacancies', is_flag=True, default=False,
-	help='Defines, if vacancies should be counted as neighbors, when '
+	help='Specifies, if vacancies should be counted as neighbors, when '
 	'calculating the fraction of unlike neighbors.')
 @click.option('--iterations', '-i', default=10000,
 	help='Number of iterations. One agent moves during an iteration. '
