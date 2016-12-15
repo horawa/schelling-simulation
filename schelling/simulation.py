@@ -36,15 +36,21 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	utility = get_utility_for_array(settings.utility_function, array, 
 		count_vacancies=settings.count_vacancies)
 
-	if settings.pick_random:
+	if settings.agent_picking_regime == 'random':
 		agent_picker=_random_picker
-	else:
+	elif settings.agent_picking_regime == 'first':
 		agent_picker=_first_picker
+	elif settings.agent_picking_regime == 'roulette':
+		agent_picker=_create_roulette_picker(settings.roulette_base_weight, 
+			utility)
 
-	if settings.move_to_random:
-		vacancy_picker = _random_picker
-	else:
-		vacancy_picker = _first_picker
+	if settings.vacancy_picking_regime == 'random':
+		vacancy_picker=_random_picker
+	elif settings.vacancy_picking_regime == 'first':
+		vacancy_picker=_first_picker
+	elif settings.vacancy_picking_regime == 'roulette':
+		vacancy_picker=_create_roulette_picker(settings.roulette_base_weight, 
+			utility)
 
 	for i in range(settings.iterations):
 		callback(array, result, i)

@@ -13,8 +13,9 @@ class SimulationSettings:
 			initial_random_allocation=True,
 			utility_function=(lambda f: 0.0),
 			satisficers=False,
-			pick_random=True,
-			move_to_random=True,
+			agent_picking_regime='random',
+			vacancy_picking_regime='random',
+			roulette_base_weight=None,
 			radius=1,
 			count_vacancies=False,
 			iterations=10000):
@@ -25,8 +26,9 @@ class SimulationSettings:
 		self.initial_random_allocation = initial_random_allocation
 		self.utility_function = utility_function
 		self.satisficers = satisficers
-		self.pick_random = pick_random
-		self.move_to_random = move_to_random
+		self.agent_picking_regime = agent_picking_regime
+		self.vacancy_picking_regime = vacancy_picking_regime
+		self.roulette_base_weight = roulette_base_weight
 		self.radius = radius
 		self.count_vacancies = count_vacancies
 		self.iterations = iterations
@@ -53,11 +55,21 @@ class SimulationSettings:
 		if is_not_bool(self.satisficers):
 			raise ValueError("Satisficers must be true or false")
 
-		if is_not_bool(self.pick_random):
-			raise ValueError("Pick random must be true or false")
+		if self.agent_picking_regime not in ['random', 'first', 'roulette']:
+			raise ValueError("vacancy_picking_regime must be either "
+				"'random', 'first' or 'roulette'.")
 
-		if is_not_bool(self.move_to_random):
-			raise ValueError("Move to random must be true or false")
+		if self.vacancy_picking_regime not in ['random', 'first', 'roulette']:
+			raise ValueError("vacancy_picking_regime must be either "
+				"'random', 'first' or 'roulette'.")
+
+		if self.vacancy_picking_regime == 'roulette' or \
+			self.agent_picking_regime == 'roulette':
+				if self.roulette_base_weight < 0.0:
+					raise ValueError("Roulette base weight must be > 0")
+		elif self.roulette_base_weight is not None:
+			raise ValueError("Roulette base weight should be left None, "
+				"if a picking regime is not set to 'roulette'.")
 
 		if self.radius < 1:
 			raise ValueError("Radius must be > 1")

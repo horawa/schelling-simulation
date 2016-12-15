@@ -383,8 +383,8 @@ class SimulationTestCase(unittest.TestCase):
 			initial_random_allocation=False,
 			utility_function=create_flat_utility(0.5),
 			satisficers=False,
-			pick_random=False,
-			move_to_random=False,
+			agent_picking_regime='first',
+			vacancy_picking_regime='first',
 			radius=1,
 			iterations=len(iteration_states)
 		)
@@ -420,8 +420,8 @@ class SimulationTestCase(unittest.TestCase):
 			initial_random_allocation=False,
 			utility_function=create_flat_utility(0.5),
 			satisficers=False,
-			pick_random=False,
-			move_to_random=False,
+			agent_picking_regime='first',
+			vacancy_picking_regime='first',
 			radius=1,
 			iterations=100
 		)
@@ -494,8 +494,8 @@ class SimulationTestCase(unittest.TestCase):
 			initial_random_allocation=False,
 			utility_function=create_flat_utility(3/8),
 			satisficers=False,
-			pick_random=True,
-			move_to_random=False,
+			agent_picking_regime='random',
+			vacancy_picking_regime='first',
 			radius=1,
 			iterations=2
 		)
@@ -566,8 +566,8 @@ class SimulationTestCase(unittest.TestCase):
 			initial_random_allocation=False,
 			utility_function=create_flat_utility(1/8),
 			satisficers=False,
-			pick_random=False,
-			move_to_random=True,
+			agent_picking_regime='first',
+			vacancy_picking_regime='random',
 			radius=1,
 			iterations=2
 		)
