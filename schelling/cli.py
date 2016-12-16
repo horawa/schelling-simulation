@@ -62,7 +62,9 @@ _utility_function_creators = {
 	'w = 1 - utility + base-weight; requires the --roulette-base-weight option'
 	'Default is random')
 @click.option('--roulette-base-weight', default=0.0, type=float,
-	help='The base weight used with roulette algorithm. Default is 0.0')
+	help='The base weight used with roulette algorithm. '
+	'The satisficers option must be set for values over 0 to have an effect.'
+	'Default is 0.0')
 @click.option('--radius', '-r', default=1,
 	help='Radius of neighborhood that agents will consider. '
 	'Default = 1 (only directly adjacent neighbors).')
