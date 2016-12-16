@@ -59,7 +59,8 @@ _utility_function_creators = {
 	'"roulette" - vacancies picked according to roulette algorithm, in which '
 	'each vacancy is picked with a probability proportional to its weight'
 	'The weight of each vacancy is given by: '
-	'w = 1 - utility + base-weight; requires the --roulette-base-weight option'
+	'w = 1 - utility + base-weight; requires the --roulette-base-weight option.'
+	' Agents only pick from better or equal vacancies'
 	'Default is random')
 @click.option('--roulette-base-weight', default=0.0, type=float,
 	help='The base weight used with roulette algorithm. '
