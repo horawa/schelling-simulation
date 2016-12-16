@@ -7,17 +7,17 @@ In the model, agents of several types are allocated on a 2D square grid. The age
 
 ## Usage
 ### Setup
-Install dependencies:
+Install:
 
 ```
-$ pip3 install -r requirements.txt
+$ python setup.py install
 ```
 
 ### Command Line Interface
 
 
 ```
-Usage: python3 -m schelling.cli [OPTIONS]
+Usage: schelling-cli [OPTIONS]
 
   Command line interface for the Schelling simulation.
 
@@ -39,21 +39,49 @@ Options:
                                   0.5* for flat utility with threshold 0.5.
                                   Default = flat 0.625.
   --satisficers / --no-satisficers
-                                  Satisficer relocation regime. Agents move to
-                                  vacancies of equal utility instead of only
-                                  moving to vacancies of greater utility. Off
-                                  by default.
-  --pick-random / --pick-first    Relocation regime - agent to relocate picked
-                                  at random, or first on list. Random by
-                                  default.
-  --move-to-random / --move-to-first
-                                  Relocation regime - agents move to random
-                                  better vacancy, or to first better vacancy.
-                                  Random by default.
+                                  Satisficer relocation regime. Agents can
+                                  move to vacancies of equal utility instead
+                                  of only moving to vacancies of greater
+                                  utility. Off by default.
+  --agent-picking-regime [random|first|roulette]
+                                  Agent picking regime. Agents to relocate are
+                                  picked according to the specified
+                                  regime.Available regimes are: "random" -
+                                  agents picked randomly, "first" - first
+                                  agent on list picked"roulette" - agents
+                                  picked according to roulette algorithm, in
+                                  which each agent is picked with a
+                                  probability proportional to its weight The
+                                  weight of each agent is given by: w = 1 -
+                                  utility + base-weight; requires the
+                                  --roulette-base-weight optionDefault is
+                                  random
+  --vacancy-picking-regime [random|first|roulette]
+                                  Vacancy picking regime. Vacancies to
+                                  relocate to are picked according to the
+                                  specified regime.Available regimes are:
+                                  "random" - vacancies picked randomly,
+                                  "first" - first vacancy on list
+                                  picked"roulette" - vacancies picked
+                                  according to roulette algorithm, in which
+                                  each vacancy is picked with a probability
+                                  proportional to its weightThe weight of each
+                                  vacancy is given by: w = 1 - utility + base-
+                                  weight; requires the --roulette-base-weight
+                                  option. Agents only pick from better or
+                                  equal vacanciesDefault is random
+  --agent-roulette-base-weight FLOAT
+                                  The base weight used with roulette
+                                  algorithm. The satisficers option must be
+                                  set for values over 0 to have an
+                                  effect.Default is 0.0
+  --vacancy-roulette-base-weight FLOAT
+                                  The base weight used with roulette
+                                  algorithm. Default is 0.0
   -r, --radius INTEGER            Radius of neighborhood that agents will
                                   consider. Default = 1 (only directly
                                   adjacent neighbors).
-  --count-vacancies               Defines, if vacancies should be counted as
+  --count-vacancies               Specifies, if vacancies should be counted as
                                   neighbors, when calculating the fraction of
                                   unlike neighbors.
   -i, --iterations INTEGER        Number of iterations. One agent moves during
