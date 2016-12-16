@@ -62,9 +62,12 @@ _utility_function_creators = {
 	'w = 1 - utility + base-weight; requires the --roulette-base-weight option.'
 	' Agents only pick from better or equal vacancies'
 	'Default is random')
-@click.option('--roulette-base-weight', default=0.0, type=float,
+@click.option('--agent-roulette-base-weight', default=0.0, type=float,
 	help='The base weight used with roulette algorithm. '
 	'The satisficers option must be set for values over 0 to have an effect.'
+	'Default is 0.0')
+@click.option('--vacancy-roulette-base-weight', default=0.0, type=float,
+	help='The base weight used with roulette algorithm. '
 	'Default is 0.0')
 @click.option('--radius', '-r', default=1,
 	help='Radius of neighborhood that agents will consider. '
@@ -85,8 +88,9 @@ _utility_function_creators = {
 	'console. Off by default.')
 def simulation(grid_size, vacancy_proportion, agent_proportion, 
 	initial_random_allocation, utility_function, satisficers, 
-	agent_picking_regime, vacancy_picking_regime, roulette_base_weight, radius, 
-	count_vacancies, iterations, save_to, save_period, verbose):
+	agent_picking_regime, vacancy_picking_regime, agent_roulette_base_weight, 
+	vacancy_roulette_base_weight, radius, count_vacancies, iterations, save_to, 
+	save_period, verbose):
 	"""Command line interface for the Schelling simulation."""
 	
 	ut_name = utility_function[0]
@@ -96,8 +100,11 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 
 	utility = create_utility(ut_arg)
 
-	if 'roulette' not in [agent_picking_regime, vacancy_picking_regime]:
-		roulette_base_weight = None
+	if agent_picking_regime != 'roulette':
+		agent_roulette_base_weight = None
+	if vacancy_picking_regime != 'roulette':
+		vacancy_roulette_base_weight = None
+
 
 	settings = SimulationSettings(
 			grid_size=grid_size,
@@ -108,7 +115,8 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 			satisficers=satisficers,
 			agent_picking_regime=agent_picking_regime,
 			vacancy_picking_regime=vacancy_picking_regime,
-			roulette_base_weight=roulette_base_weight,
+			agent_roulette_base_weight=agent_roulette_base_weight,
+			vacancy_roulette_base_weight=vacancy_roulette_base_weight,
 			radius=radius,
 			count_vacancies=count_vacancies,
 			iterations=iterations

@@ -17,19 +17,21 @@ class SettingsTestCase(unittest.TestCase):
 			{"agent_picking_regime": 10},
 			{"vacancy_picking_regime": 'asdf'},
 			{"vacancy_picking_regime": 10},
-			{"roulette_base_weight": 'asdf'},
-			{"roulette_base_weight": 10},
+			{"vacancy_roulette_base_weight": 'asdf'},
+			{"vacancy_roulette_base_weight": 10},
+			{"agent_roulette_base_weight": 'asdf'},
+			{"agent_roulette_base_weight": 10},
 			{"radius": 0},
 			{"radius": -100},
 			{"count_vacancies": 'asdf'},
 			{"iterations": -1},
 			{
 				"vacancy_picking_regime": 'roulette',
-				"roulette_base_weight": -10,
+				"vacancy_roulette_base_weight": -10,
 			},
 			{
 				"agent_picking_regime": 'roulette',
-				"roulette_base_weight": -10,
+				"agent_roulette_base_weight": -10,
 
 			}
 		]

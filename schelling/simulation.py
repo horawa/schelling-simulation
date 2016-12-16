@@ -42,13 +42,13 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	}
 
 	agent_pickers = dict(pickers, **{
-		'roulette': _create_roulette_picker(settings.roulette_base_weight, 
-			utility, for_agents=True),
+		'roulette': _create_roulette_picker(
+			settings.agent_roulette_base_weight, utility, for_agents=True),
 	})
 
 	vacancy_pickers = dict(pickers, **{
-		'roulette': _create_roulette_picker(settings.roulette_base_weight, 
-			utility, for_agents=False),
+		'roulette': _create_roulette_picker(
+			settings.vacancy_roulette_base_weight, utility, for_agents=False),
 	})
 
 	agent_picker = agent_pickers[settings.agent_picking_regime]
