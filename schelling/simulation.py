@@ -36,15 +36,23 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	utility = get_utility_for_array(settings.utility_function, array, 
 		count_vacancies=settings.count_vacancies)
 
-	picking_regime_functions = {
+	pickers = {
 		'random': _random_picker,
 		'first': _first_picker,
-		'roulette': _create_roulette_picker(settings.roulette_base_weight, 
-			utility)
 	}
 
-	agent_picker = picking_regime_functions[settings.agent_picking_regime]
-	vacancy_picker = picking_regime_functions[settings.vacancy_picking_regime]
+	agent_pickers = dict(pickers, **{
+		'roulette': _create_roulette_picker(settings.roulette_base_weight, 
+			utility, for_agents=True),
+	})
+
+	vacancy_pickers = dict(pickers, **{
+		'roulette': _create_roulette_picker(settings.roulette_base_weight, 
+			utility, for_agents=False),
+	})
+
+	agent_picker = agent_pickers[settings.agent_picking_regime]
+	vacancy_picker = vacancy_pickers[settings.vacancy_picking_regime]
 
 	for i in range(settings.iterations):
 		callback(array, result, i)
@@ -88,8 +96,12 @@ def update_array(array, utility, radius, result, agent_picker,
 
 	vacancy_indices = get_vacancy_indices(array)
 
-	better_vacancy_indices = _get_better_vacancies(array, agent_index, 
-		utility, vacancy_indices, satisficers=satisficers)
+	# if vacancy picker is roulette, consider all vacancies 
+	if vacancy_picker.__name__ == 'roulette_picker':
+		better_vacancy_indices = vacancy_indices
+	else:
+		better_vacancy_indices = _get_better_vacancies(array, agent_index, 
+			utility, vacancy_indices, satisficers=satisficers)
 
 	if better_vacancy_indices.size == 0:
 		# if relocation regime is move first, and the first agent has no better
@@ -153,7 +165,6 @@ def _pick_agent_index_to_move(unsatisfied_agent_indices,
 	Returns:
 	    tuple: Index of random unsatisfied agent
 	"""
-	# random chooser is a parameter only for testing
 	agent_index = tuple(agent_picker(unsatisfied_agent_indices))
 	return agent_index
 
@@ -264,31 +275,42 @@ def _random_picker(agent_indices, agent_type=None):
 	rand_index_index = rand.randint(0, agent_indices.shape[0])
 	return tuple(agent_indices[rand_index_index])
 
-def _create_roulette_picker(base_weight, utility, uniform_dist=rand.uniform):
-	"""Agents will be assigned the weight of 1 - utility + base_weight"""
 
-	def roulette_picker(agent_indices, agent_type=None):
+def _create_roulette_picker(base_weight, utility, for_agents=True, 
+	uniform_dist=rand.uniform):
+	"""Agents will be assigned the weight of 1 - utility + base_weight
+	Vacancies will be assigned the weight of utility + base_weight"""
+
+	def roulette_picker(array_indices, agent_type=None):
 		
-		agent_utilities = np.apply_along_axis(utility, 1, agent_indices, 
+		utilities = np.apply_along_axis(utility, 1, array_indices, 
 			agent_type=agent_type)
-		total_utilities = np.sum(agent_utilities)
+		total_utilities = np.sum(utilities)
 		
-		sorted_utility_indices = np.argsort(agent_utilities)
+		sorted_utility_indices = np.argsort(utilities)
 
-		total_weights = (
-			len(agent_utilities) * (1 + base_weight)) - total_utilities
+		if for_agents:
+			total_weights = (
+				utilities.size * (1 + base_weight)) - total_utilities
+		else:
+			total_weights = (utilities.size * base_weight) + total_utilities
+		
 		picked_total = uniform_dist(total_weights)
 
 		current_total_weight = 0
 		for index in sorted_utility_indices:
-			agent_weight = 1 - agent_utilities[index] + base_weight
-			current_total_weight += agent_weight
+			if for_agents:
+				weight = 1 - utilities[index] + base_weight
+			else:
+				weight = utilities[index] + base_weight
+
+			current_total_weight += weight
 
 			if current_total_weight >= picked_total:
-				return tuple(agent_indices[index])
+				return tuple(array_indices[index])
 
-		# if picked value out of range (float error), pick last agent index
-		return tuple(agent_indices[sorted_utility_indices[-1]])
+		# if picked value out of range (float error), pick last index
+		return tuple(array_indices[sorted_utility_indices[-1]])
 	return roulette_picker
 
 

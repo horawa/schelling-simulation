@@ -13,6 +13,7 @@ from ..utility_functions import get_utility_for_array, create_flat_utility
 from ..simulation_settings import SimulationSettings
 from ..simulation_result import SimulationResult
 
+# TODO Refactor this abomination
 
 class SimulationTestCase(unittest.TestCase):
 	def setUp(self):
@@ -254,7 +255,7 @@ class SimulationTestCase(unittest.TestCase):
 				return picked_value
 
 			roulette_picker = _create_roulette_picker(0.0, utility, 
-				uniform_dist)
+				for_agents=True, uniform_dist=uniform_dist)
 
 			index = -1
 			for i in range(len(agent_cum_weights)):
@@ -301,7 +302,7 @@ class SimulationTestCase(unittest.TestCase):
 				return picked_value
 
 			roulette_picker = _create_roulette_picker(0.1, utility, 
-				uniform_dist)
+				for_agents=True, uniform_dist=uniform_dist)
 
 			index = -1
 			for i in range(len(agent_cum_weights)):
@@ -539,7 +540,6 @@ class SimulationTestCase(unittest.TestCase):
 			self.assertEqual(result.clusters, clusters)
 
 
-
 	def test_simulation_random_agent_picker(self):
 		array = [
 			np.array([
@@ -682,6 +682,266 @@ class SimulationTestCase(unittest.TestCase):
 
 		with self.subTest():
 			self.assertEqual(len(possible_states_reached), len(possible_states))
+
+
+	def test_update_array_roulette_agent_picker0(self):
+		array = np.array([
+			[0, 0, 0, 0],
+			[0, 0, 0, 0],
+			[1, 1, 1, 1],
+			[1, 1, 2, 2]
+		])
+
+		utility = get_utility_for_array(create_flat_utility(0.5), array, True)
+
+		states_for_picked = [
+			(
+				0.0, 
+				np.array([
+					[2, 0, 0, 0],
+					[0, 0, 0, 0],
+					[1, 1, 1, 1],
+					[1, 1, 0, 2]
+				])
+			),
+			(
+				0.5, 
+				np.array([
+					[2, 0, 0, 0],
+					[0, 0, 0, 0],
+					[1, 1, 1, 1],
+					[1, 1, 0, 2]
+				])
+			),
+			(
+				1.0, 
+				np.array([
+					[2, 0, 0, 0],
+					[0, 0, 0, 0],
+					[1, 1, 1, 1],
+					[1, 1, 0, 2]
+				])
+			),
+			(
+				1.00001, 
+				np.array([
+					[2, 0, 0, 0],
+					[0, 0, 0, 0],
+					[1, 1, 1, 1],
+					[1, 1, 2, 0]
+				])
+			),
+			(
+				1.5, 
+				np.array([
+					[2, 0, 0, 0],
+					[0, 0, 0, 0],
+					[1, 1, 1, 1],
+					[1, 1, 2, 0]
+				])
+			),
+			(
+				2.0, 
+				np.array([
+					[2, 0, 0, 0],
+					[0, 0, 0, 0],
+					[1, 1, 1, 1],
+					[1, 1, 2, 0]
+				])
+			),			
+
+		]
+
+		result = SimulationResult()
+
+		for picked_value, expected_state in states_for_picked:
+			array = np.array([
+				[0, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[1, 1, 2, 2]
+			])
+			agent_picker = _create_roulette_picker(0.0, utility, True,
+				lambda *a: picked_value)
+			update_array(array, utility, 1, result, agent_picker, _first_picker,
+			 True, False)
+
+			with self.subTest(v=picked_value, out=array, exp=expected_state):
+				self.assertTrue(np.array_equal(array, expected_state))
+
+
+	def test_update_array_roulette_agent_picker_01(self):
+		array = np.array([
+			[0, 0, 0],
+			[0, 1, 1],
+			[1, 2, 2]
+		])
+
+		utility = get_utility_for_array(create_flat_utility(0.5), array, True)
+
+		states_for_picked = [
+			(
+				0.0,
+				np.array([
+					[2, 0, 0],
+					[0, 1, 1],
+					[1, 0, 2]
+				])
+			),
+			(
+				0.5,
+				np.array([
+					[2, 0, 0],
+					[0, 1, 1],
+					[1, 0, 2]
+				])
+			),
+			(
+				1.1,
+				np.array([
+					[2, 0, 0],
+					[0, 1, 1],
+					[1, 0, 2]
+				])
+			),		
+			(
+				1.5,
+				np.array([
+					[2, 0, 0],
+					[0, 1, 1],
+					[1, 2, 0]
+				])
+			),
+			(
+				2.2,
+				np.array([
+					[2, 0, 0],
+					[0, 1, 1],
+					[1, 2, 0]
+				])
+			),
+			(
+				2.3,
+				np.array([
+					[1, 0, 0],
+					[0, 0, 1],
+					[1, 2, 2]
+				])
+			),
+			(
+				2.4,
+				np.array([
+					[1, 0, 0],
+					[0, 1, 0],
+					[1, 2, 2]
+				])
+			),
+			(
+				2.5,
+				np.array([
+					[1, 0, 0],
+					[0, 1, 1],
+					[0, 2, 2]
+				])
+			),
+		]
+
+		result = SimulationResult()
+
+		for picked_value, expected_state in states_for_picked:
+			array = np.array([
+				[0, 0, 0],
+				[0, 1, 1],
+				[1, 2, 2]
+			])
+			agent_picker = _create_roulette_picker(0.1, utility, True,
+				lambda *a: picked_value)
+			update_array(array, utility, 1, result, agent_picker, _first_picker,
+			 True, True)
+
+			with self.subTest(v=picked_value, out=array, exp=expected_state):
+				self.assertTrue(np.array_equal(array, expected_state))
+
+
+	def test_update_array_roulette_vacancy_picker_01(self):
+		array = np.array([
+			[0, 0, 0],
+			[0, 1, 1],
+			[1, 2, 2]
+		])
+
+		utility = get_utility_for_array(create_flat_utility(0.5), array, True)
+
+		states_for_picked = [
+			(
+				0.1,
+				np.array([
+					[0, 0, 2],
+					[0, 1, 1],
+					[1, 0, 2]
+				])
+			),
+			(
+				0.2,
+				np.array([
+					[2, 0, 0],
+					[0, 1, 1],
+					[1, 0, 2]
+				])
+			),
+			(
+				1.2,
+				np.array([
+					[2, 0, 0],
+					[0, 1, 1],
+					[1, 0, 2]
+				])
+			),		
+			(
+				2.3,
+				np.array([
+					[0, 2, 0],
+					[0, 1, 1],
+					[1, 0, 2]
+				])
+			),
+			(
+				3.4,
+				np.array([
+					[0, 0, 0],
+					[2, 1, 1],
+					[1, 0, 2]
+				])
+			),
+			(
+				3.5,
+				np.array([
+					[0, 0, 0],
+					[2, 1, 1],
+					[1, 0, 2]
+				])
+			),
+			
+		]
+
+		result = SimulationResult()
+
+		for picked_value, expected_state in states_for_picked:
+			array = np.array([
+				[0, 0, 0],
+				[0, 1, 1],
+				[1, 2, 2]
+			])
+			vacancy_picker = _create_roulette_picker(0.1, utility, False,
+				lambda *a: picked_value)
+			agent_picker = _create_roulette_picker(0.0, utility, True, 
+				lambda *a: 0.0)
+
+			update_array(array, utility, 1, result, agent_picker, 
+				vacancy_picker, True, True)
+
+			with self.subTest(v=picked_value, out=array, exp=expected_state):
+				self.assertTrue(np.array_equal(array, expected_state))
 
 
 	def test_update_array_all_agents_satisfied_should_end_simulation(self):
