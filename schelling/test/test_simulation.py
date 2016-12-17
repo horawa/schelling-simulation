@@ -8,7 +8,6 @@ from schelling.simulation import (_get_unsatisfied_agent_indices, update_array,
 	_create_roulette_picker)
 import schelling.utility_functions as ut
 from schelling.array_utils import get_agent_indices, get_vacancy_indices
-from schelling.neighborhood import get_unlike_neighbor_fraction
 from schelling.utility_functions import (get_utility_for_array, 
 	create_flat_utility)
 from schelling.simulation_settings import SimulationSettings

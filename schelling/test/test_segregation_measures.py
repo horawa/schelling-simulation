@@ -3,8 +3,7 @@ from schelling.segregation_measures import (entropy, switch_rate,
 	distance_average, entropy_average, switch_rate_average, ghetto_rate, 
 	clusters, distance, mix_deviation, mix_deviation_average, share, 
 	share_average)
-from schelling.neighborhood import get_neighborhood
-from numpy import array, mean
+from numpy import array
 from math import log
 
 class SegregationMeasureTest(unittest.TestCase):
