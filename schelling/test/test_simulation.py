@@ -541,14 +541,14 @@ class SimulationTestCase(unittest.TestCase):
 
 
 	def test_simulation_random_agent_picker(self):
-		array = [
-			np.array([
-				[0, 0, 0, 0],
-				[0, 0, 0, 0],
-				[1, 1, 1, 1],
-				[1, 1, 2, 2]
-			]),
-		]
+		# initial_array = [
+		# 	np.array([
+		# 		[0, 0, 0, 0],
+		# 		[0, 0, 0, 0],
+		# 		[1, 1, 1, 1],
+		# 		[1, 1, 2, 2]
+		# 	]),
+		# ]
 
 		possible_states = [
 			np.array([
@@ -613,14 +613,14 @@ class SimulationTestCase(unittest.TestCase):
 			
 
 	def test_simulation_random_vacancy_picker(self):
-		array = [
-			np.array([
-				[0, 0, 0, 0],
-				[1, 1, 1, 1],
-				[1, 1, 1, 1],
-				[1, 1, 2, 2]
-			]),
-		]
+		# array = [
+		# 	np.array([
+		# 		[0, 0, 0, 0],
+		# 		[1, 1, 1, 1],
+		# 		[1, 1, 1, 1],
+		# 		[1, 1, 2, 2]
+		# 	]),
+		# ]
 
 		possible_states = [
 			np.array([

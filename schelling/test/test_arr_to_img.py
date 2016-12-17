@@ -5,11 +5,7 @@ from schelling.arr_to_img import to_image
 class ArrToImgTest(unittest.TestCase):
 
 	def test_expected_output(self):
-		c0 = [255, 255, 255]
-		c1 = [255, 0, 0]
-		c6 = [255, 255, 0]
-
-
+		
 		c = [
 			[255, 255, 255],
 			[255, 0, 0],
