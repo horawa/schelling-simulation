@@ -1,4 +1,4 @@
-from ..create_array import create_array
+from schelling.create_array import create_array
 from decimal import Decimal
 import unittest
 import numpy as np

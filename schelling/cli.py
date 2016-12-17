@@ -1,5 +1,5 @@
-from .simulation import run_simulation, get_save_state_callback
-from .simulation_settings import SimulationSettings
+from schelling.simulation import run_simulation, get_save_state_callback
+from schelling.simulation_settings import SimulationSettings
 import schelling.utility_functions as ut
 
 import click

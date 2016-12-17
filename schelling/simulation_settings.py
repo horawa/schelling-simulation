@@ -1,4 +1,4 @@
-from .agent_distributions import get_distribution_including_vacancies
+from schelling.agent_distributions import get_distribution_including_vacancies
 
 class SimulationSettings:
 	"""

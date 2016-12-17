@@ -1,5 +1,5 @@
 import unittest
-from ..simulation_settings import SimulationSettings
+from schelling.simulation_settings import SimulationSettings
 
 class SettingsTestCase(unittest.TestCase):
 	def test_validate(self):

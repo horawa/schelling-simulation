@@ -1,6 +1,6 @@
 import unittest
-from ..utility_functions import (create_flat_utility, create_peaked_utility, 
-	create_spiked_utility)
+from schelling.utility_functions import (create_flat_utility, 
+	create_peaked_utility, create_spiked_utility)
 from numpy import linspace
 
 class UtilityFunctionsTest(unittest.TestCase):

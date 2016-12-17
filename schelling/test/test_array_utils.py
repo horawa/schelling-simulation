@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from ..array_utils import get_agent_indices, get_vacancy_indices
+from schelling.array_utils import get_agent_indices, get_vacancy_indices
 
 class ArrayUtilsTest(unittest.TestCase):
 	def setUp(self):

@@ -1,7 +1,7 @@
 import unittest
 from math import isclose
 
-from ..agent_distributions import (get_uniform_distribution, 
+from schelling.agent_distributions import (get_uniform_distribution, 
 	get_exponential_distribution,
 	get_normal_distribution, get_linear_distribution,
 	get_distribution_including_vacancies)

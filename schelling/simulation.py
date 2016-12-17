@@ -3,11 +3,11 @@ import numpy.random as rand
 import math
 import os
 
-from .array_utils import get_agent_indices, get_vacancy_indices
-from .utility_functions import get_utility_for_array
-from .create_array import create_array
-from .simulation_result import SimulationResult
-from .arr_to_img import to_image, image_save
+from schelling.array_utils import get_agent_indices, get_vacancy_indices
+from schelling.utility_functions import get_utility_for_array
+from schelling.create_array import create_array
+from schelling.simulation_result import SimulationResult
+from schelling.arr_to_img import to_image, image_save
 import schelling.segregation_measures as sm
 
 

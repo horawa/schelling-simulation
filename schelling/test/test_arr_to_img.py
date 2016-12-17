@@ -1,6 +1,6 @@
 import unittest
 from numpy import array, array_equal
-from ..arr_to_img import to_image
+from schelling.arr_to_img import to_image
 
 class ArrToImgTest(unittest.TestCase):
 

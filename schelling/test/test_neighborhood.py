@@ -1,6 +1,6 @@
 import unittest
 from numpy import array, array_equal
-from ..neighborhood import (get_neighborhood, get_neighborhood_exclusive, 
+from schelling.neighborhood import (get_neighborhood, get_neighborhood_exclusive, 
 	get_unlike_neighbor_fraction)
 
 

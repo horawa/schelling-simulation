@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from ..simulation_result import SimulationResult
+from schelling.simulation_result import SimulationResult
 
 class ResultTestCase(unittest.TestCase):
 	def setUp(self):

@@ -2,16 +2,17 @@ import unittest
 import math
 import numpy as np
 
-from ..simulation import (_get_unsatisfied_agent_indices, update_array,
+from schelling.simulation import (_get_unsatisfied_agent_indices, update_array,
 	_pick_agent_index_to_move, _get_better_vacancies, run_simulation,
 	_pick_better_vacancy_index, _move, _random_picker, _first_picker, 
 	_create_roulette_picker)
 import schelling.utility_functions as ut
-from ..array_utils import get_agent_indices, get_vacancy_indices
-from ..neighborhood import get_unlike_neighbor_fraction
-from ..utility_functions import get_utility_for_array, create_flat_utility
-from ..simulation_settings import SimulationSettings
-from ..simulation_result import SimulationResult
+from schelling.array_utils import get_agent_indices, get_vacancy_indices
+from schelling.neighborhood import get_unlike_neighbor_fraction
+from schelling.utility_functions import (get_utility_for_array, 
+	create_flat_utility)
+from schelling.simulation_settings import SimulationSettings
+from schelling.simulation_result import SimulationResult
 
 # TODO Refactor this abomination
 

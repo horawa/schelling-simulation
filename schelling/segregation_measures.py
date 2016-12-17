@@ -2,8 +2,8 @@ from math import log, isclose
 import numpy as np
 from scipy.ndimage.measurements import label
 
-from .neighborhood import (get_neighborhood, get_neighborhood_exclusive, 
-	get_unlike_neighbor_fraction)
+from schelling.neighborhood import (get_neighborhood, 
+	get_neighborhood_exclusive, get_unlike_neighbor_fraction)
 
 
 def _get_measure_average(array, agent_indices, measure_func):
