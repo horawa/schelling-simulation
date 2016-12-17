@@ -5,6 +5,7 @@ from .arr_to_img import to_image, image_save
 
 import click
 import os
+import sys
 
 _utility_function_creators = {
 		'flat': ut.create_flat_utility,
@@ -126,7 +127,7 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 	if os.path.exists(save_to):
 		if not os.path.isdir(save_to):
 			print("Not a directory: " + save_to)
-			exit(1)
+			sys.exit(1)
 	else:
 		os.mkdir(save_to)
 
