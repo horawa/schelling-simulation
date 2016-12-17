@@ -4,7 +4,6 @@ import math
 import os
 
 from .array_utils import get_agent_indices, get_vacancy_indices
-from .neighborhood import get_unlike_neighbor_fraction
 from .utility_functions import get_utility_for_array
 from .create_array import create_array
 from .simulation_result import SimulationResult
@@ -92,7 +91,6 @@ def update_array(array, utility, radius, result, agent_picker,
 
 	agent_index = _pick_agent_index_to_move(unsatisfied_agent_indices, 
 		agent_picker)
-	agent_utility = utility(agent_index)
 
 	vacancy_indices = get_vacancy_indices(array)
 

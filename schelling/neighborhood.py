@@ -1,5 +1,4 @@
 import numpy as np
-from .array_utils import get_agent_indices
 
 def get_neighborhood(array, agent_index, radius=1):
 	"""Get neighborhood of agent with specified radius.

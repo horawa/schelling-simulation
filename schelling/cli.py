@@ -1,7 +1,6 @@
 from .simulation import run_simulation, get_save_state_callback
 from .simulation_settings import SimulationSettings
 import schelling.utility_functions as ut
-from .arr_to_img import to_image, image_save
 
 import click
 import os
