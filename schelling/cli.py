@@ -137,6 +137,8 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 
 	result.save_JSON(os.path.join(save_to, 'result.json'))
 
+	if verbose:
+		print("done!")
 
 if __name__ == '__main__':
 	simulation()
