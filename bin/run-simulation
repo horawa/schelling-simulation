@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+# This script runs 30 simulations with different settings and saves the output
+# in a subdirectory of the directory specified by first argument. 
+# Arguments $2 and $3 specify a range of tests to run.
+# Output and time for each simulation are stored in simulation.log
+# Example:
+# `run-simulation ./out` runs all simulations
+# `run-simulation ./out  8 10` runs simulations 8, 9, 10
+# `run-simulation ./out  0 12` Test different utilities for 2 and 4 agents
+# `run-simulation ./out 12 24` Test roulette picker with flat utility and peaked utility
+# `run-simulation ./out 24 30` Test radii for peaked utility
+
+
+get_agent_proportion_flags ()
+{
+	agent_count=$1
+	# set agent-proportion the given number of times
+	agent_proportion=`bc -l <<< "1/$agent_count"`
+	agent_proportion_flags=""
+	for i in `seq 1 $agent_count` ; do
+		agent_proportion_flags+="--agent-proportion $agent_proportion "
+	done
+	echo -n "$agent_proportion_flags"
+}
+
+COMMANDS=()
+OUTPUT_DIRS=()
+
+
+
+# All options:
+# --grid-size
+# --vacancy-proportion
+# --agent-proportion
+# --initial-random-allocation
+# --utility-function
+# --satisficers / --no-satisficers
+# --agent-picking-regime
+# --vacancy-picking-regime
+# --agent-roulette-base-weight
+# --vacancy-roulette-base-weight
+# --radius
+# --count-vacancies  
+# --iterations
+# --save-to          
+# --save-period
+
+
+SAVE_PERIOD=100
+SAVE_DIR=$1
+
+GRID_SIZE=100
+ITERATIONS=1000000
+VACANCY_PROPORTION=0.2
+
+# Test different utilities for 2 and 4 agents
+# initial random allocation
+# agent picking regime random
+# vacancy picking regime random
+# radius 1
+# count vacancies true
+# agent_count=2, 4
+# utility = flat 0.375, flat 0.5, flat 0.625, peaked 0.5, peaked_cutoff 0.5, spiked 0.5
+
+AGENT_PICKING_REGIME="random"
+VACANCY_PICKING_REGIME="random"
+RADIUS=1
+AGENT_COUNTS=(2 4)
+UTILITIES=(
+	"flat 0.375"
+	"flat 0.5" 
+	"flat 0.625" 
+	"peaked 0.5" 
+	"peaked_cutoff 0.5" 
+	"spiked 0.5"
+)
+
+
+
+for utility in "${UTILITIES[@]}" ; do
+	for agent_count in "${AGENT_COUNTS[@]}" ; do
+		agent_proportion_flags=`get_agent_proportion_flags $agent_count`
+		save_to="$SAVE_DIR/test_utilities/$utility/${agent_count}_agents/"
+		save_to=`echo -n $save_to | tr ' ' '_'`
+		cli_command="schelling-cli \
+			--grid-size $GRID_SIZE \
+			--vacancy-proportion $VACANCY_PROPORTION \
+			$agent_proportion_flags \
+			--initial-random-allocation \
+			--utility-function $utility \
+			--no-satisficers \
+			--agent-picking-regime random \
+			--vacancy-picking-regime random \
+			--radius $RADIUS \
+			--count-vacancies \
+			--iterations $ITERATIONS \
+			--save-to $save_to \
+			--save-period $SAVE_PERIOD
+			--verbose"
+		cli_command=`echo -n $cli_command | tr -s ' ' | tr -s '\t'`
+		OUTPUT_DIRS+=("$save_to")
+		COMMANDS+=("$cli_command")
+	done
+done
+
+
+# Test roulette picker with flat utility and peaked utility
+RADIUS=1
+
+AGENT_PICKING_REGIMES=("roulette" "random" "roulette")
+VACANCY_PICKING_REGIMES=("random" "roulette" "roulette")
+AGENT_COUNTS=(2 4)
+UTILITIES=("flat 0.625" "peaked 0.5")
+
+for (( i = 0; i < ${#AGENT_PICKING_REGIMES[@]}; i++ )) ; do
+	agent_regime=${AGENT_PICKING_REGIMES[$i]}
+	vacancy_regime=${VACANCY_PICKING_REGIMES[$i]}
+	for utility in "${UTILITIES[@]}" ; do
+		for agent_count in "${AGENT_COUNTS[@]}" ; do
+			agent_proportion_flags=`get_agent_proportion_flags $agent_count`
+			save_to="$SAVE_DIR/test_roulette/a_${agent_regime}_v_${vacancy_regime}/$utility/${agent_count}_agents/"
+			save_to=`echo -n $save_to | tr ' ' '_'`
+			cli_command="schelling-cli \
+				--grid-size $GRID_SIZE \
+				--vacancy-proportion $VACANCY_PROPORTION \
+				$agent_proportion_flags \
+				--initial-random-allocation \
+				--utility-function $utility \
+				--no-satisficers \
+				--agent-picking-regime $agent_regime \
+				--vacancy-picking-regime $vacancy_regime \
+				--radius $RADIUS \
+				--count-vacancies \
+				--iterations $ITERATIONS \
+				--save-to $save_to \
+				--save-period $SAVE_PERIOD
+				--verbose"
+			cli_command=`echo -n $cli_command | tr -s ' ' | tr -s '\t'`
+			OUTPUT_DIRS+=("$save_to")
+			COMMANDS+=("$cli_command")
+		done
+	done
+done
+
+
+
+# Test radii for peaked utility
+UTILITY="peaked 0.5"
+
+RADII=(1 2 4)
+AGENT_COUNTS=(2 4)
+
+for radius in "${RADII[@]}" ; do
+	for agent_count in "${AGENT_COUNTS[@]}" ; do
+		agent_proportion_flags=`get_agent_proportion_flags $agent_count`
+		save_to="$SAVE_DIR/test_radii_peaked/radius_${radius}/${agent_count}_agents/"
+		save_to=`echo -n $save_to | tr ' ' '_'`
+		cli_command="schelling-cli \
+			--grid-size $GRID_SIZE \
+			--vacancy-proportion $VACANCY_PROPORTION \
+			$agent_proportion_flags \
+			--initial-random-allocation \
+			--utility-function $UTILITY \
+			--no-satisficers \
+			--agent-picking-regime random \
+			--vacancy-picking-regime random \
+			--radius $radius \
+			--count-vacancies \
+			--iterations $ITERATIONS \
+			--save-to $save_to \
+			--save-period $SAVE_PERIOD
+			--verbose"
+		cli_command=`echo -n $cli_command | tr -s ' ' | tr -s '\t'`
+		OUTPUT_DIRS+=("$save_to")
+		COMMANDS+=("$cli_command")
+	done
+done
+
+
+# validate arguments
+if [[ $# -eq 1 ]] ; then
+	first=0
+	last=${#COMMANDS[@]}
+elif [[ $# -eq 3 && $2 -ge 0 && $3 -le ${#COMMANDS[@]} ]]; then
+	first=$2
+	last=$3
+else
+	echo "Usage: $0 output_dir [<first test> <last test>]"
+	exit 1
+fi
+
+
+# Execute all commands
+for (( i = $first; i < $last; i++ )) ; do
+	save_directory="${OUTPUT_DIRS[$i]}"
+	cmd="${COMMANDS[$i]}"
+	echo "$save_directory"
+	mkdir -p "$save_directory"
+	echo "$cmd" > "$save_directory/command.txt"
+	(time eval "$cmd") > "$save_directory/simulation.log" 2>&1 &
+done
+
+
+

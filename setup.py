@@ -23,6 +23,7 @@ setup(
 	],
 	include_package_data=True,
 	zip_safe=False,
+    scripts=['bin/run-simulation'],
 	entry_points = {
 		'console_scripts': ['schelling-cli=schelling.cli:simulation'],
 	}
