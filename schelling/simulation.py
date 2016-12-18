@@ -2,6 +2,7 @@ import numpy as np
 import numpy.random as rand
 import math
 import os
+import click
 
 from schelling.array_utils import get_agent_indices, get_vacancy_indices
 from schelling.utility_functions import get_utility_for_array
@@ -321,8 +322,8 @@ def get_save_state_callback(save_directory, save_period,
 			image_save(to_image(array), 
 				os.path.join(save_directory, file_name))
 			if verbose:
-				print(iteration)
-				print(result)
+				click.echo(iteration)
+				click.echo(result)
 	return save_state
 
 
