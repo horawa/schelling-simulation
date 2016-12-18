@@ -14,11 +14,8 @@ setup(
 	author='Stas Horawa',
 	author_email='stashorawa@gmail.com',
 	packages=['schelling'],
-	setup_requires=[
-		"numpy>=1.12.0b1,<2.0.0",
-	],
 	install_requires=[
-		#"numpy>=1.12.0b1,<2.0.0",
+		"numpy>=1.12.0b1,<2.0.0",
 		"scipy>=0.18.1,<1.0.0",
 		"matplotlib>=1.5.3,<2.0.0",
 		"scikit-image>=0.12.3,<1.0.0",
