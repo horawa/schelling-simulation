@@ -1,6 +1,5 @@
 import json
 import os
-import matplotlib.pyplot as plt
 import numpy as np
 
 class SimulationResult:
@@ -34,6 +33,8 @@ class SimulationResult:
 
 
 	def plot_measures(self): # pragma: nocover
+		import matplotlib.pyplot as plt
+
 		measures = self.__dict__.items()
 		plots = len(measures)
 
