@@ -5,10 +5,10 @@
 # Output and time for each simulation are stored in simulation.log
 # Example:
 # `run-simulation ./out` runs all simulations
-# `run-simulation ./out  8 10` runs simulations 8, 9, 10
-# `run-simulation ./out  0 12` Test different utilities for 2 and 4 agents
-# `run-simulation ./out 12 24` Test roulette picker with flat utility and peaked utility
-# `run-simulation ./out 24 30` Test radii for peaked utility
+# `run-simulation ./out`  8 10` runs simulations 8, 9, 10
+# `run-simulation ./out`  0 12` Test different utilities for 2 and 4 agents
+# `run-simulation ./out` 12 24` Test roulette picker with flat utility and peaked utility
+# `run-simulation ./out` 24 30` Test radii for peaked utility
 
 
 get_agent_proportion_flags ()
@@ -50,7 +50,7 @@ SAVE_PERIOD=100
 SAVE_DIR=$1
 
 GRID_SIZE=100
-ITERATIONS=1000000
+ITERATIONS=100000
 VACANCY_PROPORTION=0.2
 
 # Test different utilities for 2 and 4 agents
@@ -189,7 +189,6 @@ else
 	exit 1
 fi
 
-
 # Execute all commands
 for (( i = $first; i < $last; i++ )) ; do
 	save_directory="${OUTPUT_DIRS[$i]}"
@@ -197,7 +196,7 @@ for (( i = $first; i < $last; i++ )) ; do
 	echo "$save_directory"
 	mkdir -p "$save_directory"
 	echo "$cmd" > "$save_directory/command.txt"
-	(time eval "$cmd") > "$save_directory/simulation.log" 2>&1 &
+	{ time eval "${cmd}" > $save_directory/simulation.log 2>&1 ; }  > "$save_directory/time.log" 2>&1
 done
 
 
