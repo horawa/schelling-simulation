@@ -196,7 +196,7 @@ for (( i = $first; i < $last; i++ )) ; do
 	echo "$save_directory"
 	mkdir -p "$save_directory"
 	echo "$cmd" > "$save_directory/command.txt"
-	{ time eval "${cmd}" > $save_directory/simulation.log 2>&1 ; }  > "$save_directory/time.log" 2>&1
+	{ time eval "${cmd}" > $save_directory/simulation.log 2>&1 ; }  > "$save_directory/time.log" 2>&1 &
 done
 
 
