@@ -23,7 +23,7 @@ _utility_function_creators = {
 @click.option('--agent-proportion', '-a', multiple=True, type=float, 
 	default=(0.5, 0.5),
 	help='Proportion of agents. '
-	'Specify multiple for up 8 agent types (must sum up to 1). '
+	'Specify multiple times for up 8 agent types (must sum up to 1). '
 	'Default = 0.5 0.5')
 @click.option('--initial-random-allocation/--initial-segregated-allocation', 
 	default=True,
@@ -75,6 +75,14 @@ _utility_function_creators = {
 @click.option('--count-vacancies', is_flag=True, default=False,
 	help='Specifies, if vacancies should be counted as neighbors, when '
 	'calculating the fraction of unlike neighbors.')
+@click.option('--segregation-measure', multiple=True, type=str, 
+	default=('entropy_average', 'clusters', 'ghetto_rate', 
+		'mix_deviation_average'),
+	help='Segregation measure to be saved in result. '
+	'Specify multiple times for multiple measures. Avaliable measures are: '
+	'entropy_average, switch_rate_average, distance_average, '
+	'mix_deviation_average, share_average, ghetto_rate, clusters'
+	'Default: entropy_average, clusters, ghetto_rate, mix_deviation_average')
 @click.option('--iterations', '-i', default=10000,
 	help='Number of iterations. One agent moves during an iteration. '
 	'Default = 10000')
@@ -89,8 +97,8 @@ _utility_function_creators = {
 def simulation(grid_size, vacancy_proportion, agent_proportion, 
 	initial_random_allocation, utility_function, satisficers, 
 	agent_picking_regime, vacancy_picking_regime, agent_roulette_base_weight, 
-	vacancy_roulette_base_weight, radius, count_vacancies, iterations, save_to, 
-	save_period, verbose):
+	vacancy_roulette_base_weight, radius, count_vacancies, segregation_measure,
+	iterations, save_to, save_period, verbose):
 	"""Command line interface for the Schelling simulation."""
 	
 	ut_name = utility_function[0]
@@ -119,6 +127,7 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 			vacancy_roulette_base_weight=vacancy_roulette_base_weight,
 			radius=radius,
 			count_vacancies=count_vacancies,
+			segregation_measure_names=list(segregation_measure),
 			iterations=iterations
 		)
 

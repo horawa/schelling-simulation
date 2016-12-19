@@ -5,23 +5,27 @@ from schelling.simulation_result import SimulationResult
 
 class ResultTestCase(unittest.TestCase):
 	def setUp(self):
-		self.result = SimulationResult()
-		self.result.switch_rate_average = [4, 5]
-		self.result.entropy_average = [4, 5]
-		self.result.ghetto_rate = [4, 5]
-		self.result.clusters = [4, 5]
-		self.result.distance_average = [4, 5]
-		self.result.mix_deviation_average = []
+		names=['entropy_average', 
+			'switch_rate_average', 'clusters', 'mix_deviation_average']
+		self.result = SimulationResult(names)
+		
+		# leave one empty
+		for name in names[:-1]:
+			self.result.save_measure(name, 4)
+			self.result.save_measure(name, 5)
+			self.result.save_measure(name, 6)
+			self.result.save_measure(name, 7)
+
 
 	def test_JSON(self):
 		path = './out.json'
 
-		initial_dict = dict(self.result.__dict__)
+		initial_dict = dict(self.result._segregation_measures)
 
 		self.result.save_JSON(path)
 		self.result.parse_JSON(path)
 
-		final_dict = dict(self.result.__dict__)
+		final_dict = dict(self.result._segregation_measures)
 
 		os.remove(path)
 
@@ -30,7 +34,7 @@ class ResultTestCase(unittest.TestCase):
 
 	def test_str(self):
 		expected_output = ""
-		items = self.result.__dict__.items()
+		items = self.result._segregation_measures.items()
 		for item in items:
 			expected_output += item[0] + ": " 
 			if item[1]:

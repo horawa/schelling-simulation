@@ -386,7 +386,7 @@ class SimulationTestCase(unittest.TestCase):
 
 		clusters = [3, 4, 4, 4, 3] + ([4, 3] * 100)
 		with self.subTest():
-			self.assertEqual(result.clusters, clusters)
+			self.assertEqual(result.get_measures()['clusters'], clusters)
 
 
 	def test_simulation_halted(self):
@@ -423,7 +423,7 @@ class SimulationTestCase(unittest.TestCase):
 
 		clusters = [1]
 		with self.subTest():
-			self.assertEqual(result.clusters, clusters)
+			self.assertEqual(result.get_measures()['clusters'], clusters)
 
 		with self.subTest():
 			self.assertEqual(callback_count[0], expected_callback_count)
@@ -475,7 +475,7 @@ class SimulationTestCase(unittest.TestCase):
 
 		clusters = [1] + ([2, 2] * 100)
 		with self.subTest():
-			self.assertEqual(result.clusters, clusters)	
+			self.assertEqual(result.get_measures()['clusters'], clusters)	
 
 
 	def test_run_simulation_vacancies_counted(self):
@@ -537,7 +537,7 @@ class SimulationTestCase(unittest.TestCase):
 
 		clusters = [2, 3, 3, 3, 2]
 		with self.subTest():
-			self.assertEqual(result.clusters, clusters)
+			self.assertEqual(result.get_measures()['clusters'], clusters)
 
 
 	def test_simulation_random_agent_picker(self):
@@ -764,7 +764,7 @@ class SimulationTestCase(unittest.TestCase):
 			agent_picker = _create_roulette_picker(0.0, utility, True,
 				lambda *a: picked_value)
 			update_array(array, utility, 1, result, agent_picker, _first_picker,
-			 True, False)
+			 True, ['entropy_average'], False)
 
 			with self.subTest(v=picked_value, out=array, exp=expected_state):
 				self.assertTrue(np.array_equal(array, expected_state))
@@ -857,7 +857,7 @@ class SimulationTestCase(unittest.TestCase):
 			agent_picker = _create_roulette_picker(0.1, utility, True,
 				lambda *a: picked_value)
 			update_array(array, utility, 1, result, agent_picker, _first_picker,
-			 True, True)
+			 True, ['entropy_average'], True)
 
 			with self.subTest(v=picked_value, out=array, exp=expected_state):
 				self.assertTrue(np.array_equal(array, expected_state))
@@ -938,7 +938,7 @@ class SimulationTestCase(unittest.TestCase):
 				lambda *a: 0.0)
 
 			update_array(array, utility, 1, result, agent_picker, 
-				vacancy_picker, True, True)
+				vacancy_picker, True, ['entropy_average'], True)
 
 			with self.subTest(v=picked_value, out=array, exp=expected_state):
 				self.assertTrue(np.array_equal(array, expected_state))
@@ -959,7 +959,7 @@ class SimulationTestCase(unittest.TestCase):
 			all_satisfied_array)
 
 		output = update_array(all_satisfied_array, utility, 
-			1, result, _first_picker, _first_picker, False)
+			1, result, _first_picker, _first_picker, False, ['entropy_average'])
 
 		self.assertEqual(output, expected_output)
 
@@ -979,7 +979,8 @@ class SimulationTestCase(unittest.TestCase):
 			no_better_vacancies_array)
 
 		output = update_array(no_better_vacancies_array, 
-			utility, 1, result, _first_picker, _first_picker, False)
+			utility, 1, result, _first_picker, _first_picker, False, 
+			['entropy_average'])
 
 		self.assertEqual(output, expected_output)
 
@@ -1000,7 +1001,7 @@ class SimulationTestCase(unittest.TestCase):
 
 		output = update_array(no_better_vacancies_for_first_agent_array, 
 			utility, 1, result, _first_picker, 
-			_first_picker, False)
+			_first_picker, False, ['entropy_average'])
 
 		self.assertEqual(output, expected_output)
 
@@ -1024,7 +1025,7 @@ class SimulationTestCase(unittest.TestCase):
 
 		output = update_array(no_better_vacancies_array, 
 			utility, 1, result, custom_first_picker, 
-			custom_first_picker, False)
+			custom_first_picker, False, ['entropy_average'])
 
 		self.assertEqual(output, expected_output)
 

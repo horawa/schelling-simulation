@@ -1,4 +1,5 @@
 from schelling.agent_distributions import get_distribution_including_vacancies
+import schelling.segregation_measures as sm
 
 class SimulationSettings:
 	"""
@@ -19,6 +20,8 @@ class SimulationSettings:
 			vacancy_roulette_base_weight=None,
 			radius=1,
 			count_vacancies=False,
+			segregation_measure_names=['entropy_average', 'clusters', 
+				'ghetto_rate', 'mix_deviation_average'],
 			iterations=10000):
 
 		self.grid_size = grid_size
@@ -33,6 +36,7 @@ class SimulationSettings:
 		self.vacancy_roulette_base_weight = vacancy_roulette_base_weight
 		self.radius = radius
 		self.count_vacancies = count_vacancies
+		self.segregation_measure_names = segregation_measure_names
 		self.iterations = iterations
 
 	def validate(self):
@@ -84,6 +88,10 @@ class SimulationSettings:
 
 		if is_not_bool(self.count_vacancies):
 			raise ValueError("Count vacancies must be true or false")
+
+		if any(measure not in sm.segregation_measures \
+				for measure in self.segregation_measure_names):
+			raise ValueError("Invalid segregation measure name")
 
 		if self.iterations < 1:
 			raise ValueError("Iterations must be > 1")

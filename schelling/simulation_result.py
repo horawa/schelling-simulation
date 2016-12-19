@@ -1,24 +1,24 @@
 import json
 import os
 import numpy as np
+import schelling.segregation_measures as sm
 
 class SimulationResult:
 	"""
 	This class stores the values of segregation measures 
 	calculated for each iteration of simulation
 	"""
-	def __init__(self):
-		self.switch_rate_average = []
-		self.entropy_average = []
-		self.ghetto_rate = []
-		self.clusters = []
-		self.distance_average = []
-		self.mix_deviation_average = []
-		self.share_average = []
+	_segregation_measures = {}
+
+	def __init__(self, 
+			segregation_measure_names=sm.segregation_measures.keys()):
+		for segregation_measure_name in segregation_measure_names:
+			self._segregation_measures[segregation_measure_name] = []
 
 
 	def save_JSON(self, output_path):
-		json_data = json.dumps(self.__dict__, sort_keys=True, indent=4)
+		json_data = json.dumps(self._segregation_measures, 
+			sort_keys=True, indent=4)
 		file = open(output_path, 'w')
 		file.write(json_data)
 		file.close()
@@ -29,13 +29,21 @@ class SimulationResult:
 		data = file.read()
 		file.close()
 		json_data = json.loads(data)
-		self.__dict__ = json_data
+		self._segregation_measures = json_data
+
+
+	def save_measure(self, name, value):
+		self._segregation_measures[name].append(value)
+
+
+	def get_measures(self):
+		return self._segregation_measures
 
 
 	def plot_measures(self): # pragma: nocover
 		import matplotlib.pyplot as plt
 
-		measures = self.__dict__.items()
+		measures = self._segregation_measures.items()
 		plots = len(measures)
 
 		f, axarr = plt.subplots(plots, sharex=True)
@@ -54,7 +62,7 @@ class SimulationResult:
 
 	def __str__(self):
 		output = ""
-		for measure_name, measure_values in self.__dict__.items():
+		for measure_name, measure_values in self._segregation_measures.items():
 			if measure_values:
 				seg_last_value = str(round(measure_values[-1], 4))
 			else:

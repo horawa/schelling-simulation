@@ -6,6 +6,9 @@ from schelling.neighborhood import (get_neighborhood,
 	get_neighborhood_exclusive, get_unlike_neighbor_fraction)
 
 
+
+
+
 def _get_measure_average(array, agent_indices, measure_func):
 	"""Get average of fuction results for each index in array
 	
@@ -218,3 +221,12 @@ def share(array, agent_index, radius=1):
 		array, tuple(agent_index), radius=radius, count_vacancies=False)
 	return 1 - unlike_neighbor_fraction
 
+segregation_measures = {
+	'entropy_average': entropy_average,
+	'switch_rate_average': switch_rate_average,
+	'distance_average': distance_average,
+	'mix_deviation_average': mix_deviation_average,
+	'share_average': share_average,
+	'ghetto_rate': ghetto_rate,
+	'clusters': clusters,
+}

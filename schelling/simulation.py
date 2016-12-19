@@ -26,7 +26,7 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	    SimulationResult: Result - segregation measures for each iteration
 	"""
 	settings.validate()
-	result = SimulationResult()
+	result = SimulationResult(settings.segregation_measure_names)
 
 	array = create_array(settings.grid_size, 
 		settings.get_agent_type_proportions(), 
@@ -58,7 +58,7 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 		callback(array, result, i)
 		is_simulation_halted = update_array(array, utility, settings.radius, 
 			result, agent_picker, vacancy_picker, settings.count_vacancies, 
-			settings.satisficers)
+			settings.segregation_measure_names, settings.satisficers)
 
 		# if no further moves are possible, exit simulation early
 		if is_simulation_halted:
@@ -68,7 +68,8 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 
 def update_array(array, utility, radius, result, agent_picker, 
-	vacancy_picker, count_vacancies, satisficers=False):
+	vacancy_picker, count_vacancies, segregation_measure_names,
+	satisficers=False):
 	"""Do a single iteration of the simulation.
 	
 	Args:
@@ -81,7 +82,8 @@ def update_array(array, utility, radius, result, agent_picker,
 	"""
 	agent_indices = get_agent_indices(array)
 
-	_update_result(result, array, agent_indices, count_vacancies)
+	_update_result(result, array, agent_indices, count_vacancies, 
+		segregation_measure_names)
 	
 	unsatisfied_agent_indices = _get_unsatisfied_agent_indices(utility, 
 		agent_indices, satisficers=satisficers)
@@ -240,7 +242,8 @@ def _move(array, agent_index, vacancy_index):
 	array[agent_index] = 0
 
 
-def _update_result(result, array, agent_indices, count_vacancies):
+def _update_result(result, array, agent_indices, count_vacancies, 
+		segregation_measure_names):
 	"""Store current segregation measures in segregation result object
 	
 	Args:
@@ -248,22 +251,34 @@ def _update_result(result, array, agent_indices, count_vacancies):
 	    array (ndarray): array
 	    agent_indices (ndarray): indices of agents in array
 	"""
-	switch_rate_average = sm.switch_rate_average(array, agent_indices)
-	entropy_average = sm.entropy_average(array, agent_indices, 
-		count_vacancies=count_vacancies)
-	ghetto_rate = sm.ghetto_rate(array, agent_indices)
-	clusters = sm.clusters(array)
-	distance_average = sm.distance_average(array, agent_indices)
-	mix_deviation_average = sm.mix_deviation_average(array, agent_indices)
-	share_average = sm.share_average(array, agent_indices)
+	for segregation_measure_name in segregation_measure_names:
+		if segregation_measure_name == 'entropy_average':
+			value = sm.segregation_measures['entropy_average'](
+				array, agent_indices, count_vacancies=count_vacancies)
+		elif segregation_measure_name == 'clusters':
+			value = sm.segregation_measures['clusters'](array)
+		else:
+			value = sm.segregation_measures[segregation_measure_name](
+				array, agent_indices)
 
-	result.switch_rate_average.append(switch_rate_average)
-	result.entropy_average.append(entropy_average)
-	result.ghetto_rate.append(ghetto_rate)
-	result.clusters.append(clusters)
-	result.distance_average.append(distance_average)
-	result.mix_deviation_average.append(mix_deviation_average)
-	result.share_average.append(share_average)
+		result.save_measure(segregation_measure_name, value)
+
+	# switch_rate_average = sm.switch_rate_average(array, agent_indices)
+	# entropy_average = sm.entropy_average(array, agent_indices, 
+	# 	count_vacancies=count_vacancies)
+	# ghetto_rate = sm.ghetto_rate(array, agent_indices)
+	# clusters = sm.clusters(array)
+	# distance_average = sm.distance_average(array, agent_indices)
+	# mix_deviation_average = sm.mix_deviation_average(array, agent_indices)
+	# share_average = sm.share_average(array, agent_indices)
+
+	# result.switch_rate_average.append(switch_rate_average)
+	# result.entropy_average.append(entropy_average)
+	# result.ghetto_rate.append(ghetto_rate)
+	# result.clusters.append(clusters)
+	# result.distance_average.append(distance_average)
+	# result.mix_deviation_average.append(mix_deviation_average)
+	# result.share_average.append(share_average)
 
 
 def _first_picker(agent_indices, agent_type=None):
