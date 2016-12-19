@@ -11,6 +11,14 @@
 # `run-simulation ./out` 24 30` Test radii for peaked utility
 
 
+USAGE="Usage: $0 output_dir grid_size [<first test> <last test>]"
+
+if [[ $2 -le 1 || $2 -gt 1000 ]] ; then
+	echo "$USAGE"
+	echo "Pick grid size in [2, 1000]"
+	exit 2
+fi
+
 get_agent_proportion_flags ()
 {
 	agent_count=$1
@@ -49,7 +57,7 @@ OUTPUT_DIRS=()
 SAVE_PERIOD=100
 SAVE_DIR=$1
 
-GRID_SIZE=100
+GRID_SIZE=$2
 ITERATIONS=100000
 VACANCY_PROPORTION=0.2
 
@@ -177,15 +185,16 @@ for radius in "${RADII[@]}" ; do
 done
 
 
+
 # validate arguments
-if [[ $# -eq 1 ]] ; then
+if [[ $# -eq 2 ]] ; then
 	first=0
 	last=${#COMMANDS[@]}
-elif [[ $# -eq 3 && $2 -ge 0 && $3 -le ${#COMMANDS[@]} ]]; then
-	first=$2
-	last=$3
+elif [[ $# -eq 4 && $3 -ge 0 && $4 -le ${#COMMANDS[@]} ]]; then
+	first=$3
+	last=$4
 else
-	echo "Usage: $0 output_dir [<first test> <last test>]"
+	echo "$USAGE"
 	exit 1
 fi
 
