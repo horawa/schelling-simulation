@@ -28,6 +28,7 @@ class SettingsTestCase(unittest.TestCase):
 			{"segregation_measure_names": ['entropy_average', 'asdf']},
 			{"segregation_measure_names": ['asdf']},
 			{"iterations": -1},
+			{"save_period": -1},
 			{
 				"vacancy_picking_regime": 'roulette',
 				"vacancy_roulette_base_weight": -10,

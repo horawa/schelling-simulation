@@ -56,9 +56,11 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 	for i in range(settings.iterations):
 		callback(array, result, i)
-		is_simulation_halted = update_array(array, utility, settings.radius, 
+		should_save_result = i % settings.save_period == 0
+		is_simulation_halted = update_array(array, utility, 
 			result, agent_picker, vacancy_picker, settings.count_vacancies, 
-			settings.segregation_measure_names, settings.satisficers)
+			settings.segregation_measure_names, settings.satisficers,
+			should_save_result)
 
 		# if no further moves are possible, exit simulation early
 		if is_simulation_halted:
@@ -67,9 +69,9 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	return result
 
 
-def update_array(array, utility, radius, result, agent_picker, 
+def update_array(array, utility, result, agent_picker, 
 	vacancy_picker, count_vacancies, segregation_measure_names,
-	satisficers=False):
+	satisficers=False, save_result=True):
 	"""Do a single iteration of the simulation.
 	
 	Args:
@@ -82,8 +84,9 @@ def update_array(array, utility, radius, result, agent_picker,
 	"""
 	agent_indices = get_agent_indices(array)
 
-	_update_result(result, array, agent_indices, count_vacancies, 
-		segregation_measure_names)
+	if save_result:
+		_update_result(result, array, agent_indices, count_vacancies, 
+			segregation_measure_names)
 	
 	unsatisfied_agent_indices = _get_unsatisfied_agent_indices(utility, 
 		agent_indices, satisficers=satisficers)
@@ -361,13 +364,12 @@ if __name__ == '__main__': # pragma: no cover
 			vacancy_proportion=0.2,
 			agent_proportions=(0.5, 0.5),
 			utility_function=create_flat_utility(5/8),
-			iterations=10000
+			iterations=10000,
+			save_period=100
 		)
 
-	save_period = 100
-
 	# assuming ./image/ directory exists
-	save_callback = get_save_state_callback('./image/', save_period, 
+	save_callback = get_save_state_callback('./image/', settings.save_period, 
 		settings.iterations, verbose=True)
 
 	simulation_result = run_simulation(settings, callback=save_callback)

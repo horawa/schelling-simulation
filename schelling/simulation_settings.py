@@ -22,7 +22,8 @@ class SimulationSettings:
 			count_vacancies=False,
 			segregation_measure_names=['entropy_average', 'clusters', 
 				'ghetto_rate', 'mix_deviation_average'],
-			iterations=10000):
+			iterations=10000,
+			save_period=100):
 
 		self.grid_size = grid_size
 		self.vacancy_proportion = vacancy_proportion
@@ -38,6 +39,7 @@ class SimulationSettings:
 		self.count_vacancies = count_vacancies
 		self.segregation_measure_names = segregation_measure_names
 		self.iterations = iterations
+		self.save_period = save_period
 
 	def validate(self):
 		def is_not_bool(val):
@@ -94,6 +96,9 @@ class SimulationSettings:
 			raise ValueError("Invalid segregation measure name")
 
 		if self.iterations < 1:
+			raise ValueError("Iterations must be > 1")
+
+		if self.save_period < 1:
 			raise ValueError("Iterations must be > 1")
 
 	def get_agent_type_proportions(self):

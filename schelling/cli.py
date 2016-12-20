@@ -128,7 +128,8 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 			radius=radius,
 			count_vacancies=count_vacancies,
 			segregation_measure_names=list(segregation_measure),
-			iterations=iterations
+			iterations=iterations,
+			save_period=save_period
 		)
 
 
