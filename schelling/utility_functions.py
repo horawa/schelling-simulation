@@ -114,7 +114,7 @@ def create_spiked_utility(spike):
 	return spiked_utility
 
 
-def get_utility_for_array(utility_function, array, count_vacancies=False):
+def get_utility_for_array(utility_function, array, count_vacancies=False, radius=1):
 	"""A wrapper for utility functions.
 	The returned function gets unlike neighbor fraction for specified index
 	in array and optionally agent type and returns the value to the utility 
@@ -129,7 +129,8 @@ def get_utility_for_array(utility_function, array, count_vacancies=False):
 	"""
 	def utility(index, agent_type=None):
 		return utility_function(get_unlike_neighbor_fraction(array, index, 
-			agent_type=agent_type, count_vacancies=count_vacancies))
+			radius=radius, agent_type=agent_type, 
+			count_vacancies=count_vacancies))
 	
 	return utility
 

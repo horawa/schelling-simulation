@@ -34,7 +34,7 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 	# utility - function: (index) -> (0,1)
 	utility = get_utility_for_array(settings.utility_function, array, 
-		count_vacancies=settings.count_vacancies)
+		count_vacancies=settings.count_vacancies, radius=settings.radius)
 
 	pickers = {
 		'random': _random_picker,
