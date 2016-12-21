@@ -399,7 +399,7 @@ class SimulationTestCase(unittest.TestCase):
 			])
 		
 		callback_count = [0]
-		expected_callback_count = 1
+		expected_callback_count = 2 # additional callback when simulation halted
 
 		def callback(array, result, iteration):
 			expected_output = all_satisfied_array
