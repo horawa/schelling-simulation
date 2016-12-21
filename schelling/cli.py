@@ -140,8 +140,7 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 	else:
 		os.mkdir(save_to)
 
-	save_callback = get_save_state_callback(save_to, save_period, 
-		iterations, verbose)
+	save_callback = get_save_state_callback(save_to, iterations, verbose)
 	
 	result = run_simulation(settings, save_callback)
 

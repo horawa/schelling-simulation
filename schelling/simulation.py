@@ -55,8 +55,11 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	vacancy_picker = vacancy_pickers[settings.vacancy_picking_regime]
 
 	for i in range(settings.iterations):
-		callback(array, result, i)
 		should_save_result = i % settings.save_period == 0
+
+		if should_save_result:
+			callback(array, result, i)
+
 		is_simulation_halted = update_array(array, utility, 
 			result, agent_picker, vacancy_picker, settings.count_vacancies, 
 			settings.segregation_measure_names, settings.satisficers,
@@ -266,23 +269,6 @@ def _update_result(result, array, agent_indices, count_vacancies,
 
 		result.save_measure(segregation_measure_name, value)
 
-	# switch_rate_average = sm.switch_rate_average(array, agent_indices)
-	# entropy_average = sm.entropy_average(array, agent_indices, 
-	# 	count_vacancies=count_vacancies)
-	# ghetto_rate = sm.ghetto_rate(array, agent_indices)
-	# clusters = sm.clusters(array)
-	# distance_average = sm.distance_average(array, agent_indices)
-	# mix_deviation_average = sm.mix_deviation_average(array, agent_indices)
-	# share_average = sm.share_average(array, agent_indices)
-
-	# result.switch_rate_average.append(switch_rate_average)
-	# result.entropy_average.append(entropy_average)
-	# result.ghetto_rate.append(ghetto_rate)
-	# result.clusters.append(clusters)
-	# result.distance_average.append(distance_average)
-	# result.mix_deviation_average.append(mix_deviation_average)
-	# result.share_average.append(share_average)
-
 
 def _first_picker(agent_indices, agent_type=None):
 	return tuple(agent_indices[0])
@@ -331,17 +317,16 @@ def _create_roulette_picker(base_weight, utility, for_agents=True,
 	return roulette_picker
 
 
-def get_save_state_callback(save_directory, save_period, 
-		iterations, verbose=False):
+def get_save_state_callback(save_directory, iterations, verbose=False):
 	iter_order_of_magnitude = int(math.log10(iterations))
 	def save_state(array, result, iteration):
-		if iteration % save_period == 0:
-			file_name = str(iteration).zfill(iter_order_of_magnitude) + '.png'
-			image_save(to_image(array), 
-				os.path.join(save_directory, file_name))
-			if verbose:
-				click.echo(iteration)
-				click.echo(result)
+		file_name = str(iteration).zfill(iter_order_of_magnitude) + '.png'
+		image_save(to_image(array), 
+			os.path.join(save_directory, file_name))
+		result.save_JSON(os.path.join(save_directory, 'result.json'))
+		if verbose:
+			click.echo(iteration)
+			click.echo(result)
 	return save_state
 
 
@@ -369,8 +354,8 @@ if __name__ == '__main__': # pragma: no cover
 		)
 
 	# assuming ./image/ directory exists
-	save_callback = get_save_state_callback('./image/', settings.save_period, 
-		settings.iterations, verbose=True)
+	save_callback = get_save_state_callback('./image/', settings.iterations, 
+		verbose=True)
 
 	simulation_result = run_simulation(settings, callback=save_callback)
 	simulation_result.save_JSON('result.json')
