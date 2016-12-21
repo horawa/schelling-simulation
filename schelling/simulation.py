@@ -67,11 +67,12 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 		# if no further moves are possible, exit simulation early
 		if is_simulation_halted:
-			# Get measures for final state and save
-			agent_indices = get_agent_indices(array)
-			_update_result(result, array, agent_indices, 
-				settings.count_vacancies, settings.segregation_measure_names)
-			callback(array, result, i)
+			# Get measures for final state and save (unless it was just saved)
+			if not should_save_result:
+				agent_indices = get_agent_indices(array)
+				_update_result(result, array, agent_indices, 
+					settings.count_vacancies, settings.segregation_measure_names)
+				callback(array, result, i)
 			break
 
 	return result

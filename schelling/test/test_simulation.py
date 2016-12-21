@@ -399,7 +399,7 @@ class SimulationTestCase(unittest.TestCase):
 			])
 		
 		callback_count = [0]
-		expected_callback_count = 2 # additional callback when simulation halted
+		expected_callback_count = 1 
 
 		def callback(array, result, iteration):
 			expected_output = all_satisfied_array
@@ -407,7 +407,7 @@ class SimulationTestCase(unittest.TestCase):
 				self.assertTrue(np.array_equal(array, expected_output))
 			callback_count[0] += 1
 
-		settings = SimulationSettings(		
+		settings = SimulationSettings(
 			grid_size=4,
 			vacancy_proportion=0.5,
 			agent_proportions=(1.0,),
