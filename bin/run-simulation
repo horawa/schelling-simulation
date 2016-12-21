@@ -1,22 +1,28 @@
 #!/usr/bin/env bash
 # This script runs 30 simulations with different settings and saves the output
 # in a subdirectory of the directory specified by first argument. 
-# Arguments $2 and $3 specify a range of tests to run.
+# Arguments $2 and $3 specify grid size and vacancy proportion
+# Arguments $4 and $5 specify a range of tests to run.
 # Output and time for each simulation are stored in simulation.log
 # Example:
-# `run-simulation ./out` runs all simulations
-# `run-simulation ./out`  8 10` runs simulations 8, 9, 10
-# `run-simulation ./out`  0 12` Test different utilities for 2 and 4 agents
-# `run-simulation ./out` 12 24` Test roulette picker with flat utility and peaked utility
-# `run-simulation ./out` 24 30` Test radii for peaked utility
+# `run-simulation ./out` 20 0.2 runs all simulations (grid size 100, vacancies 0.2)
+# `run-simulation ./out` 20 0.2  8 10` runs simulations 8 and 9
+# `run-simulation ./out` 20 0.2  0 12` Test different utilities for 2 and 4 agents
+# `run-simulation ./out` 20 0.2 12 24` Test roulette picker with flat utility and peaked utility
+# `run-simulation ./out` 20 0.2 24 30` Test radii for peaked utility
 
-
-USAGE="Usage: $0 output_dir grid_size [<first test> <last test>]"
+USAGE="Usage: $0 output_dir grid_size vacancy_proportion [<first test> <last test>]"
 
 if [[ $2 -le 1 || $2 -gt 1000 ]] ; then
 	echo "$USAGE"
 	echo "Pick grid size in [2, 1000]"
 	exit 2
+fi
+
+if [[ ! $3 =~ ^0?\.[0-9]+ ]] ; then
+	echo "$USAGE"
+	echo "Pick grid size in [2, 1000]"
+	exit 3
 fi
 
 get_agent_proportion_flags ()
@@ -187,12 +193,12 @@ done
 
 
 # validate arguments
-if [[ $# -eq 2 ]] ; then
+if [[ $# -eq 3 ]] ; then
 	first=0
 	last=${#COMMANDS[@]}
-elif [[ $# -eq 4 && $3 -ge 0 && $4 -le ${#COMMANDS[@]} ]]; then
-	first=$3
-	last=$4
+elif [[ $# -eq 5 && $4 -ge 0 && $5 -le ${#COMMANDS[@]} ]]; then
+	first=$4
+	last=$5
 else
 	echo "$USAGE"
 	exit 1
