@@ -191,6 +191,41 @@ for radius in "${RADII[@]}" ; do
 done
 
 
+# Test flat utility with counting vacancies, and various vacancy proportions 
+UTILITY="flat 0.625"
+RADIUS=1
+
+COUNT_VACANCIES=("count-vacancies" "no-count-vacancies")
+VACANCY_PROPORTIONS=(0.05 0.1 0.2)
+AGENT_COUNTS=(2 4)
+
+for count_vacancies in "${COUNT_VACANCIES[@]}" ; do
+	for vacancy_proportion in "${VACANCY_PROPORTIONS[@]}" ; do
+		for agent_count in "${AGENT_COUNTS[@]}" ; do
+			agent_proportion_flags=`get_agent_proportion_flags $agent_count`
+			save_to="$SAVE_DIR/test_flat/$count_vacancies/v_prop_$vacancy_proportion/${agent_count}_agents/"
+			save_to=`echo -n $save_to | tr ' ' '_'`
+			cli_command="schelling-cli \
+				--grid-size $GRID_SIZE \
+				--vacancy-proportion $vacancy-proportion \
+				$agent_proportion_flags \
+				--initial-random-allocation \
+				--utility-function $UTILITY \
+				--no-satisficers \
+				--agent-picking-regime random \
+				--vacancy-picking-regime random \
+				--radius $RADIUS \
+				--$count_vacancies \
+				--iterations $ITERATIONS \
+				--save-to $save_to \
+				--save-period $SAVE_PERIOD
+				--verbose"
+			cli_command=`echo -n $cli_command | tr -s ' ' | tr -s '\t'`
+			OUTPUT_DIRS+=("$save_to")
+			COMMANDS+=("$cli_command")
+		done
+	done
+done
 
 # validate arguments
 if [[ $# -eq 3 ]] ; then
