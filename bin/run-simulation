@@ -64,7 +64,7 @@ SAVE_PERIOD=100
 SAVE_DIR=$1
 
 GRID_SIZE=$2
-ITERATIONS=100000
+ITERATIONS=50000
 VACANCY_PROPORTION=0.2
 
 # Test different utilities for 2 and 4 agents
@@ -224,6 +224,87 @@ for count_vacancies in "${COUNT_VACANCIES[@]}" ; do
 			OUTPUT_DIRS+=("$save_to")
 			COMMANDS+=("$cli_command")
 		done
+	done
+done
+
+
+# test peaked low vacancies
+UTILITY="peaked 0.5"
+VACANCY_PROPORTION=0.05
+RADIUS=1
+
+COUNT_VACANCIES=("count-vacancies" "no-count-vacancies")
+AGENT_COUNTS=(2 4)
+
+for count_vacancies in "${COUNT_VACANCIES[@]}" ; do
+	for agent_count in "${AGENT_COUNTS[@]}" ; do
+		agent_proportion_flags=`get_agent_proportion_flags $agent_count`
+		save_to="$SAVE_DIR/test_peaked_v0.05/$count_vacancies/${agent_count}_agents/"
+		save_to=`echo -n $save_to | tr ' ' '_'`
+		cli_command="schelling-cli \
+			--grid-size $GRID_SIZE \
+			--vacancy-proportion $VACANCY_PROPORTION \
+			$agent_proportion_flags \
+			--initial-random-allocation \
+			--utility-function $UTILITY \
+			--no-satisficers \
+			--agent-picking-regime random \
+			--vacancy-picking-regime random \
+			--radius $RADIUS \
+			--$count_vacancies \
+			--iterations $ITERATIONS \
+			--save-to $save_to \
+			--save-period $SAVE_PERIOD
+			--verbose"
+		cli_command=`echo -n $cli_command | tr -s ' ' | tr -s '\t'`
+		OUTPUT_DIRS+=("$save_to")
+		COMMANDS+=("$cli_command")
+	done
+done
+
+
+#test_flat_low_vacancies
+AGENT_PICKING_REGIME="random"
+VACANCY_PICKING_REGIME="random"
+RADIUS=1
+VACANCY_PROPORTION=0.05
+
+AGENT_COUNTS=(2 4)
+UTILITIES=(
+	"flat 0.125"
+	"flat 0.25"
+	"flat 0.375"
+	"flat 0.5" 
+	"flat 0.625" 
+	"flat 0.75" 
+	"flat 0.875" 
+)
+
+
+
+for utility in "${UTILITIES[@]}" ; do
+	for agent_count in "${AGENT_COUNTS[@]}" ; do
+		agent_proportion_flags=`get_agent_proportion_flags $agent_count`
+		save_to="$SAVE_DIR/test_flat_v0.05/$utility/${agent_count}_agents/"
+		save_to=`echo -n $save_to | tr ' ' '_'`
+		cli_command="schelling-cli \
+			--grid-size $GRID_SIZE \
+			--vacancy-proportion $VACANCY_PROPORTION \
+			$agent_proportion_flags \
+			--initial-random-allocation \
+			--utility-function $utility \
+			--no-satisficers \
+			--agent-picking-regime random \
+			--vacancy-picking-regime random \
+			--radius $RADIUS \
+			--count-vacancies \
+			--iterations $ITERATIONS \
+			--save-to $save_to \
+			--save-period $SAVE_PERIOD
+			--verbose"
+		cli_command=`echo -n $cli_command | tr -s ' ' | tr -s '\t'`
+		OUTPUT_DIRS+=("$save_to")
+		COMMANDS+=("$cli_command")
 	done
 done
 
