@@ -207,7 +207,7 @@ for count_vacancies in "${COUNT_VACANCIES[@]}" ; do
 			save_to=`echo -n $save_to | tr ' ' '_'`
 			cli_command="schelling-cli \
 				--grid-size $GRID_SIZE \
-				--vacancy-proportion $vacancy-proportion \
+				--vacancy-proportion $vacancy_proportion \
 				$agent_proportion_flags \
 				--initial-random-allocation \
 				--utility-function $UTILITY \
