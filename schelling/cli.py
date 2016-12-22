@@ -72,7 +72,7 @@ _utility_function_creators = {
 @click.option('--radius', '-r', default=1,
 	help='Radius of neighborhood that agents will consider. '
 	'Default = 1 (only directly adjacent neighbors).')
-@click.option('--count-vacancies', is_flag=True, default=False,
+@click.option('--count-vacancies/--no-count-vacancies', default=False,
 	help='Specifies, if vacancies should be counted as neighbors, when '
 	'calculating the fraction of unlike neighbors.')
 @click.option('--segregation-measure', multiple=True, type=str, 
