@@ -1,6 +1,7 @@
-from numpy import vectorize, dstack, unique, amax
+from numpy import vectorize, dstack, unique, amax, zeros
 from matplotlib.image import imsave
 from skimage.transform import resize
+from scipy.misc import imread
 
 
 def _get_color(color_index):
@@ -19,6 +20,25 @@ def _get_color(color_index):
 
 		_get_color.colors = (w, r, g, b, c, m, y, k)
 		return _get_color.colors[color_index]
+
+
+def _get_color_index(color_rgb):
+	"""Get index of rgb color in W, R, G, B, C, M, Y, K"""
+	try:
+		return _get_color_index.colors.index(color_rgb)
+	except AttributeError:
+		w = (255, 255, 255)
+		r = (255, 0, 0)
+		g = (0, 255, 0)
+		b = (0, 0, 255)
+		c = (0, 255, 255)
+		m = (255, 0, 255)
+		y = (255, 255, 0)
+		k = (0, 0, 0)
+
+		_get_color_index.colors = (w, r, g, b, c, m, y, k)
+		return _get_color_index.colors.index(color_rgb)
+
 
 
 def to_image(array, size=800):
@@ -54,7 +74,7 @@ def to_image(array, size=800):
 	return image_array
 
 
-def image_save(image_array, output): # pragma: nocover
+def image_save(image_array, output):
 	"""Save image to file
 	
 	Args:
@@ -64,3 +84,19 @@ def image_save(image_array, output): # pragma: nocover
 	# TODO convert this to use either scipy or skimage, so matplotlib 
 	# requirement can be removed.
 	imsave(output, image_array)
+
+
+def image_parse(file_path, grid_size=100):
+	image_array = imread(file_path)
+	cell_size = image_array.shape[0] / grid_size
+	array = zeros((grid_size, grid_size), dtype='int')
+
+	for grid_row in range(grid_size):
+		im_row = int((cell_size / 2) + (grid_row * cell_size))
+		for grid_col in range(grid_size):
+			im_col = int((cell_size / 2) + (grid_col * cell_size))
+
+			color = tuple(image_array[im_row, im_col, 0:3])
+			array[grid_row, grid_col] = _get_color_index(color)
+
+	return array

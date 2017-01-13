@@ -1,6 +1,8 @@
 import unittest
 from numpy import array, array_equal
-from schelling.arr_to_img import to_image
+from schelling.arr_to_img import to_image, image_save, image_parse
+from random import randrange
+import os
 
 class ArrToImgTest(unittest.TestCase):
 
@@ -42,6 +44,24 @@ class ArrToImgTest(unittest.TestCase):
 		arr = array([[0, 10], [0, 10]])
 		with self.assertRaises(ValueError):
 			to_image(arr)
+
+
+	def test_image_save_load(self):
+		size = 10
+		values = [randrange(0, 8) for _ in range(size**2)]
+		name = 'tmp.png'
+
+		arr = array(values).reshape((size, size))
+		image_save(to_image(arr), name)
+		parsed = image_parse(name, grid_size=10)
+
+		os.remove(name)
+
+		print(arr, parsed)
+
+		self.assertTrue(array_equal(arr, parsed))
+
+
 
 if __name__ == '__main__':
 	unittest.main()
