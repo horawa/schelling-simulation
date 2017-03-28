@@ -57,8 +57,6 @@ class ArrToImgTest(unittest.TestCase):
 
 		os.remove(name)
 
-		print(arr, parsed)
-
 		self.assertTrue(array_equal(arr, parsed))
 
 

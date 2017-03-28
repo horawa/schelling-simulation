@@ -75,6 +75,24 @@ def share_average(array, agent_indices, radius=1):
 	return _get_measure_average(array, agent_indices, share_for_radius)
 
 
+def unlike_neighbor_fraction_average(array, agent_indices, radius=1):
+	return _get_measure_average(array, agent_indices, unlike_neighbor_fraction)
+
+
+def unlike_neighbor_fraction_distribution(array, agent_indices):
+	distribution = {(agents/8): 0 for agents in range(9)}
+	for agent_index in agent_indices:
+		if agent_index[0] == 0 or agent_index[1] == 0 \
+				or agent_index[0] == array.shape[0] - 1 \
+				or agent_index[1] == array.shape[0] - 1:
+			continue # ignore edges
+		uf = unlike_neighbor_fraction(
+			array, tuple(agent_index))
+		distribution[uf] += 1
+
+	return distribution
+
+
 def switch_rate(array, agent_index):
 	"""Calculates switch rate for agent at specified index in array
 	Switch rate: Turn around an agent full circle. 
@@ -203,6 +221,11 @@ def distance(array, agent_index):
 		distance += 1
 
 	return distance
+
+
+def unlike_neighbor_fraction(array, agent_index):
+	return get_unlike_neighbor_fraction(
+		array, tuple(agent_index), radius=1, count_vacancies=True)
 
 
 def mix_deviation(array, agent_index, radius=1):

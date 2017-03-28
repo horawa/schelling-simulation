@@ -95,7 +95,6 @@ def image_parse(file_path, grid_size=100):
 		im_row = int((cell_size / 2) + (grid_row * cell_size))
 		for grid_col in range(grid_size):
 			im_col = int((cell_size / 2) + (grid_col * cell_size))
-
 			color = tuple(image_array[im_row, im_col, 0:3])
 			array[grid_row, grid_col] = _get_color_index(color)
 
