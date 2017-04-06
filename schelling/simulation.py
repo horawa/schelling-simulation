@@ -11,6 +11,9 @@ from schelling.simulation_result import SimulationResult
 from schelling.arr_to_img import to_image, image_save
 import schelling.segregation_measures as sm
 
+_stop = False
+_pause = False
+
 
 def run_simulation(settings, callback=lambda arr, res, i: None):
 	"""Run simulation with specified settings.
@@ -55,6 +58,11 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	vacancy_picker = vacancy_pickers[settings.vacancy_picking_regime]
 
 	for i in range(settings.iterations):
+
+		while _pause:
+			pass
+
+
 		should_save_result = i % settings.save_period == 0
 
 		if should_save_result:
@@ -73,6 +81,9 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 				_update_result(result, array, agent_indices, 
 					settings.count_vacancies, settings.segregation_measure_names)
 				callback(array, result, i)
+			break
+
+		if _stop:
 			break
 
 	return result
@@ -326,7 +337,7 @@ def _create_roulette_picker(base_weight, utility, for_agents=True,
 def get_save_state_callback(save_directory, iterations, verbose=False):
 	iter_order_of_magnitude = int(math.log10(iterations))
 	def save_state(array, result, iteration):
-		file_name = str(iteration).zfill(iter_order_of_magnitude) + '.png'
+		file_name = str(iteration).zfill(iter_order_of_magnitude + 1) + '.png'
 		image_save(to_image(array), 
 			os.path.join(save_directory, file_name))
 		result.save_JSON(os.path.join(save_directory, 'result.json'))
