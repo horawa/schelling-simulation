@@ -15,6 +15,19 @@ _stop = False
 _pause = False
 
 
+def stop():
+	global _stop
+	_stop = True
+
+def pause():
+	global _pause
+	_pause = True
+
+def unpause():
+	global _pause
+	_pause = False
+
+
 def run_simulation(settings, callback=lambda arr, res, i: None):
 	"""Run simulation with specified settings.
 	Call the optional callback function after each iteration,
@@ -28,6 +41,9 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	Returns:
 	    SimulationResult: Result - segregation measures for each iteration
 	"""
+	global _stop
+
+
 	settings.validate()
 	result = SimulationResult(settings.segregation_measure_names)
 
@@ -85,6 +101,8 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 
 		if _stop:
 			break
+
+	_stop = False
 
 	return result
 
