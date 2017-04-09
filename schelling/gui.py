@@ -2,6 +2,9 @@ import appJar
 import numpy as np
 import os
 import threading
+from io import BytesIO
+from PIL import Image
+import base64
 
 import schelling.simulation
 import schelling.arr_to_img as im
@@ -17,6 +20,7 @@ running = False
 blank_image_data = \
 "R0lGODdh9AH0AfAAAP///wAAACwAAAAA9AH0AQAC/oSPqcvtD6OctNqLs968+w+G4kiW5omm6sq27gvH8kzX9o3n+s73/g8MCofEovGITCqXzKbzCY1Kp9Sq9YrNarfcrvcLDovH5LL5jE6r1+y2+w2Py+f0uv2Oz+v3/L7/DxgoOEhYaHiImKi4yNjo+AgZKTlJWWl5iZmpucnZ6fkJGio6SlpqeoqaqrrK2ur6ChsrO0tba3uLm6u7y9vr+wscLDxMXGx8jJysvMzc7PwMHS09TV1tfY2drb3N3e39DR4uPk5ebn6Onq6+zt7u/g4fLz9PX29/j5+vv8/f7/8PMKDAgQQLGjyIMKHChQwbOnwIMaLEiRQrWryIMaPG/o0cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9Czeu3Ll069q9izev3r18+/r9Cziw4MGECxs+jDix4sWMGzt+DDmy5MmUK1u+jDmz5s2cO3v+DDq06NGkS5s+jTq16tWsW7t+DTu27Nm0a9u+jTu37t28e/v+DTy48OHEixs/jjy58uXMmzt/Dj269OnUq1u/jj279u3cu3v/Dj68+PHky5s/jz69+vXs27t/Dz++/Pn069u/jz+//v38/vv7/w9ggAIOSGCBBh6IYIIKLshggw4+CGGEEk5IYYUWXohhhhpuyGGHHn4IYogijkhiiSaeiGKKKq7IYosuvghjjDLOSGONNt6IY4467shjjz7+CGSQQg5JZJFGHolkkkouyWSTTj4JZZRSTklllVZeiWWWWm7JZZdefglmmGKOSWaZZp6JZppqrslmm26+CWeccs5JZ5123olnnnruyWeffv4JaKCCDkpooYYeimiiii7KaKOOPgpppJJOSmmlll6Kaaaabsppp55+Cmqooo5Kaqmmnopqqqquymqrrr4Ka6yyzkprrbbeimuuuu7Ka6++/gpssMIOS2yxxsZWAQAAOw=="
 
+images = []
 
 def press(btn):
 	global running
@@ -37,9 +41,10 @@ def scale_changed(scale):
 		return
 
 	pos = app.getScale(scale)
-	images = get_images()
+	#images = get_images()
 	image = images[pos]
-	app.setImage("simulation", image)
+	# app.setImage("simulation", image)
+	app.setImageData("simulation", image)
 
 
 def start_simulation():
@@ -72,13 +77,20 @@ def stop_simulation():
 def gui_callback(array, result, iteration):
 	size = 600
 	image = im.to_image(array, size=size)
-	name = str(iteration).zfill(8) + ".png"
-	im.image_save(image, os.path.join(image_path, name))
-	app.setImage("simulation", name)
-	app.setScaleRange("pos", 0, iteration)
-	app.setScale("pos", iteration, callFunction=False)
-	print(iteration)
+	# name = str(iteration).zfill(8) + ".gif"
+	# im.image_save(image, os.path.join(image_path, name))
+	# app.setImage("simulation", name)
+	# app.setScaleRange("pos", 0, iteration, curr=iteration)
 
+	# # app.setScale("pos", iteration, callFunction=True)
+	# print(iteration)
+	pil_image = Image.fromarray(image)
+	image_bytes = BytesIO()
+	pil_image.save(image_bytes, format="gif")
+	base64_image = base64.b64encode(image_bytes.getvalue())
+	images.append(base64_image)
+	app.setImageData("simulation", base64_image)
+	app.setScaleRange("pos", 0, iteration, curr=iteration)
 
 
 def create_gui():
@@ -121,9 +133,9 @@ def create_gui():
 	app.go()
 
 
-def get_images():
-	return list(filter(
-		lambda str: str.endswith(".png"), os.listdir(image_path)))
+# def get_images():
+# 	return list(filter(
+# 		lambda str: str.endswith(".gif"), os.listdir(image_path)))
 
 
 # def update_images(image_path):

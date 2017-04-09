@@ -1,7 +1,7 @@
 from numpy import vectorize, dstack, unique, amax, zeros
-from matplotlib.image import imsave
-from skimage.transform import resize
+§from skimage.transform import resize
 from scipy.misc import imread
+from PIL import Image
 
 
 def _get_color(color_index):
@@ -81,9 +81,8 @@ def image_save(image_array, output):
 	    image_array (ndarray): 3d array representing rgb image
 	    output (file): file to save
 	"""
-	# TODO convert this to use either scipy or skimage, so matplotlib 
-	# requirement can be removed.
-	imsave(output, image_array)
+	image = Image.fromarray(image_array)
+	image.save(output)
 
 
 def image_parse(file_path, grid_size=100):
