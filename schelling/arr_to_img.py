@@ -1,5 +1,5 @@
 from numpy import vectorize, dstack, unique, amax, zeros
-§from skimage.transform import resize
+from skimage.transform import resize
 from scipy.misc import imread
 from PIL import Image
 

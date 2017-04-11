@@ -252,4 +252,5 @@ segregation_measures = {
 	'share_average': share_average,
 	'ghetto_rate': ghetto_rate,
 	'clusters': clusters,
+	'unlike_neighbor_fraction_average': unlike_neighbor_fraction_average,
 }
