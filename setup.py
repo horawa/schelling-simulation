@@ -16,7 +16,7 @@ setup(
 	packages=['schelling'],
 	include_package_data=True,
 	zip_safe=False,
-    scripts=['bin/run-simulation'],
+    scripts=['bin/run-simulation', 'bin/run-v-T'],
 	entry_points = {
 		'console_scripts': ['schelling-cli=schelling.cli:simulation'],
 	}
