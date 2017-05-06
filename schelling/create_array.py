@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def create_array(size, agent_type_fractions, random_allocation=True):
 	"""Creates a square 2d numpy array representing a 2d grid randomly 
@@ -24,7 +25,7 @@ def create_array(size, agent_type_fractions, random_allocation=True):
 	Returns:
 	    ndarray: array representing 2d grid randomly populated by agents
 	"""
-	if float(sum(agent_type_fractions)) != 1.0:
+	if not math.isclose(float(sum(agent_type_fractions)), 1.0):
 		raise ValueError("agent type fractions must sum up to 1")
 
 	n_cells = size * size
