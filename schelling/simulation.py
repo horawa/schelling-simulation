@@ -356,7 +356,7 @@ def _create_roulette_picker(base_weight, utility, for_agents=True,
 
 
 def get_save_state_callback(save_directory, iterations, verbose=False):
-	iter_order_of_magnitude = int(math.log10(iterations))
+	iter_order_of_magnitude = int(math.log10(iterations)) + 1
 	def save_state(array, result, iteration):
 		file_name = str(iteration).zfill(iter_order_of_magnitude + 1) + '.png'
 		image_save(to_image(array), 
