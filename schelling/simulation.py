@@ -140,6 +140,8 @@ def update_array(array, utility, result, agent_picker,
 		agent_picker)
 
 	vacancy_indices = get_vacancy_indices(array)
+	if vacancy_indices.size == 0:
+		return True
 
 	# if vacancy picker is roulette, consider all vacancies 
 	if vacancy_picker.__name__ == 'roulette_picker':
