@@ -1,35 +1,74 @@
-#!/bin/bash
+#! /usr/bin/env python
+from schelling.simulation_settings import SimulationSettings
+import schelling.utility_functions as ut
+import os
+import schelling.simulation as sim
+import sys
+import multiprocessing
+import datetime
 
-# Settings
+# argv[1] is thread count (default=8)
+def log(text):
+	log_file = open(os.path.join(result_dir, "log.txt"), "a+")
+	log_file.write("[" + str(datetime.datetime.now()) +"] " + text + "\n")
+	log_file.close()
 
-GRID_SIZE=50
-ITERATIONS=5000
-SAVE_TO="~/results"
-SAVE_PERIOD=100
 
-TOLERANCES=(0.0 0.125 0.25 0.375 0.5 0.625 0.75 0.875 1.0)
-VACANCY_PROPORTIONS=(0.0 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.2 0.21 0.22 0.23 0.24 0.25 0.26 0.27 0.28 0.29 0.3 0.31 0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.4 0.41 0.42 0.43 0.44 0.45 0.46 0.47 0.48 0.49 0.5 0.51 0.52 0.53 0.54 0.55 0.56 0.57 0.58 0.59 0.6 0.61 0.62 0.63 0.64 0.65 0.66 0.67 0.68 0.69 0.7 0.71 0.72 0.73 0.74 0.75 0.76 0.77 0.78 0.79 0.8 0.81 0.82 0.83 0.84 0.85 0.86 0.87 0.88 0.89 0.9 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 1.0)
+def run(settings):
+	output_dir = settings['output_dir']
+	settings = settings['settings']
 
-for TOLERANCE in "${TOLERANCES[@]}" ; do
-	for VACANCY_PROPORTION in "${VACANCY_PROPORTIONS[@]}" ; do		
-		cli_command="schelling-cli \
-			--grid-size $GRID_SIZE \
-			--vacancy-proportion $VACANCY_PROPORTION \
-			--agent-proportion 0.5 --agent-proportion 0.5 \
-			--initial-random-allocation \
-			--utility-function flat $TOLERANCE \
-			--no-satisficers \
-			--agent-picking-regime random \
-			--vacancy-picking-regime random \
-			--radius 1 \
-			--count-vacancies \
-			--iterations $ITERATIONS \
-			--save-to $save_to \
-			--save-period $SAVE_PERIOD
-			--verbose"
-		cli_command=`echo -n $cli_command | tr -s ' ' | tr -s '\t'`
-		echo $cli_command
-	done
-done
+	log("Running: " + output_dir)
 
-# schelling-cli --grid-size 50 --vacancy-proportion 0.2 --agent-proportion 0.5 --agent-proportion 0.5 --initial-random-allocation --utility-function flat 0.625 --no-satisficers --agent-picking-regime random --vacancy-picking-regime random --radius 1 --count-vacancies --iterations 10000 --save-to ~/temp --save-period 100 --verbose 
+	os.makedirs(output_dir, exist_ok=True)
+
+	callback = sim.get_save_state_callback(
+		output_dir, settings.iterations)
+	
+	settings_file = open(os.path.join(output_dir, "settings.txt"), 'w')
+	settings_file.write(str(settings))
+	settings_file.close()
+	
+	# create utility function here: workaround for 'Cant pickle local object'.
+	settings.utility_function = ut.create_flat_utility(
+		settings.utility_function)
+	
+	sim.run_simulation(settings, callback)
+	log("Done: " + output_dir)
+
+result_dir = os.path.join(os.path.expanduser("~"), "results")
+
+tolerances = [0.125 * x for x in range(9)]
+vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+
+settings = [ {'output_dir': os.path.join(result_dir, "v_"+str(v), "T_"+str(T)),
+	'settings': SimulationSettings(grid_size=2,
+		vacancy_proportion=v,
+		agent_proportions=(0.5, 0.5),
+		initial_random_allocation=True,
+		utility_function=T,
+		satisficers=False,
+		agent_picking_regime='random',
+		vacancy_picking_regime='random',
+		agent_roulette_base_weight=None,
+		vacancy_roulette_base_weight=None,
+		radius=1,
+		count_vacancies=True,
+		segregation_measure_names=['entropy_average', 'clusters', 
+			'unlike_neighbor_fraction_average'],
+		iterations=5000,
+		save_period=100) } for v in vacancy_proportions for T in tolerances]
+
+if __name__ == '__main__':
+	#touch log file
+	os.makedirs(result_dir, exist_ok=True)
+
+	if len(sys.argv) != 2:
+		threads = 8
+	else:
+		threads = sys.argv[1]
+
+	pool = multiprocessing.Pool(threads)
+	pool.map(run, settings)
+
+
