@@ -105,3 +105,6 @@ class SimulationSettings:
 		return get_distribution_including_vacancies(self.vacancy_proportion, 
 			self.agent_proportions)
 
+	def __str__(self):
+		return str(self.__dict__)
+
