@@ -73,8 +73,13 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	agent_picker = agent_pickers[settings.agent_picking_regime]
 	vacancy_picker = vacancy_pickers[settings.vacancy_picking_regime]
 
-	_update_result(result, array, get_agent_indices(array),
-		settings.count_vacancies, settings.segregation_measure_names)
+	# if no agents, end simulation
+	agent_indices = get_agent_indices(array)
+	if agent_indices.shape[0] == 0:
+		return result
+
+	# _update_result(result, array, agent_indices,
+		# settings.count_vacancies, settings.segregation_measure_names)
 
 	for i in range(settings.iterations):
 
