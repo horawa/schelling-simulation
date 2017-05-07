@@ -42,8 +42,9 @@ result_dir = os.path.join(os.path.expanduser("~"), "results")
 tolerances = [0.125 * x for x in range(9)]
 vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
 
-settings = [ (os.path.join(result_dir, "v_"+str(v), "T_"+str(T)),
-	SimulationSettings(grid_size=50,
+settings = [(
+	os.path.join(result_dir, "v_"+str(v), "T_"+str(T), str(test_no)),
+	SimulationSettings(grid_size=100,
 		vacancy_proportion=v,
 		agent_proportions=(0.5, 0.5),
 		initial_random_allocation=True,
@@ -58,7 +59,8 @@ settings = [ (os.path.join(result_dir, "v_"+str(v), "T_"+str(T)),
 		segregation_measure_names=['entropy_average', 'clusters', 
 			'unlike_neighbor_fraction_average'],
 		iterations=5000,
-		save_period=100) ) for v in vacancy_proportions for T in tolerances]
+		save_period=100) 
+	) for v in vacancy_proportions for T in tolerances for test_no in range(10)]
 
 if __name__ == '__main__':
 	#touch log file
@@ -71,5 +73,4 @@ if __name__ == '__main__':
 
 	pool = multiprocessing.Pool(threads)
 	pool.map(run, settings)
-
 
