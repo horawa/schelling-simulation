@@ -1,4 +1,16 @@
 from setuptools import setup
+from setuptools.command.install import install as InstallCommand
+import pip
+
+
+class Install(InstallCommand):
+	"""Install requirements with pip, install_requires causes bugs
+	with numpy/scipy"""
+
+	def run(self, *args, **kwargs):
+		pip.main(['install', '.'])
+		InstallCommand.run(self, *args, **kwargs)
+
 
 def readme():
 	with open('README.md') as readme:
@@ -16,8 +28,11 @@ setup(
 	packages=['schelling'],
 	include_package_data=True,
 	zip_safe=False,
-    scripts=['bin/run-simulation', 'bin/run-v-T'],
-	entry_points = {
+	scripts=['bin/run-simulation', 'bin/run-v-T'],
+	entry_points={
 		'console_scripts': ['schelling-cli=schelling.cli:simulation'],
+	},
+	cmdclass={
+		'install': Install,
 	}
 )
