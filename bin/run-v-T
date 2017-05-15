@@ -12,7 +12,6 @@ def log(text):
 	log_file = open(os.path.join(result_dir, "log.txt"), "a+")
 	log_file.write("[" + str(datetime.datetime.now()) +"] " + text + "\n")
 	log_file.close()
-	# print(text)
 
 
 def run(settings):
@@ -66,11 +65,50 @@ if __name__ == '__main__':
 	#touch log file
 	os.makedirs(result_dir, exist_ok=True)
 
-	if len(sys.argv) != 2:
+	check = False
+
+	if len(sys.argv) < 2:
 		threads = 8
 	else:
-		threads = sys.argv[1]
+		if sys.argv[1] == "check":
+			check = True
+		else:
+			threads = int(sys.argv[1])
 
-	pool = multiprocessing.Pool(threads)
-	pool.map(run, settings)
+	if len(sys.argv) < 4:
+		start = 0
+		end = len(settings)
+	else:
+		start = int(sys.argv[2])
+		end = int(sys.argv[3])
+
+	if check:
+		with open("results/log.txt") as log:
+			log_lines = log.readlines()
+
+		started_lines = list( 
+			map(lambda l: l.split(": ")[1],
+				filter(lambda line: "Running:" in line,
+					log_lines)))
+
+		done_lines = list( 
+			map(lambda l: l.split(": ")[1],
+				filter(lambda line: "Done:" in line,
+					log_lines)))
+
+		not_done = list(
+			filter(lambda l: l not in done_lines,
+				started_lines))
+
+		settings_dirs = list(map(lambda l: l[0], settings))
+
+		not_done_settings = list(
+			filter(lambda l: l not in settings_dirs,
+				started_lines))
+
+		print("\n".join(not_done_settings))
+
+	else:
+		pool = multiprocessing.Pool(threads)
+		pool.map(run, settings)
 
