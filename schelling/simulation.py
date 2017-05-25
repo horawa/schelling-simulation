@@ -376,8 +376,12 @@ def get_save_state_callback(save_directory, iterations, verbose=False):
 
 
 def is_simulation_halted(array, utility_function):
+
 	utility = get_utility_for_array(utility_function, array, count_vacancies=True)
 	agent_indices = get_agent_indices(array)
+
+	if agent_indices.size == 0:
+		return True
 
 	unsatisfied_agent_indices = _get_unsatisfied_agent_indices(utility, agent_indices, satisficers=False)
 	if unsatisfied_agent_indices.size == 0:
@@ -385,6 +389,9 @@ def is_simulation_halted(array, utility_function):
 
 	vacancy_indices = get_vacancy_indices(array)
 	
+	if vacancy_indices.size == 0:
+		return True
+
 	for agent_index in unsatisfied_agent_indices:
 		better_vacancies = _get_better_vacancies(array, agent_index, utility, vacancy_indices, satisficers=False)
 		if better_vacancies.size != 0:
