@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 from schelling.simulation_settings import SimulationSettings
 import schelling.utility_functions as ut
 import os
@@ -104,10 +104,10 @@ if __name__ == '__main__':
 
 		not_done_settings = list(
 			filter(lambda l: l not in settings_dirs,
-				started_lines))
+				done_lines))
 
-		print("\n".join(not_done_settings))
-
+		print("\n".join(settings_dirs))
+		
 	else:
 		pool = multiprocessing.Pool(threads)
 		pool.map(run, settings)
