@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+import os
+import schelling.simulation as sim
+import schelling.arr_to_img as im
+import schelling.utility_functions as ut
+
+result_dir = os.path.join(os.path.expanduser("~"), "results")
+
+tolerances = [0.125 * x for x in range(9)]
+vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+test_nos = list(range(10))
+
+
+not_halted = []
+
+def is_halted(image_file, utility_th):
+	array = im.image_parse(image_file)
+	utility_function = ut.create_flat_utility(utility_th)
+	return sim.is_simulation_halted(array, utility_function)
+
+def main():
+	for v in vacancy_proportions:
+		for T in tolerances:
+			for test_no in test_nos:
+				result_path = os.path.join(result_dir, "v_"+str(v),
+					"T_"+str(T), str(test_no))
+				result_files = sorted(os.listdir(result_path)[:-2])
+				final_state_image = os.path.join(result_path, result_files[-1])
+				halted = is_halted(final_state_image, T)
+				if halted:
+					print("Halted: " + result_path)
+				else:
+					not_halted.add(result_path)
+					print("Not halted: " + result_path)
+
+
+	if len(not_halted) == 0:
+		print("All halted!")
+
+if __name__ == '__main__':
+	main()
