@@ -29,7 +29,7 @@ setup(
 	include_package_data=True,
 	zip_safe=False,
 	scripts=['bin/run-simulation', 'bin/run-v-T', 
-		'bin/verify_simulations_halted'],
+		'bin/verify_simulations_halted', 'bin/get_results'],
 	entry_points={
 		'console_scripts': ['schelling-cli=schelling.cli:simulation'],
 	},

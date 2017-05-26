@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+"""Get simulation results and save as csv"""
+import sys
+import os
+import json
+import schelling.segregation_measures as sm
+import schelling.arr_to_img as im
+import schelling.array_utils as ut
+
+result_dir = os.path.join(os.path.expanduser("~"), "results")
+result_file_name = "result.json"
+
+tolerances = [0.125 * x for x in range(9)]
+vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+test_nos = list(range(10))
+
+final_measure_values = {}
+
+
+def output_csv(result):
+	for v in vacancy_proportions:
+		for T in tolerances[:-1]:
+			print(str(result[(v, T)]), end=",")
+		print(str(result[v, tolerances[-1]]))
+
+
+def get_measure(test_dir, measure):
+	files = sorted(os.listdir(test_dir))
+
+	# make sure the simulation ended at first iteration - should only have
+	# three files - 0.png, result.json and settings.txt
+	assert len(files) == 3
+	array = im.image_parse(os.path.join(test_dir, files[0]))
+	agent_indices = ut.get_agent_indices(array)
+
+	sm_func = sm.segregation_measures[measure]
+
+	return sm_func(array, agent_indices)
+
+
+
+def main():
+	measure = 'unlike_neighbor_fraction_average'
+
+	for v in vacancy_proportions:
+		for T in tolerances:
+			avg_final_value = 0
+			for test_no in test_nos:
+				test_dir = os.path.join(result_dir, "v_"+str(v),
+					"T_"+str(T), str(test_no))
+				result_path = os.path.join(test_dir, result_file_name)
+
+				try:
+					with open(result_path) as result_file:
+						result_data = json.load(result_file)
+				except FileNotFoundError:
+					assert v == 1.0
+					result_data = {measure: [0]}
+				
+
+				try:
+					measure_value = result_data[measure][-1]
+				except IndexError:
+					measure_value = get_measure(test_dir, measure)
+				
+
+				avg_final_value += measure_value
+			avg_final_value /= len(test_nos)
+			final_measure_values[(v, T)] = avg_final_value
+		print(v, file=sys.stderr)
+	output_csv(final_measure_values)
+		
+if __name__ == '__main__':
+	main()
