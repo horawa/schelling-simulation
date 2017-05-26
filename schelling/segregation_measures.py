@@ -198,7 +198,7 @@ def ghetto_rate(array, agent_indices, radius=1):
 	return ghetto_rate
 
 
-def clusters(array):
+def clusters(array, agent_indices=None):
 	#TODO cache agent types
 	agent_types = np.unique(array)[1:]
 	total_clusters = 0
