@@ -30,7 +30,7 @@ def main():
 				if halted:
 					print("Halted: " + result_path)
 				else:
-					not_halted.add(result_path)
+					not_halted.append(result_path)
 					print("Not halted: " + result_path)
 
 
