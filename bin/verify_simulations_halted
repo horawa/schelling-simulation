@@ -28,14 +28,14 @@ def main():
 				final_state_image = os.path.join(result_path, result_files[-1])
 				halted = is_halted(final_state_image, T)
 				if halted:
-					print("Halted: " + result_path)
+					print("Halted: " + result_path, flush=True)
 				else:
 					not_halted.append(result_path)
-					print("Not halted: " + result_path)
+					print("Not halted: " + result_path, flush=True)
 
 
 	if len(not_halted) == 0:
-		print("All halted!")
+		print("All halted!", flush=True)
 
 if __name__ == '__main__':
 	main()
