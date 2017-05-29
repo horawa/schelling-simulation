@@ -1,0 +1,126 @@
+#!/usr/bin/env python
+import os
+import ast
+from schelling.simulation_settings import SimulationSettings
+import schelling.utility_functions as ut
+import schelling.simulation as sim
+import sys
+import multiprocessing
+import datetime
+
+verify_log_path = os.path.join(os.path.expanduser("~"), "halted.txt")
+iterations=10000
+result_dir = os.path.join(os.path.expanduser("~"), "results_updated")
+
+
+def get_not_done():
+	with open(verify_log_path) as verify_log:
+		halted_log_lines = verify_log.readlines()
+
+	not_halted_paths = list(
+		map(lambda line: line.split(": ")[1].replace("/home/shor", "/Users/stas")[:-1],
+		# map(lambda line: line.split(": ")[1][:-1],
+		filter(lambda line: line.startswith("Not halted"), halted_log_lines)))
+	# print("\n".join(not_halted_paths))
+	return not_halted_paths
+
+def get_settings_from_path(path):
+	settings_path = os.path.join(path, "settings.txt")
+	
+	with open(settings_path) as settigns_file:
+		settings_str = settigns_file.read()
+	
+	settings_dict = ast.literal_eval(settings_str)
+	settings = SimulationSettings()
+	settings.__dict__ = settings_dict
+	settings.iterations = iterations
+
+	output_dir = settings_path.replace(
+		"/results/", "/results_updated/").replace("settings.txt", "")
+	return (output_dir, settings)
+
+# argv[1] is thread count (default=8)
+def log(text):
+	print(text)
+	log_file = open(os.path.join(result_dir, "log.txt"), "a+")
+	log_file.write("[" + str(datetime.datetime.now()) +"] " + text + "\n")
+	log_file.close()
+
+
+def run(settings):
+	output_dir = settings[0]
+	settings = settings[1]
+
+	log("Running: " + output_dir)
+
+	os.makedirs(output_dir, exist_ok=True)
+
+	callback = sim.get_save_state_callback(
+		output_dir, settings.iterations)
+	
+	settings_file = open(os.path.join(output_dir, "settings.txt"), 'w')
+	settings_file.write(str(settings))
+	settings_file.close()
+	
+	# create utility function here: workaround for 'Cant pickle local object'.
+	settings.utility_function = ut.create_flat_utility(
+		settings.utility_function)
+	
+	sim.run_simulation(settings, callback)
+	log("Done: " + output_dir)
+
+
+
+settings = [get_settings_from_path(set_path) for set_path in get_not_done()]
+
+if __name__ == '__main__':
+	#touch log file
+	os.makedirs(result_dir, exist_ok=True)
+
+	check = False
+
+	if len(sys.argv) < 2:
+		threads = 8
+	else:
+		if sys.argv[1] == "check":
+			check = True
+		else:
+			threads = int(sys.argv[1])
+
+	if len(sys.argv) < 4:
+		start = 0
+		end = len(settings)
+	else:
+		start = int(sys.argv[2])
+		end = int(sys.argv[3])
+
+	if check:
+		with open("results/log.txt") as log:
+			log_lines = log.readlines()
+
+		started_lines = list( 
+			map(lambda l: l.split(": ")[1],
+				filter(lambda line: "Running:" in line,
+					log_lines)))
+
+		done_lines = list( 
+			map(lambda l: l.split(": ")[1],
+				filter(lambda line: "Done:" in line,
+					log_lines)))
+
+		not_done = list(
+			filter(lambda l: l not in done_lines,
+				started_lines))
+
+		settings_dirs = list(map(lambda l: l[0], settings))
+
+		not_done_settings = list(
+			filter(lambda l: l not in settings_dirs,
+				done_lines))
+
+		print("\n".join(settings_dirs))
+		
+	else:
+		pool = multiprocessing.Pool(threads)
+		pool.map(run, settings)
+
