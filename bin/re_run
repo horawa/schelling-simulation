@@ -18,8 +18,8 @@ def get_not_done():
 		halted_log_lines = verify_log.readlines()
 
 	not_halted_paths = list(
-		map(lambda line: line.split(": ")[1].replace("/home/shor", "/Users/stas")[:-1],
-		# map(lambda line: line.split(": ")[1][:-1],
+		# map(lambda line: line.split(": ")[1].replace("/home/shor", "/Users/stas")[:-1],
+		map(lambda line: line.split(": ")[1][:-1],
 		filter(lambda line: line.startswith("Not halted"), halted_log_lines)))
 	# print("\n".join(not_halted_paths))
 	return not_halted_paths
