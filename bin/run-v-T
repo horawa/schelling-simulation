@@ -8,6 +8,8 @@ import multiprocessing
 import datetime
 
 # argv[1] is thread count (default=8)
+# argv[2] is agent count (default=2)
+
 def log(text):
 	log_file = open(os.path.join(result_dir, "log.txt"), "a+")
 	log_file.write("[" + str(datetime.datetime.now()) +"] " + text + "\n")
@@ -36,7 +38,27 @@ def run(settings):
 	sim.run_simulation(settings, callback)
 	log("Done: " + output_dir)
 
-result_dir = os.path.join(os.path.expanduser("~"), "results")
+check = False
+
+
+if len(sys.argv) < 2:
+	threads = 8
+else:
+	if sys.argv[1] == "check":
+		check = True
+	else:
+		threads = int(sys.argv[1])
+
+if len(sys.argv) < 3:
+	agents = 2
+else:
+	agents = int(sys.argv[2])
+
+
+results_name = "results"
+if agents != 2:
+	results_name += str(agents)
+result_dir = os.path.join(os.path.expanduser("~"), results_name)
 
 tolerances = [0.125 * x for x in range(9)]
 vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
@@ -45,7 +67,7 @@ settings = [(
 	os.path.join(result_dir, "v_"+str(v), "T_"+str(T), str(test_no)),
 	SimulationSettings(grid_size=100,
 		vacancy_proportion=v,
-		agent_proportions=(0.5, 0.5),
+		agent_proportions=tuple(1/agents for _ in range(agents)),
 		initial_random_allocation=True,
 		utility_function=T,
 		satisficers=False,
@@ -57,7 +79,7 @@ settings = [(
 		count_vacancies=True,
 		segregation_measure_names=['entropy_average', 'clusters', 
 			'unlike_neighbor_fraction_average'],
-		iterations=5000,
+		iterations=10000,
 		save_period=100) 
 	) for v in vacancy_proportions for T in tolerances for test_no in range(10)]
 
@@ -65,22 +87,16 @@ if __name__ == '__main__':
 	#touch log file
 	os.makedirs(result_dir, exist_ok=True)
 
-	check = False
 
-	if len(sys.argv) < 2:
-		threads = 8
-	else:
-		if sys.argv[1] == "check":
-			check = True
-		else:
-			threads = int(sys.argv[1])
 
-	if len(sys.argv) < 4:
-		start = 0
-		end = len(settings)
-	else:
-		start = int(sys.argv[2])
-		end = int(sys.argv[3])
+
+	# if len(sys.argv) < 4:
+	# 	start = 0
+	# 	end = len(settings)
+	# else:
+	# 	start = int(sys.argv[2])
+	# 	end = int(sys.argv[3])
+
 
 	if check:
 		with open("results/log.txt") as log:
