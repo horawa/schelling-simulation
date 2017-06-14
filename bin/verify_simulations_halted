@@ -25,8 +25,18 @@ def main():
 				result_path = os.path.join(result_dir, "v_"+str(v),
 					"T_"+str(T), str(test_no))
 				result_files = sorted(os.listdir(result_path))[:-2]
-				final_state_image = os.path.join(result_path, result_files[-1])
-				halted = is_halted(final_state_image, T)
+				
+				try:
+					final_state_image = os.path.join(result_path, result_files[-1])
+				except IndexError:
+					# if no image for v == 1.0, assume halted
+					if v == 1.0:
+						halted = True
+					else:
+						raise
+				else:
+					halted = is_halted(final_state_image, T)
+
 				if halted:
 					print("Halted: " + result_path, flush=True)
 				else:
