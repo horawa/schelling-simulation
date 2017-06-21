@@ -3,6 +3,7 @@ import os
 import schelling.simulation as sim
 import schelling.arr_to_img as im
 import schelling.utility_functions as ut
+import sys
 
 result_dir = os.path.join(os.path.expanduser("~"), "results")
 
@@ -48,4 +49,9 @@ def main():
 		print("All halted!", flush=True)
 
 if __name__ == '__main__':
+	if len(sys.argv == 2):
+		n = int(sys.argv[1])
+		global result_dir
+		result_dir = os.path.join(os.path.expanduser("~"), "results" + str(n))
+
 	main()
