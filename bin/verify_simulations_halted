@@ -5,6 +5,8 @@ import schelling.arr_to_img as im
 import schelling.utility_functions as ut
 import sys
 
+# argv[1] = agent count to verify (e.g. 3 for results3)
+
 result_dir = os.path.join(os.path.expanduser("~"), "results")
 
 tolerances = [0.125 * x for x in range(9)]
@@ -49,7 +51,7 @@ def main():
 		print("All halted!", flush=True)
 
 if __name__ == '__main__':
-	if len(sys.argv == 2):
+	if len(sys.argv) == 2:
 		n = int(sys.argv[1])
 		global result_dir
 		result_dir = os.path.join(os.path.expanduser("~"), "results" + str(n))
