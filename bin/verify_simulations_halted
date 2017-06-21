@@ -51,9 +51,9 @@ def main():
 		print("All halted!", flush=True)
 
 if __name__ == '__main__':
+	global result_dir
 	if len(sys.argv) == 2:
 		n = int(sys.argv[1])
-		global result_dir
 		result_dir = os.path.join(os.path.expanduser("~"), "results" + str(n))
 
 	main()
