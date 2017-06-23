@@ -7,6 +7,9 @@ import schelling.segregation_measures as sm
 import schelling.arr_to_img as im
 import schelling.array_utils as ut
 
+#argv[1] is results dir
+#argv[2] is measure
+
 result_dir = os.path.join(os.path.expanduser("~"), "results")
 result_file_name = "result.json"
 
@@ -20,8 +23,8 @@ final_measure_values = {}
 def output_csv(result):
 	for v in vacancy_proportions:
 		for T in tolerances[:-1]:
-			print(str(result[(v, T)]), end=",")
-		print(str(result[v, tolerances[-1]]))
+			print(str(result[(v, T)]), end=",", flush=True)
+		print(str(result[v, tolerances[-1]]), flush=True)
 
 
 def get_measure(test_dir, measure):
@@ -40,7 +43,14 @@ def get_measure(test_dir, measure):
 
 
 def main():
-	measure = 'unlike_neighbor_fraction_average'
+	global result_dir
+	if len(sys.argv) >=  2:
+		result_dir = sys.argv[1]
+
+	if len(sys.argv) >= 3:
+		measure = sys.argv[2]
+	else:
+		measure = 'unlike_neighbor_fraction_average'
 
 	for v in vacancy_proportions:
 		for T in tolerances:
@@ -67,7 +77,7 @@ def main():
 				avg_final_value += measure_value
 			avg_final_value /= len(test_nos)
 			final_measure_values[(v, T)] = avg_final_value
-		print(v, file=sys.stderr)
+		print(v, file=sys.stderr, flush=True)
 	output_csv(final_measure_values)
 		
 if __name__ == '__main__':
