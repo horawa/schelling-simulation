@@ -24,7 +24,7 @@ def output_csv(result):
 	for T in tolerances:
 		for v in vacancy_proportions:
 			print(str(result[(v, T)]), end=" ", flush=True)
-		print("\n")
+		print(flush=True)
 
 
 def get_measure(test_dir, measure):
