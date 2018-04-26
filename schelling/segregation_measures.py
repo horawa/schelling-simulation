@@ -78,6 +78,12 @@ def share_average(array, agent_indices, radius=1):
 def unlike_neighbor_fraction_average(array, agent_indices, radius=1):
 	return _get_measure_average(array, agent_indices, unlike_neighbor_fraction)
 
+def unlike_neighbor_fraction_average_ncv(array, agent_indices, radius=1):
+	total = sum(unlike_neighbor_fraction(array, tuple(index), 
+				count_vacancies=False) for index in agent_indices)
+
+	return total / agent_indices.shape[0]
+
 
 def unlike_neighbor_fraction_distribution(array, agent_indices):
 	distribution = {(agents/8): 0 for agents in range(9)}
@@ -223,9 +229,9 @@ def distance(array, agent_index):
 	return distance
 
 
-def unlike_neighbor_fraction(array, agent_index):
+def unlike_neighbor_fraction(array, agent_index, count_vacancies=True):
 	return get_unlike_neighbor_fraction(
-		array, tuple(agent_index), radius=1, count_vacancies=True)
+		array, tuple(agent_index), radius=1, count_vacancies=count_vacancies)
 
 
 def mix_deviation(array, agent_index, radius=1):
@@ -253,4 +259,5 @@ segregation_measures = {
 	'ghetto_rate': ghetto_rate,
 	'clusters': clusters,
 	'unlike_neighbor_fraction_average': unlike_neighbor_fraction_average,
+	'unlike_neighbor_fraction_average_ncv': unlike_neighbor_fraction_average_ncv,
 }

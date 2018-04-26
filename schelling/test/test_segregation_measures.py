@@ -2,7 +2,7 @@ import unittest
 from schelling.segregation_measures import (entropy, switch_rate, 
 	distance_average, entropy_average, switch_rate_average, ghetto_rate, 
 	clusters, distance, mix_deviation, mix_deviation_average, share, 
-	share_average)
+	share_average, unlike_neighbor_fraction_average_ncv)
 from numpy import array
 from math import log
 
@@ -276,6 +276,36 @@ class SegregationMeasureTest(unittest.TestCase):
 			with self.subTest(i=agent_index):
 				self.assertAlmostEqual(output, expected_output)
 
+	def test_unlike_neighbor_fraction_average_ncv(self):
+		# parameters = [
+		# 	((0, 1), 0),
+		# 	((0, 2), 0),
+		# 	((1, 0), 1/3),
+		# 	((1, 1), 2/5),
+		# 	((1, 3), 1/2),
+		# 	((2, 1), 3/5),
+		# 	((2, 2), 3/5),
+		# 	((3, 1), 1),
+		# 	((3, 2), 1/3),
+		# ]
+
+		agent_indices= array([
+			(0,1),
+			(0,2),
+			(1,0),
+			(1,1),
+			(1,3),
+			(2,1),
+			(2,2),
+			(3,1),
+			(3,2),
+		])
+
+		expected_output = ((1/3) + (2/5) + (1/2) + (3/5) + (3/5) + 1 + (1/3)
+			) / 9
+		output = unlike_neighbor_fraction_average_ncv(
+			self.test_array, agent_indices)
+		self.assertAlmostEqual(output, expected_output)
 
 
 if __name__ == '__main__':
