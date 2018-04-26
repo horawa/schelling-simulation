@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+# import plotly.plotly as py
+import plotly.graph_objs as go
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot,iplot
+import csv
+import os
+
+path = "/Users/stas/Projects/schelling/misc/results_csv/"
+files = os.listdir(path)
+
+tolerances = ['0'] + [str(x)+'/8' for x in range(1,8)] + ['1'] #[0.125 * x for x in range(9)]
+vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+
+for file in files:
+	if file[-4:] != ".csv":
+		continue
+
+	name = file[:-4]
+	file = path + file
+	
+	data = list()
+
+
+	with open(file, newline='') as f:
+		reader = csv.reader(f)
+		try:
+			for row in reader:
+				data_row = [float(p) for p in row]
+				data.append(data_row)
+		except csv.Error as e:
+			sys.exit('file {}, line {}: {}'.format(file, reader.line_num, e))
+
+	# reverse_scale = "clusters" in name
+	reverse_scale = True
+
+	trace = go.Heatmap(z=data,
+	                   x=vacancy_proportions,
+	                   y=tolerances,
+	                   colorscale='Reds',
+	                   reversescale=reverse_scale)
+
+	layout = go.Layout(
+	    title=name,
+	    xaxis=dict(
+	        title='Vacancy Proportion v',
+	        # titlefont=dict(
+	        #     family='Courier New, monospace',
+	        #     size=18,
+	        #     color='#7f7f7f'
+	        # )
+	    ),
+	    yaxis=dict(
+	        title='Agent Tolerance T',
+	        # titlefont=dict(
+	        #     family='Courier New, monospace',
+	        #     size=18,
+	        #     color='#7f7f7f'
+	        # )
+	    )
+	)
+
+	fig = go.Figure(data=[trace], layout=layout)
+
+	html_path = "/Users/stas/Projects/schelling/misc/results_html/"
+	html_name = os.path.join(html_path, name+".html")
+	png_name = os.path.join(path, name+".png")
+
+	plot(fig, filename=html_name, image='png', image_filename=png_name,
+              image_width=800, image_height=600, auto_open=True)
+	import time
+	time.sleep(5)
