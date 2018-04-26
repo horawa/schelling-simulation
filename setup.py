@@ -1,6 +1,7 @@
 from setuptools import setup
 from setuptools.command.install import install as InstallCommand
 import pip
+import os
 
 
 class Install(InstallCommand):
@@ -16,6 +17,10 @@ def readme():
 	with open('README.md') as readme:
 		return readme.read()
 
+scripts = list(
+	map(lambda f: "bin/"+f, 
+	filter(lambda f: f[0] != ".", 
+		os.listdir('bin'))))
 
 setup(
 	name='Schelling Simulation',
@@ -28,8 +33,7 @@ setup(
 	packages=['schelling'],
 	include_package_data=True,
 	zip_safe=False,
-	scripts=['bin/run-simulation', 'bin/run-v-T', 
-		'bin/verify_simulations_halted', 'bin/get_results', 'bin/re_run', 'bin/results_heatmap'],
+	scripts=scripts,
 	entry_points={
 		'console_scripts': ['schelling-cli=schelling.cli:simulation'],
 	},
