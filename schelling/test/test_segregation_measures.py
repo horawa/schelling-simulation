@@ -289,6 +289,7 @@ class SegregationMeasureTest(unittest.TestCase):
 		# 	((3, 2), 1/3),
 		# ]
 
+
 		agent_indices= array([
 			(0,1),
 			(0,2),
@@ -305,6 +306,47 @@ class SegregationMeasureTest(unittest.TestCase):
 			) / 9
 		output = unlike_neighbor_fraction_average_ncv(
 			self.test_array, agent_indices)
+		self.assertAlmostEqual(output, expected_output)
+
+	def test_unlike_neighbor_fraction_average_ncv_no_neighbors(self):
+
+		test_array = array([
+				[0, 1, 0, 0],
+				[1, 1, 0, 1],
+				[0, 2, 0, 0],
+				[0, 1, 2, 0]
+			])
+
+		agent_indices= array([
+			(0,1),
+			(1,0),
+			(1,1),
+			(1,3),
+			(2,1),
+			(3,1),
+			(3,2),
+		])
+
+		expected_output = (0 + (1/3) + (1/3) + (3/4) + 1 + (1/2)) / 6
+		output = unlike_neighbor_fraction_average_ncv(test_array, agent_indices)
+		self.assertAlmostEqual(output, expected_output)
+
+	def test_unlike_neighbor_fraction_average_ncv_empty(self):
+
+		test_array = array([
+				[0, 1, 0, 0],
+				[0, 0, 0, 1],
+				[0, 0, 0, 0],
+				[0, 0, 2, 0]
+			])
+
+		agent_indices= array([
+			(0,1),
+			(3,2),
+		])
+
+		expected_output = 0
+		output = unlike_neighbor_fraction_average_ncv(test_array, agent_indices)
 		self.assertAlmostEqual(output, expected_output)
 
 

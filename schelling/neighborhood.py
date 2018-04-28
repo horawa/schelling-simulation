@@ -118,3 +118,13 @@ def get_unlike_neighbor_fraction(array, agent_index, agent_type=None, radius=1,
 	return unlike_agent_fraction
 
 
+def has_neighbors(array, agent_index):
+	neighborhood = get_neighborhood(array, tuple(agent_index))
+	not_vacant = neighborhood != 0
+	neighbor_count = np.count_nonzero(not_vacant)
+	if array[tuple(agent_index)] != 0:
+				neighbor_count -= 1 # agent will be excluded from neighbor count
+	return neighbor_count != 0
+
+
+

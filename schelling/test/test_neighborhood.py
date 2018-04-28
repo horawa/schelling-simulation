@@ -1,7 +1,7 @@
 import unittest
 from numpy import array, array_equal
 from schelling.neighborhood import (get_neighborhood, 
-	get_neighborhood_exclusive, get_unlike_neighbor_fraction)
+	get_neighborhood_exclusive, get_unlike_neighbor_fraction, has_neighbors)
 
 
 class GetNeighborhoodTest(unittest.TestCase):
@@ -148,6 +148,28 @@ class GetNeighborhoodTest(unittest.TestCase):
 				output = get_unlike_neighbor_fraction(self.frac_test_array, 
 					agent_index, count_vacancies=True)
 				self.assertAlmostEqual(output, expected_output)
+
+
+	def test_has_neighbors(self):
+		test_array = array([
+				[1, 0, 1, 0],
+				[0, 0, 0, 2],
+				[0, 0, 0, 0],
+				[0, 2, 0, 0]
+			])
+
+		expected_outputs = [
+			((0,0), False),
+			((0,2), True),
+			((1,3), True),
+			((3,1), False)
+		]
+
+		for agent_index, expected_output in expected_outputs:
+			with self.subTest(name='has_neigbors', index=agent_index):
+				output = has_neighbors(test_array, agent_index)
+				self.assertEqual(output, expected_output)
+
 
 if __name__ == '__main__':
 	unittest.main()

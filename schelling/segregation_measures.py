@@ -3,7 +3,7 @@ import numpy as np
 from scipy.ndimage.measurements import label
 
 from schelling.neighborhood import (get_neighborhood, 
-	get_neighborhood_exclusive, get_unlike_neighbor_fraction)
+	get_neighborhood_exclusive, get_unlike_neighbor_fraction, has_neighbors)
 
 
 
@@ -82,7 +82,13 @@ def unlike_neighbor_fraction_average_ncv(array, agent_indices, radius=1):
 	total = sum(unlike_neighbor_fraction(array, tuple(index), 
 				count_vacancies=False) for index in agent_indices)
 
-	return total / agent_indices.shape[0]
+	agents_with_neigbors = len(list(
+		filter(lambda a: has_neighbors(array, tuple(a)), agent_indices)))
+
+	if agents_with_neigbors == 0:
+		return 0
+
+	return total / agents_with_neigbors
 
 
 def unlike_neighbor_fraction_distribution(array, agent_indices):
