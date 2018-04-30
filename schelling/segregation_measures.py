@@ -104,6 +104,23 @@ def unlike_neighbor_fraction_distribution(array, agent_indices):
 
 	return distribution
 
+def unlike_neighbor_fraction_distribution_ncv(array, agent_indices):
+	categories = [(agents/8) for agents in range(9)]
+
+	def _get_cat(unf):
+		for cat in categories:
+			if unf <= cat:
+				return cat
+
+	distribution = {c: 0 for c in categories}
+	for agent_index in agent_indices:
+		uf = unlike_neighbor_fraction(
+			array, tuple(agent_index), count_vacancies=False)
+		cat = _get_cat(uf)
+		distribution[cat] += 1
+
+	return distribution
+
 
 def switch_rate(array, agent_index):
 	"""Calculates switch rate for agent at specified index in array
