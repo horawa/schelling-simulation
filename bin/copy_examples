@@ -22,7 +22,7 @@ for T, v in results:
 	img_dir = os.path.join(results_path, "v_" + str(v), "T_" + str(T), "0")
 	img = sorted(filter(lambda i: i[-4:] == ".png", os.listdir(img_dir)))[-1]
 	img_path = os.path.join(img_dir, img)
-	img_out = os.path.join(output_path, "T_"+str(T)+"_v_"+str(v)+".png")
+	img_out = os.path.join(output_path, "T_"+str(T).replace(".","")+"_v_"+str(v).replace(".","")+".png")
 
 	shutil.copy(img_path, img_out)
 	print(img)
