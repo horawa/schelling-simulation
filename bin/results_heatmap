@@ -75,7 +75,7 @@ for file in files:
 
 	html_path = "/Users/stas/Projects/schelling/misc/results_html/"
 	html_name = os.path.join(html_path, name+".html")
-	png_name = os.path.join(path, name+".png")
+	png_name = name+".png"
 
 	plot(fig, filename=html_name, image='png', image_filename=png_name,
               image_width=800, image_height=600, auto_open=True)
