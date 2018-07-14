@@ -13,7 +13,6 @@ from schelling.utility_functions import (get_utility_for_array,
 from schelling.simulation_settings import SimulationSettings
 from schelling.simulation_result import SimulationResult
 
-# TODO Refactor this abomination
 
 class SimulationTestCase(unittest.TestCase):
 	def setUp(self):
@@ -1035,6 +1034,160 @@ class SimulationTestCase(unittest.TestCase):
 
 		self.assertEqual(output, expected_output)
 
+
+	def test_update_array_multiple_utilities(self):
+		array = np.array([
+			[0, 0, 0],
+			[0, 1, 1],
+			[1, 2, 2]
+		])
+
+		utilities = [create_flat_utility(0.25), create_flat_utility(0.75)]
+
+		utility = get_utility_for_array(utilities, array, True)
+
+		result = SimulationResult() #dummy result
+
+		output = update_array(array, 
+			utility, result, _first_picker, 
+			_first_picker, False, ['entropy_average'])
+
+		expected_output = np.array([
+			[1, 0, 0],
+			[0, 1, 0],
+			[1, 2, 2]
+		])
+
+		self.assertTrue(np.array_equal(array, expected_output))
+
+
+	def test_simulation_multiple_utilities(self):
+		iteration_states = [
+			np.array([
+				[0, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[2, 2, 2, 2],
+			]),
+			np.array([
+				[1, 0, 0, 0],
+				[0, 0, 0, 0],
+				[0, 1, 1, 1],
+				[2, 2, 2, 2],
+			]),
+			np.array([
+				[1, 1, 0, 0],
+				[0, 0, 0, 0],
+				[0, 0, 1, 1],
+				[2, 2, 2, 2],
+			]),
+			np.array([
+				[1, 1, 1, 0],
+				[0, 0, 0, 0],
+				[0, 0, 0, 1],
+				[2, 2, 2, 2],
+			]),
+			np.array([
+				[1, 1, 1, 1],
+				[0, 0, 0, 0],
+				[0, 0, 0, 0],
+				[2, 2, 2, 2],
+			]),
+		
+			None
+		] # simulation halted, should not fail at none
+
+		def callback(array, result, iteration):
+			expected_output = iteration_states[iteration]
+			with self.subTest(i=iteration, out=array, expected=expected_output):	
+				self.assertTrue(np.array_equal(array, expected_output))
+
+
+		settings = SimulationSettings(		
+			grid_size=4,
+			vacancy_proportion=0.5,
+			agent_proportions=(0.5, 0.5),
+			initial_random_allocation=False,
+			utility_function=[create_flat_utility(0.25), 
+				create_flat_utility(0.75)],
+			satisficers=False,
+			agent_picking_regime='first',
+			vacancy_picking_regime='first',
+			count_vacancies=True,
+			radius=1,
+			iterations=len(iteration_states),
+			save_period=1
+		)
+
+		result = run_simulation(settings, callback)
+
+		clusters = [2, 3, 3, 3, 2]
+		with self.subTest():
+			self.assertEqual(result.get_measures()['clusters'], clusters)
+
+	def test_simulation_multiple_utilities_2(self):
+		iteration_states = [
+			np.array([
+				[0, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[2, 2, 2, 2],
+			]),
+			np.array([
+				[2, 0, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 2, 2, 2],
+			]),
+			np.array([
+				[2, 2, 0, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 0, 2, 2],
+			]),
+			np.array([
+				[2, 2, 2, 0],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 0, 0, 2],
+			]),
+			np.array([
+				[2, 2, 2, 2],
+				[0, 0, 0, 0],
+				[1, 1, 1, 1],
+				[0, 0, 0, 0],
+			]),
+		
+			None
+		] # simulation halted, should not fail at none
+
+		def callback(array, result, iteration):
+			expected_output = iteration_states[iteration]
+			with self.subTest(i=iteration, out=array, expected=expected_output):	
+				self.assertTrue(np.array_equal(array, expected_output))
+
+
+		settings = SimulationSettings(		
+			grid_size=4,
+			vacancy_proportion=0.5,
+			agent_proportions=(0.5, 0.5),
+			initial_random_allocation=False,
+			utility_function=[create_flat_utility(0.75), 
+				create_flat_utility(0.25)],
+			satisficers=False,
+			agent_picking_regime='first',
+			vacancy_picking_regime='first',
+			count_vacancies=True,
+			radius=1,
+			iterations=len(iteration_states),
+			save_period=1
+		)
+
+		result = run_simulation(settings, callback)
+
+		clusters = [2, 3, 3, 3, 2]
+		with self.subTest():
+			self.assertEqual(result.get_measures()['clusters'], clusters)
 
 if __name__ == '__main__':
 	unittest.main()

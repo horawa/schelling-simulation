@@ -12,6 +12,7 @@ class SettingsTestCase(unittest.TestCase):
 			{"agent_proportions": (-1.0, 0.5)},
 			{"initial_random_allocation": 'asdf'},
 			{"utility_function": None},
+			{"utility_function": [lambda a: 1, 'x']},
 			{"satisficers": 'asdf'},
 			{"agent_picking_regime": 'asdf'},
 			{"agent_picking_regime": 10},

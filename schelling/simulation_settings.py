@@ -57,8 +57,14 @@ class SimulationSettings:
 		if is_not_bool(self.initial_random_allocation):
 			raise ValueError("Initial random allocation must be true or false")
 
-		if not callable(self.utility_function):
-			raise ValueError("Utility function must be callable")
+		try:
+			for u in self.utility_function:
+				if not callable(u):
+					raise ValueError("Utility function must be callable or list of callables")
+		except TypeError:
+			if not callable(self.utility_function):
+				raise ValueError("Utility function must be callable or list of callables")
+
 
 		if is_not_bool(self.satisficers):
 			raise ValueError("Satisficers must be true or false")

@@ -127,10 +127,23 @@ def get_utility_for_array(utility_function, array, count_vacancies=False, radius
 	Returns:
 	    function: wrapped utility function
 	"""
-	def utility(index, agent_type=None):
-		return utility_function(get_unlike_neighbor_fraction(array, index, 
-			radius=radius, agent_type=agent_type, 
-			count_vacancies=count_vacancies))
+	try:
+		# see if utility_function is subscriptable
+		utility_function[0]
+
+		def utility(index, agent_type=None):
+			if agent_type is None:
+				agent_type = array[tuple(index)]
+			utf = utility_function[agent_type - 1]
+			return utf(get_unlike_neighbor_fraction(array, index, 
+				radius=radius, agent_type=agent_type, 
+				count_vacancies=count_vacancies))
+	except TypeError:
+		# if not subscriptable use one function
+		def utility(index, agent_type=None):
+			return utility_function(get_unlike_neighbor_fraction(array, index, 
+				radius=radius, agent_type=agent_type, 
+				count_vacancies=count_vacancies))
 	
 	return utility
 
