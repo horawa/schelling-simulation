@@ -72,9 +72,10 @@ _utility_function_creators = {
 @click.option('--radius', '-r', default=1,
 	help='Radius of neighborhood that agents will consider. '
 	'Default = 1 (only directly adjacent neighbors).')
-@click.option('--count-vacancies/--no-count-vacancies', default=False,
-	help='Specifies, if vacancies should be counted as neighbors, when '
-	'calculating the fraction of unlike neighbors.')
+@click.option('--absolute-unf/--relative-unf', default=False,
+	help='Specifies, if vacancies should be counted as neighbors (absolute unf)'
+	' or not (relative unf), when calculating the fraction of unlike neighbors.'
+	)
 @click.option('--segregation-measure', multiple=True, type=str, 
 	default=('entropy_average', 'clusters', 'ghetto_rate', 
 		'mix_deviation_average'),
@@ -97,7 +98,7 @@ _utility_function_creators = {
 def simulation(grid_size, vacancy_proportion, agent_proportion, 
 	initial_random_allocation, utility_function, satisficers, 
 	agent_picking_regime, vacancy_picking_regime, agent_roulette_base_weight, 
-	vacancy_roulette_base_weight, radius, count_vacancies, segregation_measure,
+	vacancy_roulette_base_weight, radius, absolute_unf, segregation_measure,
 	iterations, save_to, save_period, verbose):
 	"""Command line interface for the Schelling simulation."""
 	
@@ -126,7 +127,7 @@ def simulation(grid_size, vacancy_proportion, agent_proportion,
 			agent_roulette_base_weight=agent_roulette_base_weight,
 			vacancy_roulette_base_weight=vacancy_roulette_base_weight,
 			radius=radius,
-			count_vacancies=count_vacancies,
+			count_vacancies=absolute_unf,
 			segregation_measure_names=list(segregation_measure),
 			iterations=iterations,
 			save_period=save_period
