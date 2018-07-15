@@ -10,9 +10,15 @@ import datetime
 # argv[1] is thread count (default=8)
 # argv[2] is agent count (default=2)
 
-def log(text):
+def log(text, print_to_console=True):
 	log_file = open(os.path.join(result_dir, "log.txt"), "a+")
-	log_file.write("[" + str(datetime.datetime.now()) +"] " + text + "\n")
+	
+	message = "[" + str(datetime.datetime.now()) +"] " + text + "\n"
+	
+	if print_to_console:
+		print(message)
+	
+	log_file.write(message)
 	log_file.close()
 
 
