@@ -16,7 +16,7 @@ def log(text, print_to_console=True):
 	message = "[" + str(datetime.datetime.now()) +"] " + text + "\n"
 	
 	if print_to_console:
-		print(message)
+		print(message, flush=True)
 	
 	log_file.write(message)
 	log_file.close()
