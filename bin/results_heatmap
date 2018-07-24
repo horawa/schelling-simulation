@@ -35,7 +35,7 @@ for file in files:
 			sys.exit('file {}, line {}: {}'.format(file, reader.line_num, e))
 
 	if "satisfied_percent" in name:
-		scale = 'Blues'
+		scale = 'Greens'
 		reverse_scale = False
 		bar_title = "← unsatisfied | satisfied →"
 	else:
@@ -45,6 +45,7 @@ for file in files:
 
 		title_font = dict(family='Serif', size=18)
 		tick_font=dict(family='Serif', size=12)
+		annotation_font=title_font
 
 
 	trace = go.Heatmap(z=data,
@@ -84,11 +85,11 @@ for file in files:
 	] 
 
 
-	if "results4" in name:
+	if "4" in name:
 		annotation_data = annotation_data_4
-	elif "results3" in name:
+	elif "3" in name:
 		annotation_data = annotation_data_3
-	elif "results" in name:
+	elif "2" in name:
 		annotation_data = annotation_data_2
 
 	annotations=list()
@@ -99,17 +100,11 @@ for file in files:
 		annotation = go.Annotation(
 			x=annotation_point[0],
 			y=annotation_point[1],
-			text='('+letters.pop(0)+')',
+			text='<b>('+letters.pop(0)+')</b>',
 			showarrow=False,
-			font=title_font
-			# xref='x',
-			# yref='y',
-			# arrowhead=7,
-			# ax=0,
-			# ay=-40
+			font=annotation_font
 		)
 		annotations.append(annotation)
-
 
 	layout = go.Layout(
 		# title=name,
