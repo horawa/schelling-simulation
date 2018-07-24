@@ -2,10 +2,11 @@
 
 # import plotly.plotly as py
 import plotly.graph_objs as go
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot,iplot
+from plotly.offline import plot
 import csv
 import os
 import sys
+import string
 
 path = "/Users/stas/Projects/schelling/misc/results_csv/"
 files = os.listdir(path)
@@ -33,42 +34,97 @@ for file in files:
 		except csv.Error as e:
 			sys.exit('file {}, line {}: {}'.format(file, reader.line_num, e))
 
-	# reverse_scale = "clusters" in name
-	reverse_scale = True
+	if "satisfied_percent" in name:
+		scale = 'Blues'
+		reverse_scale = False
+		bar_title = "← unsatisfied | satisfied →"
+	else:
+		scale = 'Reds'
+		reverse_scale = True
+		bar_title = "← segregated | integrated →"
+
+		title_font = dict(family='Serif', size=18)
+		tick_font=dict(family='Serif', size=12)
+
 
 	trace = go.Heatmap(z=data,
-	                   x=vacancy_proportions,
-	                   y=tolerances,
-	                   colorscale='Reds',
-	                   reversescale=reverse_scale)
+					   x=vacancy_proportions,
+					   y=tolerances,
+					   colorscale=scale,
+					   reversescale=reverse_scale,
+					   colorbar=dict(
+						title=bar_title,
+						titleside="right",
+						titlefont=title_font,
+					   ),)
+
+
+
+	annotation_data_2 = [
+		(10, '2/8', ),
+		(13, '2/8', ),
+		(40, '2/8'),
+		(2, '3/8'),
+		(5, '3/8'),
+		(40, '3/8'),
+		(1, '5/8'),
+		(10, '5/8'),
+	]
+
+	annotation_data_3 = [
+		(2, '4/8'),
+		(4, '4/8'),
+		(25, '4/8'),
+	] 
+
+	annotation_data_4 = [
+		(5, '4/8'),
+		(7, '4/8'),
+		(25, '4/8'),
+	] 
+
+
+	if "results4" in name:
+		annotation_data = annotation_data_4
+	elif "results3" in name:
+		annotation_data = annotation_data_3
+	elif "results" in name:
+		annotation_data = annotation_data_2
+
+	annotations=list()
+
+	letters = list(string.ascii_lowercase)
+
+	for annotation_point in annotation_data:
+		annotation = go.Annotation(
+			x=annotation_point[0],
+			y=annotation_point[1],
+			text='('+letters.pop(0)+')',
+			showarrow=False,
+			font=title_font
+			# xref='x',
+			# yref='y',
+			# arrowhead=7,
+			# ax=0,
+			# ay=-40
+		)
+		annotations.append(annotation)
+
 
 	layout = go.Layout(
-	    # title=name,
-	    xaxis=dict(
-	        title='Vacancy Proportion (v) [%]',
-	        titlefont=dict(
-	        	family='Serif',
-	        	size=18),
-	        tickfont=dict(family='Serif', size=12)
-	        # titlefont=dict(
-	        #     family='Courier New, monospace',
-	        #     size=18,
-	        #     color='#7f7f7f'
-	        # )
-	    ),
-	    yaxis=dict(
-	        title='Agent Tolerance (T)',
-	        titlefont=dict(
-	        	family='Serif',
-	        	size=18),
-	        tickfont=dict(family='Serif', size=12)
-	        # titlefont=dict(
-	        #     family='Courier New, monospace',
-	        #     size=18,
-	        #     color='#7f7f7f'
-	        # )
-	    ),
-	    font=dict(family='Serif', size=12),
+		# title=name,
+		xaxis=dict(
+			title='Vacancy Proportion (v) [%]',
+			titlefont=title_font,
+			tickfont=tick_font,
+		),
+		yaxis=dict(
+			title='Agent Tolerance (T)',
+			titlefont=title_font,
+			tickfont=tick_font,
+		),
+		font=dict(family='Serif', size=12),
+		annotations=annotations,
 	)
 
 	fig = go.Figure(data=[trace], layout=layout)
@@ -78,6 +134,6 @@ for file in files:
 	png_name = name
 
 	plot(fig, filename=html_name, image='png', image_filename=png_name,
-              image_width=800, image_height=600, auto_open=True)
+			  image_width=800, image_height=600, auto_open=True)
 	# import time
 	# time.sleep(5)
