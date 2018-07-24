@@ -11,6 +11,7 @@ import sys
 result_dir = os.path.join(os.path.expanduser("~"), "results")
 
 tolerances = [0.125 * x for x in range(9)]
+tolerances_mut = tolerances = [(1/8,7/8), (2/8,6/8), (3/8,5/8)]
 vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
 test_nos = list(range(10))
 
@@ -27,7 +28,11 @@ def output_csv(result):
 def get_satisfied_percent(image_file, T):
 	array = im.image_parse(image_file)
 	agent_indices = ut.get_agent_indices(array)
-	utility_function = utf.create_flat_utility(T)
+	try:
+		T[0] # see if list of tolerances
+		utility_function = [utf.create_flat_utility(t) for t in T]
+	except TypeError:
+		utility_function = utf.create_flat_utility(T)
 	utilityfa = utf.get_utility_for_array(utility_function, array, True)
 	return utf.satisfied_percent(utilityfa, agent_indices)
 
@@ -36,12 +41,19 @@ def main():
 	if len(sys.argv) >=  2:
 		result_dir = sys.argv[1]
 
+	if "mut" in result_dir:
+		global tolerances
+		tolerances = tolerances_mut
+		tolerance_names = {T: str(T[0])+"_"+str(T[1]) for T in tolerances}
+	else:
+		tolerance_names = {T: str(T) for T in tolerances}
+
 	for v in vacancy_proportions:
 		for T in tolerances:
 			avg_final_value = 0
 			for test_no in test_nos:
 				result_path = os.path.join(result_dir, "v_"+str(v),
-					"T_"+str(T), str(test_no))
+					"T_"+tolerance_names[T], str(test_no))
 				result_files = sorted(os.listdir(result_path))[:-2]
 				
 				try:
