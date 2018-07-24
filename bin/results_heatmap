@@ -12,12 +12,20 @@ path = "/Users/stas/Projects/schelling/misc/results_csv/"
 files = os.listdir(path)
 
 tolerances = ['0'] + [str(x)+'/8' for x in range(1,8)] + ['1'] #[0.125 * x for x in range(9)]
+tolerances_mut = ["1/8, 7/8", "2/8, 6/8", "3/8, 5/8"]
 # vacancy_proportions = [round(0.01 * x, 2) for x in range(100)] # do not use v=1.0
 vacancy_proportions = [x for x in range(100)] # do not use v=1.0
 
 for file in files:
 	if file[-4:] != ".csv":
 		continue
+
+	if "mut" in file:
+		tolerance_list = tolerances_mut
+		imheight = 350
+	else:
+		tolerance_list = tolerances
+		imheight = 600
 
 	name = file[:-4]
 	file = path + file
@@ -50,7 +58,7 @@ for file in files:
 
 	trace = go.Heatmap(z=data,
 					   x=vacancy_proportions,
-					   y=tolerances,
+					   y=tolerance_list,
 					   colorscale=scale,
 					   reversescale=reverse_scale,
 					   colorbar=dict(
@@ -91,6 +99,8 @@ for file in files:
 		annotation_data = annotation_data_3
 	elif "2" in name:
 		annotation_data = annotation_data_2
+	else:
+		annotation_data = []
 
 	annotations=list()
 
@@ -100,7 +110,7 @@ for file in files:
 		annotation = go.Annotation(
 			x=annotation_point[0],
 			y=annotation_point[1],
-			text='<b>('+letters.pop(0)+')</b>',
+			text='<b>'+letters.pop(0)+'</b>',
 			showarrow=False,
 			font=annotation_font
 		)
@@ -129,6 +139,6 @@ for file in files:
 	png_name = name
 
 	plot(fig, filename=html_name, image='png', image_filename=png_name,
-			  image_width=800, image_height=600, auto_open=True)
+			  image_width=800, image_height=imheight, auto_open=True)
 	# import time
 	# time.sleep(5)
