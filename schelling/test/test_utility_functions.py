@@ -1,7 +1,9 @@
 import unittest
 from schelling.utility_functions import (create_flat_utility, 
-	create_peaked_utility, create_spiked_utility)
-from numpy import linspace
+	create_peaked_utility, create_spiked_utility, satisfied_percent, 
+	get_utility_for_array)
+from schelling.array_utils import get_agent_indices
+import numpy as np
 
 class UtilityFunctionsTest(unittest.TestCase):
 
@@ -109,7 +111,7 @@ class UtilityFunctionsTest(unittest.TestCase):
 
 	def check_expected_output_for_range_0_1(self, name, utility_function, 
 			exepcted_output_list):
-		for unlike_neighbors, exepcted_output in zip(linspace(0.0, 1.0, 11), 
+		for unlike_neighbors, exepcted_output in zip(np.linspace(0.0, 1.0, 11), 
 				exepcted_output_list):
 			with self.subTest(name=name, input=unlike_neighbors):
 				output = utility_function(round(unlike_neighbors, 4))
@@ -134,6 +136,37 @@ class UtilityFunctionsTest(unittest.TestCase):
 				with self.subTest(name=name, input=error_input):
 					with self.assertRaises(ValueError):
 						function(error_input)
+
+
+	def test_satisfied_percent(self):
+		test_arrays = [(np.array([
+				[0, 1, 1, 0],
+				[1, 1, 0, 1],
+				[0, 2, 2, 0],
+				[0, 1, 2, 0]
+			]), 8*100/9), 
+			(np.array([
+				[0, 1, 2, 0],
+				[1, 2, 2, 1],
+				[1, 2, 2, 0],
+				[1, 1, 1, 0]
+			]), 9*100/12), 
+			(np.array([
+				[1, 1, 1, 0],
+				[1, 1, 0, 2],
+				[0, 1, 2, 2],
+				[0, 1, 2, 2]
+			 ]), 100)
+		]
+
+		utility_function = create_flat_utility(0.5)
+
+		for array, exepcted_output in test_arrays:
+			ut = get_utility_for_array(utility_function, array, True)
+			agent_indices = get_agent_indices(array)
+			sp = satisfied_percent(ut, agent_indices)
+			with self.subTest():
+				self.assertEqual(sp, exepcted_output)
 
 
 if __name__ == '__main__':

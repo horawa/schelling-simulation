@@ -13,7 +13,8 @@ import schelling.array_utils as ut
 result_dir = os.path.join(os.path.expanduser("~"), "results")
 result_file_name = "result.json"
 
-tolerances = [0.125 * x for x in range(9)]
+tolerances = [str(0.125 * x) for x in range(9)]
+tolerances_mut = ["0.125_0.875", "0.25_0.75", "0.375_0.625"]
 vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
 test_nos = list(range(10))
 
@@ -46,18 +47,21 @@ def main():
 	global result_dir
 	if len(sys.argv) >=  2:
 		result_dir = sys.argv[1]
+		if result_dir.endswith("results_mut"):
+			global tolerances
+			tolerances = tolerances_mut
 
 	if len(sys.argv) >= 3:
 		measure = sys.argv[2]
 	else:
-		measure = 'unlike_neighbor_fraction_average'
+		measure = 'unlike_neighbor_fraction_average_ncv'
 
 	for v in vacancy_proportions:
 		for T in tolerances:
 			avg_final_value = 0
 			for test_no in test_nos:
 				test_dir = os.path.join(result_dir, "v_"+str(v),
-					"T_"+str(T), str(test_no))
+					"T_"+T, str(test_no))
 				result_path = os.path.join(test_dir, result_file_name)
 
 				try:

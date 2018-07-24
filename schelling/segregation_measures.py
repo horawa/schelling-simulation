@@ -8,7 +8,6 @@ from schelling.neighborhood import (get_neighborhood,
 
 
 
-
 def _get_measure_average(array, agent_indices, measure_func):
 	"""Get average of fuction results for each index in array
 	

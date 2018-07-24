@@ -1,6 +1,7 @@
 from functools import wraps
 from math import isclose
 from schelling.neighborhood import get_unlike_neighbor_fraction
+import numpy as np
 
 
 def range_check_0_1(function):
@@ -26,10 +27,10 @@ def create_flat_utility(threshold):
 	Flat utility: u(t) = 1, if t <= threshold; 0, if t > threshold
 	
 	Args:
-	    threshold (float): threshold - in range [0.0, 1.0]
+		threshold (float): threshold - in range [0.0, 1.0]
 	
 	Returns:
-	    function: utility function
+		function: utility function
 	"""
 
 	@range_check_0_1
@@ -55,11 +56,11 @@ def create_peaked_utility(peak, cutoff=False):
 		u(t) = (1 / peak) * t, if t <= peak; 0, if t >= peak
 
 	Args:
-	    peak (float): Utility function peaks at this argument - in range [0, 1]
-	    cutoff (bool, optional): Sets cutoff behavior
+		peak (float): Utility function peaks at this argument - in range [0, 1]
+		cutoff (bool, optional): Sets cutoff behavior
 	
 	Returns:
-	    function: utility function
+		function: utility function
 	"""
 
 	try:
@@ -99,10 +100,10 @@ def create_spiked_utility(spike):
 	u(t) = 1, if t = spike; 0, otherwise
 	
 	Args:
-	    spike (float): Spike at this argument - in range [0, 1]
+		spike (float): Spike at this argument - in range [0, 1]
 	
 	Returns:
-	    function: utility function
+		function: utility function
 	"""
 	@range_check_0_1
 	def spiked_utility(unlike_neighbor_fraction):
@@ -121,14 +122,14 @@ def get_utility_for_array(utility_function, array, count_vacancies=False, radius
 		function.
 	
 	Args:
-	    utility_function (callable): function to wrap - (0, 1) -> (0, 1)
-	    array (ndarray): array
+		utility_function (callable): function to wrap - (0, 1) -> (0, 1)
+		array (ndarray): array
 	
 	Returns:
-	    function: wrapped utility function
+		function: wrapped utility function
 	"""
 	try:
-		# see if utility_function is subscriptable
+		# see if utility_function is subscriptable - multiple utility functions
 		utility_function[0]
 
 		def utility(index, agent_type=None):
@@ -139,12 +140,38 @@ def get_utility_for_array(utility_function, array, count_vacancies=False, radius
 				radius=radius, agent_type=agent_type, 
 				count_vacancies=count_vacancies))
 	except TypeError:
-		# if not subscriptable use one function
+		# if not subscriptable - one utility function
 		def utility(index, agent_type=None):
 			return utility_function(get_unlike_neighbor_fraction(array, index, 
 				radius=radius, agent_type=agent_type, 
 				count_vacancies=count_vacancies))
 	
 	return utility
+
+
+def satisfied_percent(utility_for_array, agent_indices):
+	"""Return percentage of satisfied agents
+	
+	Args:
+		utility_for_array (function): function returning utility given agent 
+			index
+		agent_indices (ndarray): array containing indices of agents.
+	"""
+	def is_satisfied(index):
+		return utility_for_array(index) == 1.0
+
+	satisfied_agent_index_indices = np.nonzero(np.apply_along_axis(
+			is_satisfied, 1, agent_indices))[0]
+
+	satisfied_agent_count = len(satisfied_agent_index_indices)
+	total_count = agent_indices.shape[0]
+
+	satisfied_proportion = (satisfied_agent_count / total_count) 
+
+	return satisfied_proportion * 100
+
+	print(satisfied_agent_index_indices)
+	
+
 
 
