@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+"""Get unlike neighbor fraction average not counting vacancies csv"""
+import os
+import schelling.utility_functions as utf
+import schelling.array_utils as ut
+import schelling.arr_to_img as im
+import sys
+
+# argv[1] = results dir
+
+result_dir = os.path.join(os.path.expanduser("~"), "results")
+
+tolerances = [0.125 * x for x in range(9)]
+vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+test_nos = list(range(10))
+
+
+final_measure_values = {}
+
+
+def output_csv(result):
+	for T in tolerances:
+		for v in vacancy_proportions[:-1]:
+			print(str(result[(v, T)]), end=",", flush=True)
+		print(str(result[(vacancy_proportions[-1], T)]), flush=True)
+
+def get_satisfied_percent(image_file, T):
+	array = im.image_parse(image_file)
+	agent_indices = ut.get_agent_indices(array)
+	utility_function = utf.create_flat_utility(T)
+	utilityfa = utf.get_utility_for_array(utility_function, array, True)
+	return utf.satisfied_percent(utilityfa, agent_indices)
+
+def main():	
+	global result_dir
+	if len(sys.argv) >=  2:
+		result_dir = sys.argv[1]
+
+	for v in vacancy_proportions:
+		for T in tolerances:
+			avg_final_value = 0
+			for test_no in test_nos:
+				result_path = os.path.join(result_dir, "v_"+str(v),
+					"T_"+str(T), str(test_no))
+				result_files = sorted(os.listdir(result_path))[:-2]
+				
+				try:
+					final_state_image = os.path.join(result_path, 
+						result_files[-1])
+				except IndexError:
+					# if no image for v == 1.0, assume halted
+					if v == 1.0:
+						measure_value = 0
+					else:
+						raise
+				else:
+					measure_value = get_satisfied_percent(final_state_image, T)
+
+				avg_final_value += measure_value
+
+			avg_final_value /= len(test_nos)
+			final_measure_values[(v, T)] = avg_final_value
+		print(v, file=sys.stderr, flush=True)
+	output_csv(final_measure_values)
+
+if __name__ == '__main__':
+	main()
