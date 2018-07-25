@@ -49,11 +49,11 @@ for file in files:
 	else:
 		scale = 'Reds'
 		reverse_scale = True
-		bar_title = "← segregated | integrated →"
+		bar_title = "← segregated |   <i>Uᵣ</i>   | integrated →"
 
-		title_font = dict(family='Serif', size=18)
-		tick_font=dict(family='Serif', size=12)
-		annotation_font=title_font
+	title_font = dict(family='Serif', size=18)
+	tick_font=dict(family='Serif', size=12)
+	annotation_font=dict(family='Serif', size=16)
 
 
 	trace = go.Heatmap(z=data,
@@ -119,12 +119,12 @@ for file in files:
 	layout = go.Layout(
 		# title=name,
 		xaxis=dict(
-			title='Vacancy Proportion (v) [%]',
+			title='Vacancy Proportion (<i>v</i>) [%]',
 			titlefont=title_font,
 			tickfont=tick_font,
 		),
 		yaxis=dict(
-			title='Agent Tolerance (T)',
+			title='Agent Tolerance (<i>T</i>)',
 			titlefont=title_font,
 			tickfont=tick_font,
 		),
