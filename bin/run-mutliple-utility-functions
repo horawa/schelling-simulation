@@ -66,8 +66,13 @@ if agents != 2:
 	results_name += str(agents)
 result_dir = os.path.join(os.path.expanduser("~"), results_name)
 
-tolerances = [[1/8,7/8], [2/8,6/8], [3/8,5/8]]
+# tolerances = [[1/8,7/8], [2/8,6/8], [3/8,5/8]]
 vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+
+tols = [x/8 for x in range(0,9)]
+tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
+
+tolerances = tol_pairs
 
 settings = [(
 	os.path.join(result_dir, "v_"+str(v), "T_"+str(T[0])+"_"+str(T[1]),
