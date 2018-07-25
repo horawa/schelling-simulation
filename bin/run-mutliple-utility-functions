@@ -66,6 +66,8 @@ if agents != 2:
 	results_name += str(agents)
 result_dir = os.path.join(os.path.expanduser("~"), results_name)
 
+tests=3
+
 # tolerances = [[1/8,7/8], [2/8,6/8], [3/8,5/8]]
 vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
 
@@ -92,7 +94,7 @@ settings = [(
 			'unlike_neighbor_fraction_average_ncv'],
 		iterations=10000,
 		save_period=100) 
-	) for v in vacancy_proportions for T in tolerances for test_no in range(10)]
+	) for v in vacancy_proportions for T in tolerances for test_no in range(tests)]
 
 if __name__ == '__main__':
 	#touch log file
