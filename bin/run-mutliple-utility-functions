@@ -94,7 +94,7 @@ settings = [(
 			'unlike_neighbor_fraction_average_ncv'],
 		iterations=10000,
 		save_period=100) 
-	) for v in vacancy_proportions for T in tolerances for test_no in range(tests)]
+	) for v in vacancy_proportions for T in tolerances for test_no in [3]]
 
 if __name__ == '__main__':
 	#touch log file
