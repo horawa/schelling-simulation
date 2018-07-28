@@ -54,6 +54,8 @@ def get_not_done(settings):
 		filter(lambda line: "Done:" in line,
 		log_lines)))
 
+	print("\n".join(done_lines))
+
 	# not_done = list(
 	# 	filter(lambda l: l not in done_lines,
 	# 		started_lines))
