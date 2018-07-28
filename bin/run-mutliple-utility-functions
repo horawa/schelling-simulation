@@ -66,9 +66,9 @@ def get_not_done(settings):
 
 	# print("\n".join(map(lambda s: s[0], not_done_settings)))
 
-	print(len(settings))
-	print(len(done_lines))
-	print(len(not_done_settings))
+	# print(len(settings))
+	# print(len(done_lines))
+	# print(len(not_done_settings))
 
 	return not_done_settings
 
@@ -167,8 +167,8 @@ if __name__ == '__main__':
 		print("\n".join(settings_dirs))
 		
 	else:
-		get_not_done(settings)
-
-		# pool = multiprocessing.Pool(threads)
-		# pool.map(run, settings)
+		# get_not_done(settings)
+		settings_to_run = get_not_done(settings)
+		pool = multiprocessing.Pool(threads)
+		pool.map(run, settings)
 
