@@ -54,17 +54,17 @@ def get_not_done(settings):
 		filter(lambda line: "Done:" in line,
 		log_lines)))
 
-	print("\n".join(done_lines))
+	# print("\n".join(done_lines))
 
 	# not_done = list(
 	# 	filter(lambda l: l not in done_lines,
 	# 		started_lines))
 
 	not_done_settings = list(
-		filter(lambda s: s[0] not in done_lines, 
+		filter(lambda s: s[0]+"\n" not in done_lines, 
 		settings))
 
-	# print("\n".join(map(lambda s: s[0], not_done_settings)))
+	print("\n".join(map(lambda s: s[0], not_done_settings)))
 
 	return not_done_settings
 
