@@ -47,29 +47,24 @@ def run(settings):
 
 def get_not_done(settings):
 	with open(os.path.join(result_dir, "log.txt")) as log_file:
-			log_lines = log_file.readlines()
+		log_lines = log_file.readlines()
 
-		started_lines = list( 
-			map(lambda l: l.split(": ")[1],
-				filter(lambda line: "Running:" in line,
-					log_lines)))
+	done_lines = list( 
+		map(lambda l: l.split(": ")[1],
+		filter(lambda line: "Done:" in line,
+		log_lines)))
 
-		done_lines = list( 
-			map(lambda l: l.split(": ")[1],
-				filter(lambda line: "Done:" in line,
-					log_lines)))
+	# not_done = list(
+	# 	filter(lambda l: l not in done_lines,
+	# 		started_lines))
 
-		# not_done = list(
-		# 	filter(lambda l: l not in done_lines,
-		# 		started_lines))
+	not_done_settings = list(
+		filter(lambda s: s[0] not in done_lines, 
+		settings))
 
-		not_done_settings = list(
-				filter(lambda s: s[0] not in done_lines, 
-					settings))
+	print("\n".join(not_done_settings))
 
-		print("\n".join(not_done_settings))
-
-		return not_done_settings
+	return not_done_settings
 
 
 check = False
