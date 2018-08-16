@@ -68,21 +68,21 @@ def main():
 			for test_no in test_nos:
 				test_dir = os.path.join(result_dir, "v_"+str(v),
 					"T_"+T, str(test_no))
-				result_path = os.path.join(test_dir, result_file_name)
+				# result_path = os.path.join(test_dir, result_file_name)
 
-				try:
-					with open(result_path) as result_file:
-						result_data = json.load(result_file)
-				except FileNotFoundError:
-					assert v == 1.0
-					result_data = {measure: [0]}
+				# try:
+				# 	with open(result_path) as result_file:
+				# 		result_data = json.load(result_file)
+				# except FileNotFoundError:
+				# 	assert v == 1.0
+				# 	result_data = {measure: [0]}
 				
 
-				try:
-					measure_value = result_data[measure][-1]
-				except IndexError:
-					measure_value = get_measure(test_dir, measure)
-				
+				# try:
+				# 	measure_value = result_data[measure][-1]
+				# except IndexError:
+				# 	measure_value = get_measure(test_dir, measure)
+				measure_value = get_measure(test_dir, measure)
 
 				avg_final_value += measure_value
 			avg_final_value /= len(test_nos)
