@@ -36,11 +36,12 @@ def output_csv(result):
 
 def get_measure(test_dir, measure):
 	files = sorted(os.listdir(test_dir))
+	files = list(filter(lambda f: f.endswith(".png")))
 
 	# make sure the simulation ended at first iteration - should only have
 	# three files - 0.png, result.json and settings.txt
-	assert len(files) == 3
-	array = im.image_parse(os.path.join(test_dir, files[0]))
+	# assert len(files) == 3
+	array = im.image_parse(os.path.join(test_dir, files[-1]))
 	agent_indices = ut.get_agent_indices(array)
 
 	sm_func = sm.segregation_measures[measure]
