@@ -11,30 +11,43 @@ import sys
 result_dir = os.path.join(os.path.expanduser("~"), "results")
 
 tolerances = [0.125 * x for x in range(9)]
-tolerances_mut = tolerances = [(1/8,7/8), (2/8,6/8), (3/8,5/8)]
+
+
+tols = [x/8 for x in range(0,9)]
+tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
+tolerances_mut = tol_pairs #[str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
+# tolerances_mut = [(1/8,7/8), (2/8,6/8), (3/8,5/8)]
+
 vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
-test_nos = list(range(10))
+test_nos = [3] #list(range(10))
 
 
 final_measure_values = {}
 
 
 def output_csv(result):
-	for T in tolerances:
-		for v in vacancy_proportions[:-1]:
-			print(str(result[(v, T)]), end=",", flush=True)
-		print(str(result[(vacancy_proportions[-1], T)]), flush=True)
+	for at in [0,1,2]:
+		for T in tolerances:
+			for v in vacancy_proportions[:-1]:
+				print(str(result[(v, T, at)]), end=",", flush=True)
+			print(str(result[(vacancy_proportions[-1], T, at)]), flush=True)
+		print("\n", flush=True)
 
 def get_satisfied_percent(image_file, T):
 	array = im.image_parse(image_file)
-	agent_indices = ut.get_agent_indices(array)
+	
+	agent_indices = [ut.get_agent_indices(array), 
+		ut.get_agent_indices_of_type(array, 1), 
+		ut.get_agent_indices_of_type(array, 2)]
+
 	try:
 		T[0] # see if list of tolerances
 		utility_function = [utf.create_flat_utility(t) for t in T]
 	except TypeError:
 		utility_function = utf.create_flat_utility(T)
 	utilityfa = utf.get_utility_for_array(utility_function, array, True)
-	return utf.satisfied_percent(utilityfa, agent_indices)
+
+	return [utf.satisfied_percent(utilityfa, ai) for ai in agent_indices]
 
 def main():	
 	global result_dir
@@ -50,28 +63,28 @@ def main():
 
 	for v in vacancy_proportions:
 		for T in tolerances:
-			avg_final_value = 0
-			for test_no in test_nos:
-				result_path = os.path.join(result_dir, "v_"+str(v),
-					"T_"+tolerance_names[T], str(test_no))
-				result_files = sorted(os.listdir(result_path))[:-2]
-				
-				try:
-					final_state_image = os.path.join(result_path, 
-						result_files[-1])
-				except IndexError:
-					# if no image for v == 1.0, assume halted
-					if v == 1.0:
-						measure_value = 0
+			for at in [0,1,2]:
+				avg_final_value = 0
+				for test_no in test_nos:
+					result_path = os.path.join(result_dir, "v_"+str(v),
+						"T_"+tolerance_names[T], str(test_no))
+					result_files = sorted(os.listdir(result_path))[:-2]
+					
+					try:
+						final_state_image = os.path.join(result_path, 
+							result_files[-1])
+					except IndexError:
+						# if no image for v == 1.0, assume halted
+						if v == 1.0:
+							measure_value = 0
+						else:
+							raise
 					else:
-						raise
-				else:
-					measure_value = get_satisfied_percent(final_state_image, T)
+						measure_value = get_satisfied_percent(final_state_image, T)[at]
+					avg_final_value += measure_value
 
-				avg_final_value += measure_value
-
-			avg_final_value /= len(test_nos)
-			final_measure_values[(v, T)] = avg_final_value
+				avg_final_value /= len(test_nos)
+				final_measure_values[(v, T, at)] = avg_final_value
 		print(v, file=sys.stderr, flush=True)
 	output_csv(final_measure_values)
 
