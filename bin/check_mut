@@ -8,7 +8,7 @@ tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
 tolerances = [str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
 
 vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
-test_nos = list(range(4,10))
+test_nos = list(range(0,4))
 
 
 def main():
