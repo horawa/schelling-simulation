@@ -20,7 +20,7 @@ agents=2
 
 settings = list()
 
-def main():
+def get_settings():
 	for v in vacancy_proportions:
 		for T in tolerances:
 			for test_no in test_nos:
@@ -89,6 +89,8 @@ def run(settings):
 threads = 8
 
 if __name__ == '__main__':
+	get_settings()
+	
 	#touch log file
 	os.makedirs(result_dir, exist_ok=True)
 
