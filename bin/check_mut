@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import os
+
+result_dir = os.path.join(os.path.expanduser("~"), "results_mut")
+
+tols = [x/8 for x in range(0,9)]
+tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
+tolerances = [str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
+
+vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
+test_nos = [0,1,2,3]
+
+def main():
+	for v in vacancy_proportions:
+		for T in tolerances:
+			for test_no in test_nos:
+				test_dir = os.path.join(result_dir, "v_"+str(v),
+					"T_"+T, str(test_no))
+
+				if not os.path.isdir(test_dir):
+					print("missing: "+test_dir)
+
+		
+if __name__ == '__main__':
+	main()
