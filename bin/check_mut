@@ -8,7 +8,8 @@ tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
 tolerances = [str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
 
 vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
-test_nos = [0,1,2,3]
+test_nos = list(range(4,10))
+
 
 def main():
 	for v in vacancy_proportions:
@@ -17,8 +18,8 @@ def main():
 				test_dir = os.path.join(result_dir, "v_"+str(v),
 					"T_"+T, str(test_no))
 
-				if not os.path.isdir(test_dir):
-					print("missing: "+test_dir)
+				if os.path.isdir(test_dir):
+					print(test_dir)
 
 		
 if __name__ == '__main__':
