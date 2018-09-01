@@ -18,7 +18,7 @@ def main():
 				test_dir = os.path.join(result_dir, "v_"+str(v),
 					"T_"+T, str(test_no))
 
-				if os.path.isdir(test_dir):
+				if not os.path.isdir(test_dir):
 					print(test_dir)
 
 		
