@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 import os
+from schelling.simulation_settings import SimulationSettings
+import schelling.utility_functions as ut
+import schelling.simulation as sim
+import multiprocessing
+import datetime
 
 result_dir = os.path.join(os.path.expanduser("~"), "results_mut")
 
@@ -10,6 +15,9 @@ tolerances = [str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
 vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
 test_nos = list(range(0,4))
 
+agents=2
+
+settings = list()
 
 def main():
 	for v in vacancy_proportions:
@@ -21,6 +29,68 @@ def main():
 				if not os.path.isdir(test_dir):
 					print(test_dir)
 
-		
+					settings.append((
+					os.path.join(result_dir, "v_"+str(v), "T_"+str(T[0])+"_"+str(T[1]),
+					 str(test_no)), SimulationSettings(grid_size=100,
+						vacancy_proportion=v,
+						agent_proportions=tuple(1/agents for _ in range(agents)),
+						initial_random_allocation=True,
+						utility_function=T,
+						satisficers=False,
+						agent_picking_regime='random',
+						vacancy_picking_regime='random',
+						agent_roulette_base_weight=None,
+						vacancy_roulette_base_weight=None,
+						radius=1,
+						count_vacancies=True,
+						segregation_measure_names=[
+							'unlike_neighbor_fraction_average_ncv'],
+						iterations=10000,
+						save_period=100) 
+					))
+
+def log(text, print_to_console=True):
+	log_file = open(os.path.join(result_dir, "log.txt"), "a+")
+	
+	message = "[" + str(datetime.datetime.now()) +"] " + text + "\n"
+	
+	if print_to_console:
+		print(message, flush=True)
+	
+	log_file.write(message)
+	log_file.close()
+
+
+def run(settings):
+	output_dir = settings[0]
+	settings = settings[1]
+
+	log("Running: " + output_dir)
+
+	os.makedirs(output_dir, exist_ok=True)
+
+	callback = sim.get_save_state_callback(
+		output_dir, settings.iterations)
+	
+	settings_file = open(os.path.join(output_dir, "settings.txt"), 'w')
+	settings_file.write(str(settings))
+	settings_file.close()
+	
+	# create utility function here: workaround for 'Cant pickle local object'.
+	utfs = [ut.create_flat_utility(tol) for tol in settings.utility_function]
+	settings.utility_function = utfs
+	
+	sim.run_simulation(settings, callback)
+	log("Done: " + output_dir)
+
+
+
+threads = 8
+
 if __name__ == '__main__':
-	main()
+	#touch log file
+	os.makedirs(result_dir, exist_ok=True)
+
+	pool = multiprocessing.Pool(threads)
+	pool.map(run, settings)
+
