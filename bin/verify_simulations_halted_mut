@@ -24,7 +24,8 @@ def is_halted(test_dir, utility_th):
 	array = im.image_parse(os.path.join(test_dir, files[-1]))
 		
 	utility_function = [ut.create_flat_utility(u) for u in utility_th]
-	return sim.is_simulation_halted(array, utility_function)
+	iterations = int(files[-1][:-4])
+	return sim.is_simulation_halted(array, utility_function), iterations
 
 def main():
 	for v in vacancy_proportions:
@@ -34,10 +35,10 @@ def main():
 					"T_"+str(T[0])+"_"+str(T[1]), str(test_no))
 												
 
-				halted = is_halted(test_dir, T)
+				halted, iterations = is_halted(test_dir, T)
 
 				if halted:
-					print("Halted: " + test_dir, flush=True)
+					print("Halted (" + str(iterations) + "): " + test_dir, flush=True)
 				else:
 					print("Not halted: " + test_dir, flush=True)
 					all_halted = False
