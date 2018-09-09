@@ -36,7 +36,9 @@ def main():
 
 				halted = is_halted(test_dir, T)
 
-				if not halted:
+				if halted:
+					print("Halted: " + test_dir, flush=True)
+				else:
 					print("Not halted: " + test_dir, flush=True)
 					all_halted = False
 
