@@ -4,7 +4,7 @@ import schelling.simulation as sim
 import schelling.arr_to_img as im
 import schelling.utility_functions as ut
 import sys
-
+	
 # argv[1] = agent count to verify (e.g. 3 for results3)
 
 result_dir = os.path.join(os.path.expanduser("~"), "results_mut")
@@ -15,8 +15,22 @@ tolerances = tol_pairs
 vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
 test_nos = range(4)
 
-
 all_halted = True
+
+
+def get_logged():
+	log_file = os.path.join(result_dir, "halted.txt")
+	
+	with open(log_file) as logf:
+		lines = logf.readlines()
+	
+	return [line.split(": ")[1] for line in lines]
+
+logged = get_logged()
+
+def is_in_log(test_dir):
+	return test_dir in logged
+
 
 def is_halted(test_dir, utility_th):
 	files = sorted(os.listdir(test_dir))
@@ -28,12 +42,15 @@ def is_halted(test_dir, utility_th):
 	return sim.is_simulation_halted(array, utility_function), iterations
 
 def main():
+
 	for v in vacancy_proportions:
 		for T in tolerances:
 			for test_no in test_nos:
 				test_dir = os.path.join(result_dir, "v_"+str(v),
 					"T_"+str(T[0])+"_"+str(T[1]), str(test_no))
 												
+				if is_in_log(test_dir):
+					continue
 
 				halted, iterations = is_halted(test_dir, T)
 
