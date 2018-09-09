@@ -40,7 +40,7 @@ def main():
 				if halted:
 					print("Halted (" + str(iterations) + "): " + test_dir, flush=True)
 				else:
-					print("Not halted: " + test_dir, flush=True)
+					print("Not halted (" + str(iterations) + "): " + test_dir, flush=True)
 					all_halted = False
 
 
