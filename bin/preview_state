@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+"""View final state in ~/results_mut folder"""
+import sys
+import os
+
+result_dir = os.path.join(os.path.expanduser("~"), "results_mut")
+result2_dir = os.path.join(os.path.expanduser("~"), "results")
+
+
+
+v = sys.argv[1]
+T0 = sys.argv[2]
+try:
+	T1 = sys.argv[3]
+except IndexError:
+	T1 = T0
+
+if "." not in v:
+	v = str(float(v)/100)
+
+if "." not in T0:
+	T0 = str(float(T0) / 8)
+
+if "." not in T1:
+	T1 = str(float(T1) / 8)
+
+if float(T0) > float(T1):
+	T0, T1 = T1, T0
+
+if float(T0) == float(T1):
+	result_dir = os.path.join(result2_dir, "v_"+v, "T_"+T0, "3")
+else:
+	result_dir = os.path.join(result_dir, "v_"+v, "T_"+T0+"_"+T1, "3")
+
+files = sorted(filter(lambda x: x.endswith(".png"), os.listdir(result_dir)))
+
+file = os.path.join(result_dir, files[-1])
+
+os.system("/usr/bin/qlmanage -p " + file)

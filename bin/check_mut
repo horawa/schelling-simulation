@@ -14,7 +14,7 @@ tolerances = tol_pairs
 # tolerances = [str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
 
 vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
-test_nos = [4,5,6]
+test_nos = [4,5,6]	
 agents=2
 
 settings = list()

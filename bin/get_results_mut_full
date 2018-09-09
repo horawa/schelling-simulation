@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+import sys
+
+results_mut_csv = sys.argv[1]
+results2_csv = sys.argv[2]
+
+tols = [x/8 for x in range(0,9)]
+tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
+tol_pairs_all = [(tol1, tol2) for tol1 in tols for tol2 in tols]
+
+vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
+
+def main(): 
+	rmut_all = dict()
+
+	with open(results_mut_csv) as csvf:
+		lines_mut = iter(csvf.readlines())
+
+	with open(results2_csv) as csvf2:
+		lines2 = iter(csvf2.readlines())
+
+	for T in tol_pairs:
+		rmut_all[T] = next(lines_mut)
+
+	for T in tols:
+		rmut_all[(T, T)] = next(lines2)
+
+	for T in tol_pairs_all:
+		if T[0] > T[1]:
+			rmut_all[T] = rmut_all[(T[1], T[0])]
+
+	for T in tol_pairs_all:
+		print(rmut_all[T].strip())
+
+if __name__ == '__main__':
+	main()
