@@ -102,19 +102,22 @@ def run(test_dir):
 	
 	callback = sim.get_save_state_callback(test_dir, settings.iterations)
 
+	tolerances = settings.utility_function
+
 	while True:
 		if curr_iter < 9900:
 			settings.iterations = 10000
 		else:
 			settings.iterations = curr_iter + 5100
 
-		
+		settings.utility_function = tolerances
+
 		settings_file = open(os.path.join(test_dir, "settings.txt"), 'w')
 		settings_file.write(str(settings))
 		settings_file.close()
 		
 		# create utility function here: workaround for 'Cant pickle local object'.
-		utfs = [ut.create_flat_utility(tol) for tol in settings.utility_function]
+		utfs = [ut.create_flat_utility(tol) for tol in tolerances]
 		settings.utility_function = utfs
 		
 		sim.continue_simulation(array, curr_iter + 1, settings, callback)
