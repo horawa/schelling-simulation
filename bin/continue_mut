@@ -1,0 +1,129 @@
+#!/usr/bin/env python
+from schelling.simulation_settings import SimulationSettings
+import schelling.utility_functions as ut
+import os
+import schelling.simulation as sim
+import multiprocessing
+import datetime
+import ast
+import schelling.arr_to_img as im
+
+# argv[1] is thread count (default=8)
+# argv[2] is agent count (default=2)
+
+results_name = "results_mut"
+result_dir = os.path.join(os.path.expanduser("~"), results_name)
+
+
+# tolerances = [[1/8,7/8], [2/8,6/8], [3/8,5/8]]
+vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+
+tols = [x/8 for x in range(0,9)]
+tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
+
+tolerances = tol_pairs
+
+threads = 8
+
+
+def get_not_done():
+	halted_log = os.path.join(result_dir, "halted.txt")
+	log1 = os.path.join(result_dir, "log1.txt")
+
+	with open(halted_log) as hl:
+		lines = hl.readlines()
+
+	not_halted = list(filter(lambda l: l.startswith("Not"), lines))
+	not_halted_paths = [nhl.split(": ")[1].strip() for nhl in not_halted]
+
+	with open(log1) as l1:
+		lines = l1.readlines()
+
+	done_lines = list(filter(lambda l: l.startswith("Done"), lines))
+	done_paths = [dl.split(": ")[1].strip() for dl in done_lines]
+
+	not_halted_paths = list(filter(lambda p: p not in done_paths, not_halted_paths))
+
+	return not_halted_paths
+
+
+def log(text, print_to_console=True):
+	log_file = open(os.path.join(result_dir, "log.txt"), "a+")
+	log_file1 = open(os.path.join(result_dir, "log1.txt"), "a+")
+	
+	message = "[" + str(datetime.datetime.now()) +"] " + text + "\n"
+	
+	if print_to_console:
+		print(message, flush=True)
+	
+	log_file.write(message)
+	log_file.close()
+	log_file1.write(message)
+	log_file1.close()
+
+
+def get_settings_from_path(path):
+	settings_path = os.path.join(path, "settings.txt")
+	
+	with open(settings_path) as settigns_file:
+		settings_str = settigns_file.read()
+	
+	settings_dict = ast.literal_eval(settings_str)
+	settings = SimulationSettings()
+	settings.__dict__ = settings_dict
+
+	return settings
+
+
+def get_final_state(test_dir):
+	files = sorted(os.listdir(test_dir))
+	files = list(filter(lambda f: f.endswith(".png"), files))
+
+	# make sure the simulation ended at first iteration - should only have
+	# three files - 0.png, result.json and settings.txt
+	# assert len(files) == 3
+	array = im.image_parse(os.path.join(test_dir, files[-1]))
+
+	final_iter = str(files[-1][:-4])
+
+	return array, int(final_iter)
+
+
+def run(test_dir):
+
+	log("Continuing: " + test_dir)
+
+	settings = get_settings_from_path(test_dir)
+	array, curr_iter = get_final_state(test_dir)
+	
+	callback = sim.get_save_state_callback(test_dir, settings.iterations)
+
+	while True:
+		if curr_iter < 9900:
+			settings.iterations = 10000
+		else:
+			settings.iterations = curr_iter + 5100
+
+		
+		settings_file = open(os.path.join(test_dir, "settings.txt"), 'w')
+		settings_file.write(str(settings))
+		settings_file.close()
+		
+		# create utility function here: workaround for 'Cant pickle local object'.
+		utfs = [ut.create_flat_utility(tol) for tol in settings.utility_function]
+		settings.utility_function = utfs
+		
+		sim.continue_simulation(array, curr_iter + 1, settings, callback)
+		if sim.is_simulation_halted(array, settings.utility_function):
+			break
+		else:
+			curr_iter = settings.iterations
+
+	log("Done: " + test_dir)
+
+if __name__ == '__main__':
+	test_dirs = get_not_done()
+
+	pool = multiprocessing.Pool(threads)
+	pool.map(run, test_dirs)
+
