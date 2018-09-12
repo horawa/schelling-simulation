@@ -44,6 +44,10 @@ def get_not_done():
 
 	not_halted_paths = list(filter(lambda p: p not in done_paths, not_halted_paths))
 
+	#filter for test 3 only
+	not_halted_paths = list(filter(lambda p: p.endswith("3"), not_halted_paths))
+
+
 	return not_halted_paths
 
 
@@ -124,6 +128,9 @@ def run(test_dir):
 if __name__ == '__main__':
 	test_dirs = get_not_done()
 
+	print("Running tests:")
+	print("\n".join(test_dirs))
+	
 	pool = multiprocessing.Pool(threads)
 	pool.map(run, test_dirs)
 
