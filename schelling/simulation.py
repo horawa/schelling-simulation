@@ -115,6 +115,90 @@ def run_simulation(settings, callback=lambda arr, res, i: None):
 	return result
 
 
+def continue_simulation(array, curr_iteration, settings, callback=lambda arr, res, i: None):
+	"""Run simulation with specified settings.
+	Call the optional callback function after each iteration,
+	passing the current array state, current result, and iteration number.
+	Returns simulation result - segregation measures before each iteration.
+	
+	Args:
+	    settings (SimulationSettings): settings
+	    callback (callable, optional): Function to call after each iteration
+	
+	Returns:
+	    SimulationResult: Result - segregation measures for each iteration
+	"""
+	global _stop
+
+
+	settings.validate()
+	result = SimulationResult(settings.segregation_measure_names)
+	
+
+	# utility - function: (index) -> (0,1)
+	utility = get_utility_for_array(settings.utility_function, array, 
+		count_vacancies=settings.count_vacancies, radius=settings.radius)
+
+	pickers = {
+		'random': _random_picker,
+		'first': _first_picker,
+	}
+
+	agent_pickers = dict(pickers, **{
+		'roulette': _create_roulette_picker(
+			settings.agent_roulette_base_weight, utility, for_agents=True),
+	})
+
+	vacancy_pickers = dict(pickers, **{
+		'roulette': _create_roulette_picker(
+			settings.vacancy_roulette_base_weight, utility, for_agents=False),
+	})
+
+	agent_picker = agent_pickers[settings.agent_picking_regime]
+	vacancy_picker = vacancy_pickers[settings.vacancy_picking_regime]
+
+	# if no agents, end simulation
+	agent_indices = get_agent_indices(array)
+	if agent_indices.shape[0] == 0:
+		return result
+
+	# _update_result(result, array, agent_indices,
+		# settings.count_vacancies, settings.segregation_measure_names)
+
+	for i in range(curr_iteration, settings.iterations):
+
+		while _pause:
+			pass
+
+
+		should_save_result = i % settings.save_period == 0
+
+		if should_save_result:
+			callback(array, result, i)
+
+		is_simulation_halted = update_array(array, utility, 
+			result, agent_picker, vacancy_picker, settings.count_vacancies, 
+			settings.segregation_measure_names, settings.satisficers,
+			should_save_result)
+
+		# if no further moves are possible, exit simulation early
+		if is_simulation_halted:
+			# Get measures for final state and save (unless it was just saved)
+			if not should_save_result:
+				agent_indices = get_agent_indices(array)
+				_update_result(result, array, agent_indices, 
+					settings.count_vacancies, settings.segregation_measure_names)
+				callback(array, result, i)
+			break
+
+		if _stop:
+			break
+
+	_stop = False
+
+	return result
+
+
 def update_array(array, utility, result, agent_picker, 
 	vacancy_picker, count_vacancies, segregation_measure_names,
 	satisficers=False, save_result=True):
