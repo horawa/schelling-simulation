@@ -18,8 +18,8 @@ result_file_name = "result.json"
 
 tols = [x/8 for x in range(0,9)]
 tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
-tolerances = tol_pairs
-# tolerances = [str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
+# tolerances = tol_pairs
+tolerances = [str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
 
 vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
 test_nos = [3] #list(range(10))
