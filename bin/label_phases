@@ -1,51 +1,52 @@
 #!/usr/bin/env python
 import sys
 
-satisfied_mut_all1_csv = sys.argv[1]
-satisfied_mut_all2_csv = sys.argv[2]
+satisfied_csv = sys.argv[1]
 
 tols = [x/8 for x in range(0,9)]
-tol_pairs_all = [(tol1, tol2) for tol1 in tols for tol2 in tols]
 
-vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
+vacancy_proportions = list(range(100))
 
 def main(): 
 	
-	satisfied1_all = dict()
-	satisfied2_all = dict()
+	satisfied = dict()
 
-	with open(satisfied_mut_all1_csv) as csvf:
-		lines_mut1 = iter(csvf.readlines())
-
-	with open(satisfied_mut_all2_csv) as csvf:
-		lines_mut2 = iter(csvf.readlines())
+	with open(satisfied_csv) as csvf:
+		lines = iter(csvf.readlines())
 
 	
 
-	for T in tol_pairs_all:
-		line1 = next(lines_mut1)
-		vals1 = [float(v) for v in line1.split(",")]
-		satisfied1_all[T] = vals1
-
-		line2 = next(lines_mut2)
-		vals2 = [float(v) for v in line2.split(",")]
-		satisfied2_all[T] = vals2
+	for T in tols:
+		line = next(lines)
+		vals = [float(v) for v in line.split(",")]
+		satisfied[T] = vals
 
 	values = dict()
 
-	for T in tol_pairs_all:
+	for T in tols[:-1]:
 		values[T] = list(range(100))
 		for v in range(100):
-			if satisfied1_all[T][v] >= 99.0 and satisfied2_all[T][v] >= 99.0:
-				values[T][v] = "ss"
-				print(str(T[0])+"_"+str(T[1])+","+str(v)+",○")
-			elif satisfied1_all[T][v] < 99.0 and satisfied2_all[T][v] < 99.0:
-				values[T][v] = "ff"
-				print(str(T[0])+"_"+str(T[1])+","+str(v)+",*")
-			elif satisfied1_all[T][v] >= 99.0 and satisfied2_all[T][v] < 99.0:
-				values[T][v] = "sf"
-			elif satisfied1_all[T][v] < 99.0 and satisfied2_all[T][v] >= 99.0:
-				values[T][v] = "fs"
+			th = 99.0 
+			if v <= 1:
+				th = 99.0
+
+			is_satisfied = satisfied[T][v] > th
+
+			values[T][v] = list()
+			
+			top = satisfied[T+0.125][v] > th
+			if is_satisfied != top:
+				values[T][v].append('t')
+
+
+			if v != 0:	
+				left = satisfied[T][v-1] > th
+				if is_satisfied != left:
+					values[T][v].append('l')
+
+
+			if values[T][v]:
+				print(T, v, "".join(values[T][v]))
 
 	# for T in tol_pairs_all:
 	# 	print(",".join(values[T]))
