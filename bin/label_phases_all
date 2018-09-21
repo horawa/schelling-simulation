@@ -65,11 +65,15 @@ def main():
 			if val != left:
 				lines += "l"
 				pair = set((val, left))
-				# frozen-eq - solid line
+				# ff ss - solid line
+				# ss sf dot
+				# ff sf dash
 				if pair == set(("ff", "ss")):
 					lines += "s"
-				elif pair in [set(("ss", "sf")), set(("ff", "sf"))]:
+				elif pair == set(("ss", "sf")):
 					lines += "d"
+				elif pair == set(("ff", "sf")):
+					lines += "g"
 				
 			if val != top:
 				lines += "t"
@@ -77,10 +81,12 @@ def main():
 				# frozen-eq - solid line
 				if pair == set(("ff", "ss")):
 					lines += "s"
-				elif pair in [set(("ss", "sf")), set(("ff", "sf"))]:
+				elif pair == set(("ss", "sf")):
 					lines += "d"
+				elif pair == set(("ff", "sf")):
+					lines += "g"
 
-			if lines:
+			if len(lines):
 				print(str(T[0])+"_"+str(T[1])+" "+str(v)+" "+lines)
 
 	# for T in tol_pairs_all:

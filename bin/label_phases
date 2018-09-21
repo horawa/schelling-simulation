@@ -7,19 +7,47 @@ tols = [x/8 for x in range(0,9)]
 
 vacancy_proportions = list(range(100))
 
+override2 = [
+	(45, 0, 100.0),
+	(26, 1/8, 100.0)
+]
+
+override3 = [
+	(3, 4/8, 100.0),
+	(53, 0, 100.0),
+	(11, 3/8, 100.0),
+	(21, 2/8, 100.0),
+	(21, 2/8, 100.0),
+]
+
+override4 = [
+	(26, 2/8, 100.0),
+	(56, 0, 100.0),
+]
+
 def main(): 
-	
+			
+	if "2" in satisfied_csv:
+		override = override2
+	elif "3" in satisfied_csv:
+		override = override3
+	elif "4" in satisfied_csv:
+		override = override4
+	else:
+		override = []
+
 	satisfied = dict()
 
 	with open(satisfied_csv) as csvf:
 		lines = iter(csvf.readlines())
 
-	
-
 	for T in tols:
 		line = next(lines)
 		vals = [float(v) for v in line.split(",")]
 		satisfied[T] = vals
+
+	for v, T, val in override:
+		satisfied[T][v] = val
 
 	values = dict()
 
