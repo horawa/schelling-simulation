@@ -14,7 +14,7 @@ tols = [0.125 * x for x in range(9)]
 tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
 tolerances = tol_pairs
 vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
-test_nos = [4]
+test_nos = [5,6]
 
 
 def get_logged():

@@ -44,8 +44,8 @@ def get_not_done():
 
 	not_halted_paths = list(filter(lambda p: p not in done_paths, not_halted_paths))
 
-	#filter for test 4 only
-	not_halted_paths = list(filter(lambda p: p.endswith("4"), not_halted_paths))
+	#filter for test 5,6 only
+	not_halted_paths = list(filter(lambda p: p.endswith("5") or p.endswith("6"), not_halted_paths))
 
 
 	return not_halted_paths
