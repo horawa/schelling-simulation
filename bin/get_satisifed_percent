@@ -18,7 +18,7 @@ tol_pairs = [(tol1, tol2) for tol1 in tols for tol2 in tols if tol2 > tol1]
 tolerances_mut = tol_pairs #[str(tol1)+"_"+str(tol2) for tol1, tol2 in tol_pairs]
 # tolerances_mut = [(1/8,7/8), (2/8,6/8), (3/8,5/8)]
 
-vacancy_proportions = [round(0.01 * x, 2) for x in range(101)]
+vacancy_proportions = [round(0.01 * x, 2) for x in range(100)]
 test_nos = list(range(5))
 
 
