@@ -85,7 +85,7 @@ def run(settings):
 
 
 
-threads = 8
+threads = 16
 
 if __name__ == '__main__':
 	get_settings()
