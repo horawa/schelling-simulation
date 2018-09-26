@@ -32,7 +32,9 @@ def main():
 		satisfied2_all[T] = next(lines_mut2)
 
 	for T in tols:
-		rmut_all[(T, T)] = next(lines2)
+		lin = next(lines2)
+		lin = ",".join(lin.split(",")[:-1])
+		rmut_all[(T, T)] = lin
 
 	for T in tol_pairs_all:
 		if T[0] > T[1]:

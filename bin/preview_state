@@ -36,4 +36,5 @@ files = sorted(filter(lambda x: x.endswith(".png"), os.listdir(result_dir)))
 
 file = os.path.join(result_dir, files[-1])
 
-os.system("/usr/bin/qlmanage -p " + file)
+# os.system("/usr/bin/qlmanage -p " + file)
+print(file)

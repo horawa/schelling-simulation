@@ -171,7 +171,7 @@ for file in files:
 
 	title_font = dict(family='Serif', size=18)
 	tick_font=dict(family='Serif', size=10)
-	annotation_font=dict(family='Serif', size=16)
+	annotation_font=dict(family='Serif', size=16, color='black')
 
 
 	trace = go.Heatmap(z=data,
@@ -194,21 +194,21 @@ for file in files:
 		(14, '2/8', 'b'),
 		(40, '2/8', 'c'),
 		(2, '3/8', 'd'),
-		(5, '3/8', 'e'),
+		(6, '3/8', 'e'),
 		(40, '3/8', 'f'),
-		(1, '5/8', 'g'),
+		(2, '5/8', 'g'),
 		(10, '5/8', 'h'),
 	]
 
 	annotation_data_3 = [
-		(2, '4/8', 'a'),
+		(1, '4/8', 'a'),
 		(4, '4/8', 'b'),
 		(25, '4/8', 'c'),
 	] 
 
 	annotation_data_4 = [
 		(5, '4/8', 'd'),
-		(7, '4/8', 'e'),
+		(8, '4/8', 'e'),
 		(25, '4/8', 'f'),
 	] 
 
