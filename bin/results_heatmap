@@ -99,8 +99,8 @@ def get_line_mut(T, v, pos):
 for file in files:
 	if file[-4:] != ".csv":
 		continue
-
-	if file == "satisfied_percent_mut_all.csv":
+	excluded = ["satisfied_percent_mut_all.csv", "satisfied_percent3.csv", "satisfied_percent4.csv"]
+	if file in excluded:
 		continue
 
 	# if file == "results3.csv" or file == "results4.csv":
@@ -110,7 +110,7 @@ for file in files:
 		# continue
 		if "mut_all" in file:
 			# continue
-			imheight = 1150
+			imheight = 1100
 			tolerance_list = tolerances_mut_all
 			lines = ["1, 0", "7/8, 0", "6/8, 0", "5/8, 0", "4/8, 0", "3/8, 0", 
 				"2/8, 0", "1/8, 0"]
@@ -138,7 +138,7 @@ for file in files:
 	else:
 		# continue
 		tolerance_list = tolerances
-		imheight = 450
+		imheight = 420
 		shapes = []
 
 
@@ -169,9 +169,9 @@ for file in files:
 		zmin=0.0
 		zmax=0.8
 
-	title_font = dict(family='Serif', size=18)
-	tick_font=dict(family='Serif', size=10)
-	annotation_font=dict(family='Serif', size=16, color='black')
+	title_font = dict(family='Arial', size=20)
+	tick_font=dict(family='Arial', size=14)
+	annotation_font=dict(family='Arial', size=16, color='black')
 
 
 	trace = go.Heatmap(z=data,
@@ -183,6 +183,7 @@ for file in files:
 						title=bar_title,
 						titleside="right",
 						titlefont=title_font,
+						tickfont=tick_font,
 					   ),
 					   zmin=zmin,
 					   zmax=zmax)
@@ -212,6 +213,47 @@ for file in files:
 		(25, '4/8', 'f'),
 	] 
 
+	annotation_data_mut = [
+		(10, '1, 2/8', 'F-MU', '2'),
+		(80, '1, 4/8', 'MU-MU'),
+
+		(10, '7/8, 2/8', 'F-MU', '2'),
+		(80, '7/8, 4/8', 'MU-MU'),
+
+		(0.5, '6/8, 7/8', 'F-MU', 50, 0),
+		(0.75, '6/8, 0', 'F-F', 25, -40),
+		(14, '6/8, 1/8', 'F-MU', '2'),
+		(80, '6/8, 4/8', 'MU-MU'),
+
+		(4.5, '5/8, 7/8', 'F-MU', 50, 0),
+		(2, '5/8, 1/8', 'F-F', 18, -22),
+		(14, '5/8, 1/8', 'F-MU', '2'),
+		(80, '5/8, 4/8', 'MU-MU'),
+
+		(6, '4/8, 7/8', 'F-MU'),
+		(2.5, '4/8, 1/8', 'F-F', 0, 3, '2'),
+		(18, '4/8, 1/8', 'F-MU'),
+		(80, '4/8, 4/8', 'MU-MU'),
+
+		(8, '3/8, 6/8', 'F-MU'),
+		(4, '3/8, 1/8', 'F-F', '2'),
+		(33, '3/8, 1/8', 'F-MU', 0, 5),
+		(80, '3/8, 4/8', 'MU-MU'),
+
+		(14, '2/8, 6/8', 'F-MU'),
+		(6, '2/8, 1/8', 'F-F', 0, -3, '2'),
+		(30.5, '2/8, 1/8', 'F-MU', 0, 5),
+		(80, '2/8, 4/8', 'MU-MU'),
+
+		(27, '1/8, 5/8', 'F-MU'),
+		(8, '1/8, 2/8', 'F-F', 0, 7, '12'),
+		(54, '1/8, 0', 'F-MU', 0, -30),
+		(80, '1/8, 4/8', 'MU-MU'),
+
+		(46, '0, 5/8', 'F-MU'),
+		(8, '0, 2/8', 'F-F', '12'),
+		(80, '0, 4/8', 'MU-MU'),
+	]
 
 	if name == "results4":
 		annotation_data = annotation_data_4
@@ -219,6 +261,8 @@ for file in files:
 		annotation_data = annotation_data_3
 	elif name == "results2":
 		annotation_data = annotation_data_2
+	elif "mut_all" in name:
+		annotation_data = annotation_data_mut
 	else:
 		annotation_data = []
 
@@ -226,13 +270,32 @@ for file in files:
 
 
 	for annotation_point in annotation_data:
-		annotation = go.layout.Annotation(
-			x=annotation_point[0],
-			y=annotation_point[1],
-			text='<b>'+annotation_point[2]+'</b>',
-			showarrow=False,
-			font=annotation_font
-		)
+		font = annotation_font
+
+		if (len(annotation_point) == 4 or len(annotation_point) == 6) and "satisfied_percent_mut_all" in name:
+			if name[-1] in annotation_point[-1]:
+				font=dict(family='Arial', size=16, color='#E0E0E0')
+
+		if len(annotation_point) <= 4:
+			annotation = go.layout.Annotation(
+				x=annotation_point[0],
+				y=annotation_point[1],
+				text='<b>'+annotation_point[2]+'</b>',
+				showarrow=False,
+				font=font
+			)
+		else:
+			annotation = go.layout.Annotation(
+				x=annotation_point[0],
+				y=annotation_point[1],
+				text='<b>'+annotation_point[2]+'</b>',
+				showarrow=True,
+				arrowhead=0,
+				ax=annotation_point[3],
+				ay=annotation_point[4],
+				font=font
+			)
+
 		annotations.append(annotation)
 
 	data_file = {
@@ -271,13 +334,20 @@ for file in files:
 			tickfont=tick_font,
 			tickmode="linear"
 		),
-		font=dict(family='Serif', size=12),
+		font=dict(family='Arial', size=12),
 		annotations=annotations,
-		shapes=shapes
+		shapes=shapes,
+		margin=go.layout.Margin(
+		l=80,
+		r=80,
+		b=80,
+		t=30,
+	),
 	)
 
 	fig = go.Figure(data=[trace], layout=layout)
-
+	
+	name = name.replace("mut_all", "vt")
 	html_path = "/Users/stas/Projects/schelling/misc/results_html/"
 	html_name = os.path.join(html_path, name+".html")
 	png_name = name
@@ -288,5 +358,6 @@ for file in files:
 	plot(fig, filename=html_name, auto_open=False)
 
 	pio.write_image(fig, "/Users/Stas/Downloads/" + name + ".pdf", width=imwidth, height=imheight)
+	# pio.write_image(fig, "/Users/Stas/Downloads/" + name + ".png", width=imwidth, height=imheight)
 	print(name)
 
