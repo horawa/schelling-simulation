@@ -4,13 +4,13 @@ import pip
 import os
 
 
-class Install(InstallCommand):
-	"""Install requirements with pip, install_requires causes bugs
-	with numpy/scipy"""
+# class Install(InstallCommand):
+# 	"""Install requirements with pip, install_requires causes bugs
+# 	with numpy/scipy"""
 
-	def run(self, *args, **kwargs):
-		pip.main(['install', '.'])
-		InstallCommand.run(self, *args, **kwargs)
+# 	def run(self, *args, **kwargs):
+# 		pip.main(['install', '.'])
+# 		InstallCommand.run(self, *args, **kwargs)
 
 
 def readme():
@@ -37,7 +37,7 @@ setup(
 	entry_points={
 		'console_scripts': ['schelling-cli=schelling.cli:simulation'],
 	},
-	cmdclass={
-		'install': Install,
-	}
+	# cmdclass={
+	# 	'install': Install,
+	# }
 )
