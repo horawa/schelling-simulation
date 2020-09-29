@@ -1,5 +1,4 @@
 import math
-# import random
 import numpy as np
 import scipy.ndimage as si
 import itertools
@@ -115,6 +114,7 @@ def run_simulation(v, th):
 	status = None
 
 	while True:
+		# what if satisfied at i % 100 == 0 ???
 		done = run_iteration(arr, th)
 		if done:
 			# print(arr)
@@ -163,7 +163,6 @@ def run_simulation(v, th):
 
 def sim_thread(run_settings):
 	
-	result = run_simulation(*run_settings[:-1])
 
 	v = "%.2f" % run_settings[0]
 	th0 = str(run_settings[1][0])
@@ -171,7 +170,16 @@ def sim_thread(run_settings):
 	no = str(run_settings[2])
 	
 	name = "_".join([v,th0,th1,no])+".npy"
-	np.save(os.path.join(output_dir, name), result[0])
+	save_path = os.path.join(output_dir, name)
+
+
+	if os.path.isfile(save_path):
+		print("skipping: " + name)
+		return
+
+	result = run_simulation(*run_settings[:-1])
+	
+	np.save(save_path, result[0])
 
 	final_state = result[1]
 	final_unf = result[2]
@@ -197,8 +205,9 @@ if __name__ == '__main__':
 
 	settings = itertools.product(vs, th, nos)
 
-	# random.seed(20)
-	# settings = random.sample(list(settings),100)
+	import random
+	random.seed(20)
+	settings = random.sample(list(sorted(settings)),20)
 	# for seed 10, sample 20 
 	# 1000 = 186s
 	# 100 = 201s
@@ -227,6 +236,8 @@ if __name__ == '__main__':
 
 	# unf = unlike_neighbor_fraction_average_ncv(arr, np.argwhere(arr != 0))
 	# print(unf)
+
+	# 1315 at 1440
 
 	
 	
