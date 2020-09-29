@@ -205,9 +205,9 @@ if __name__ == '__main__':
 
 	settings = itertools.product(vs, th, nos)
 
-	import random
-	random.seed(20)
-	settings = random.sample(list(sorted(settings)),20)
+	# import random
+	# random.seed(20)
+	# settings = random.sample(list(sorted(settings)),20)
 	# for seed 10, sample 20 
 	# 1000 = 186s
 	# 100 = 201s
