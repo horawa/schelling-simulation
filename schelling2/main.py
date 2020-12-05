@@ -280,8 +280,9 @@ def get_nearest_vacancy(x, y, th, size, array, unlike):
 				continue
 
 		# if satisfactory
-		if array[x,y] == 0 and unlike[x,y] <= th:
-			return (x, y)
+		print(array[(x,y)])
+		# if array[(x,y)] == 0 and unlike[(x,y)] <= th:
+		# 	return (x, y)
 
 	return None
 
