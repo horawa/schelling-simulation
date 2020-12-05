@@ -96,11 +96,18 @@ def run_iteration(array, th=[5,5]):
 	agent_to_move_index = tuple(unsatisfied[np.random.choice(unsatisfied.shape[0])])
 	
 	agent_t = array[agent_to_move_index]
-	satisfactory_vacancies = np.argwhere(array_where_vacant & (unlike[agent_t-1] <= th[agent_t-1]))
-	if len(satisfactory_vacancies)!=0:
-		move_to_index = tuple(satisfactory_vacancies[np.random.choice(satisfactory_vacancies.shape[0])])
-		array[move_to_index] = 1
+
+	x, y = agent_to_move_index
+	move_to_index = get_nearest_vacancy(x, y, th, size, array, unlike[agent_t - 1])
+	if move_to_index:
+		array[move_to_index] = agent_t
 		array[agent_to_move_index] = 0
+
+	# satisfactory_vacancies = np.argwhere(array_where_vacant & (unlike[agent_t-1] <= th[agent_t-1]))
+	# if len(satisfactory_vacancies)!=0:
+	# 	move_to_index = tuple(satisfactory_vacancies[np.random.choice(satisfactory_vacancies.shape[0])])
+	# 	array[move_to_index] = 1
+	# 	array[agent_to_move_index] = 0
 
 	return False
 
@@ -190,6 +197,103 @@ def sim_thread(run_settings):
 	return result
 	
 
+# def get_nearest_vacancy(x, y, agent_t, th, size, unlike):
+# 	# TODO: Figure out how to do this in numpy.
+# 	# get nearest satisfactory vacancy (manhattan distance)
+# 	# spiral pattern from x,y
+
+# 	dirs = [(0, 1), (-1, 1), (-1, 1), (1, 1)]
+
+# 	dist = 1
+# 	is_satisfied = unlike[x,y] <= th
+
+# 	while True:
+# 		# up 1
+# 		# dir = (-1, 1), steps = dist -1
+# 		# dir = (-1, -1), steps = dist
+# 		# dir = (-1, 1), steps = dist
+# 		# dir = (1, 1), steps = dist
+# 		if steps == 0:
+# 			if dir_ == (len(dirs) - 1):
+# 				dist += 1
+# 				dir_ = 0
+# 				steps = 1
+# 			else: 
+# 				dir_ += 1
+# 				if dir_ == 0:
+# 					steps = dist -1
+# 				else:
+# 					steps = dist
+
+# 		x, y += *dirs[dir_]
+# 		steps -= 1
+# 		# if is satisfied 
+
+# 		if x < 0 or y < 0 or x >= size or y >= size:
+# 			continue
+
+# 		if unlike[x,y] <= th:
+# 			return (x, y)
+# 
+	# return None
+
+def get_nearest_vacancy(x, y, th, size, array, unlike):
+	# TODO: Figure out how to do this in numpy.
+	# get nearest satisfactory vacancy (manhattan distance)
+	# diamond spiral pattern from x,y traverses by order of manhattan distance
+
+	x0, y0 = x, y
+
+	dirs = [(0, 1), (-1, 1), (-1, -1), (1, -1), (1, 1)]
+	
+	dist = 0
+	steps = 0
+	dir_ = len(dirs) - 1
+
+	while True:
+		# up 1
+		# dir = (-1, 1), steps = dist -1
+		# dir = (-1, -1), steps = dist
+		# dir = (1, -1), steps = dist
+		# dir = (1, 1), steps = dist
+		if steps == 0:
+			if dir_ == (len(dirs) - 1):
+				dist += 1
+				dir_ = 0
+				steps = 1
+			else: 
+				dir_ += 1
+				if dir_ == 1:
+					steps = dist -1
+				else:
+					steps = dist
+			continue
+
+		x += dirs[dir_][0]
+		y += dirs[dir_][1]
+		steps -= 1
+
+		if x < 0 or y < 0 or x >= size or y >= size:
+			if abs(y-y0) > 2*size:
+				break
+			else:
+				continue
+
+		# if satisfactory
+		if array[x,y] == 0 and unlike[x,y] <= th:
+			return (x, y)
+
+	return None
+
+		# move up
+		# move up and then left by dist-1
+		# move down left by dist
+		# move down right by dist
+		# move up right by dist
+
+
+
+
 if __name__ == '__main__':
 
 	vs = np.arange(0,1,.01)	
@@ -208,6 +312,16 @@ if __name__ == '__main__':
 	# import random
 	# random.seed(20)
 	# settings = random.sample(list(sorted(settings)),20)
+	# for seed 10, sample 20 
+	# 1000 = 186s
+	# 100 = 201s
+	# for seed 10, sample 100
+	# 1000 = 592s 
+	# 100 = 556s
+	import random
+	random.seed(20)
+	settings = random.sample(list(sorted(settings)),20)
+	# agents move to nearest vacancy
 	# for seed 10, sample 20 
 	# 1000 = 186s
 	# 100 = 201s
