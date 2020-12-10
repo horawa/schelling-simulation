@@ -1,6 +1,6 @@
 numpy>=1.12.0b1,<2.0.0
 scipy
-matplotlib>=1.5.3,<2.0.0
+# matplotlib>=1.5.3,<2.0.0
 scikit-image==0.14.0
 click>=6.6,<7.0
 appJar==0.52

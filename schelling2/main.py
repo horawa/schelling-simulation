@@ -7,6 +7,7 @@ import multiprocessing
 
 from schelling.create_array import create_array
 from schelling.segregation_measures import unlike_neighbor_fraction_average_ncv
+from schelling.arr_to_img import image_save, to_image
 
 threads = 8
 size = 100
@@ -74,6 +75,7 @@ def check_halted(array, th):
 	return not (can_move[0] or can_move[1])
 
 
+
 def run_iteration(array, th=[5,5]):
 	schelling_filter = np.array([[1,1,1],[1,0,1],[1,1,1]])
 	
@@ -98,7 +100,7 @@ def run_iteration(array, th=[5,5]):
 	agent_t = array[agent_to_move_index]
 
 	x, y = agent_to_move_index
-	move_to_index = get_nearest_vacancy(x, y, th, size, array, unlike[agent_t - 1])
+	move_to_index = get_nearest_vacancy(x, y, th[agent_t-1], size, array, unlike[agent_t - 1])
 	if move_to_index:
 		array[move_to_index] = agent_t
 		array[agent_to_move_index] = 0
@@ -111,7 +113,87 @@ def run_iteration(array, th=[5,5]):
 
 	return False
 
-def run_simulation(v, th):
+def check_halted_own_group_th(array, th):
+	schelling_filter = np.array([[1,1,1],[1,0,1],[1,1,1]])
+	
+	array_where_vacant = (array==0)
+	agent_type = [None, None]
+	agent_type[0] = (array==1)
+	agent_type[1] = (array==2)
+	
+	# print(array)
+	# print(array_where_vacant)
+
+
+	own_group_count = [None, None]
+	own_group_count[0] = si.convolve(agent_type[0].astype(np.int8), schelling_filter, mode='constant', cval=0)
+	own_group_count[1] = si.convolve(agent_type[1].astype(np.int8), schelling_filter, mode='constant', cval=0)
+
+	neigbor_count = si.convolve(np.logical_not(array_where_vacant).astype(np.int8), schelling_filter, mode='constant', cval=0).astype(float)
+
+	own_group_rel = [None, None]
+	own_group_rel[0] = np.true_divide(own_group_count[0].astype(float), neigbor_count.astype(float), out=np.zeros_like(neigbor_count), where=neigbor_count!=0)
+	own_group_rel[1] = np.true_divide(own_group_count[1].astype(float), neigbor_count.astype(float), out=np.zeros_like(neigbor_count), where=neigbor_count!=0)
+	
+	unsatisfied = [None, None]
+	unsatisfied[0] = (agent_type[0] & (own_group_rel[0]<th[0]))
+	unsatisfied[1] = (agent_type[1] & (own_group_rel[1]<th[1]))
+
+	satisfactory_vacancies = [None, None]
+	satisfactory_vacancies[0] = array_where_vacant & (own_group_rel[0] >= th[0])
+	satisfactory_vacancies[1] = array_where_vacant & (own_group_rel[1] >= th[1])
+
+	has_unsatisfied = [np.any(unsatisfied[n]) for n in [0,1]]
+	has_satisfactory = [np.any(satisfactory_vacancies[n]) for n in [0,1]]
+
+	can_move = [has_unsatisfied[n] and has_satisfactory[n] for n in [0,1]]
+
+	return not (can_move[0] or can_move[1])
+
+def run_iteration_own_group_th(array, th=[5,5]):
+	schelling_filter = np.array([[1,1,1],[1,0,1],[1,1,1]])
+	
+	array_where_vacant = (array==0)
+	agent_type = [None, None]
+	agent_type[0] = (array==1)
+	agent_type[1] = (array==2)
+	
+	# print(array)
+	# print(array_where_vacant)
+
+	own_group_count = [None, None]
+	own_group_count[0] = si.convolve(agent_type[0].astype(np.int8), schelling_filter, mode='constant', cval=0)
+	own_group_count[1] = si.convolve(agent_type[1].astype(np.int8), schelling_filter, mode='constant', cval=0)
+
+	neigbor_count = si.convolve(np.logical_not(array_where_vacant).astype(np.int8), schelling_filter, mode='constant', cval=0).astype(float)
+
+	own_group_rel = [None, None]
+	own_group_rel[0] = np.true_divide(own_group_count[0].astype(float), neigbor_count.astype(float), out=np.zeros_like(neigbor_count), where=neigbor_count!=0)
+	own_group_rel[1] = np.true_divide(own_group_count[1].astype(float), neigbor_count.astype(float), out=np.zeros_like(neigbor_count), where=neigbor_count!=0)
+
+	unsatisfied = np.argwhere((agent_type[0] & (own_group_rel[0]<th[0])) | (agent_type[1] & (own_group_rel[1]<th[1])))
+	if len(unsatisfied)==0:
+		return True
+	
+	agent_to_move_index = tuple(unsatisfied[np.random.choice(unsatisfied.shape[0])])
+	
+	agent_t = array[agent_to_move_index]
+
+	# x, y = agent_to_move_index
+	# move_to_index = get_nearest_vacancy(x, y, th[agent_t-1], size, array, unlike[agent_t - 1])
+	# if move_to_index:
+	# 	array[move_to_index] = agent_t
+	# 	array[agent_to_move_index] = 0
+
+	satisfactory_vacancies = np.argwhere(array_where_vacant & (own_group_rel[agent_t-1] >= th[agent_t-1]))
+	if len(satisfactory_vacancies)!=0:
+		move_to_index = tuple(satisfactory_vacancies[np.random.choice(satisfactory_vacancies.shape[0])])
+		array[move_to_index] = agent_t
+		array[agent_to_move_index] = 0
+
+	return False
+
+def run_simulation(v, th, imdir):
 	i = 1
 
 	p=(v,(1-v)/2,(1-v)/2)
@@ -122,7 +204,7 @@ def run_simulation(v, th):
 
 	while True:
 		# what if satisfied at i % 100 == 0 ???
-		done = run_iteration(arr, th)
+		done = run_iteration_own_group_th(arr, th)
 		if done:
 			# print(arr)
 			status = "Satisfied"
@@ -132,9 +214,11 @@ def run_simulation(v, th):
 			# print(i)
 			# print(arr)
 			# sim_state[str(i)] = np.copy(arr)
-			if check_halted(arr, th):
+			# image_save(to_image(arr), os.path.join(imdir, str(i)+".png"))
+			if check_halted_own_group_th(arr, th):
 				status = "Frozen"
 				break
+			# print(i)
 
 		i += 1
 
@@ -177,6 +261,8 @@ def sim_thread(run_settings):
 	no = str(run_settings[2])
 	
 	name = "_".join([v,th0,th1,no])+".npy"
+	imdir = os.path.join(output_dir, "_".join([v,th0,th1,no]))
+	# os.mkdir(imdir)
 	save_path = os.path.join(output_dir, name)
 
 
@@ -184,7 +270,7 @@ def sim_thread(run_settings):
 		print("skipping: " + name)
 		return
 
-	result = run_simulation(*run_settings[:-1])
+	result = run_simulation(*(list(run_settings[:-1])+[imdir]))
 	
 	np.save(save_path, result[0])
 
@@ -280,9 +366,9 @@ def get_nearest_vacancy(x, y, th, size, array, unlike):
 				continue
 
 		# if satisfactory
-		print(array[(x,y)])
-		# if array[(x,y)] == 0 and unlike[(x,y)] <= th:
-		# 	return (x, y)
+		# print(type(array[(x,y)]))
+		if (int(array[(x,y)]) == 0) and (int(unlike[(x,y)]) <= th):
+			return (x, y)
 
 	return None
 
@@ -303,12 +389,15 @@ if __name__ == '__main__':
 
 	for t0 in range(9):
 		for t1 in range(t0, 9):
-			th.append((t0,t1))
+			th.append((t0/8,t1/8))
 	# print(len(th))
 	# exit()
 	nos = range(10)
 
 	settings = itertools.product(vs, th, nos)
+
+	# print(len(list(sorted(settings))))
+	# = 45000
 
 	# import random
 	# random.seed(20)
@@ -321,14 +410,9 @@ if __name__ == '__main__':
 	# 100 = 556s
 	import random
 	random.seed(20)
-	settings = random.sample(list(sorted(settings)),20)
+	settings = random.sample(list(sorted(settings)),100)
 	# agents move to nearest vacancy
-	# for seed 10, sample 20 
-	# 1000 = 186s
-	# 100 = 201s
-	# for seed 10, sample 100
-	# 1000 = 592s 
-	# 100 = 556s
+
 
 	with multiprocessing.Pool(threads) as pool:
 		pool.map(sim_thread, settings)
