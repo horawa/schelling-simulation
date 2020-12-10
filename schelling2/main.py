@@ -408,9 +408,9 @@ if __name__ == '__main__':
 	# for seed 10, sample 100
 	# 1000 = 592s 
 	# 100 = 556s
-	import random
-	random.seed(20)
-	settings = random.sample(list(sorted(settings)),100)
+	# import random
+	# random.seed(20)
+	# settings = random.sample(list(sorted(settings)),100)
 	# agents move to nearest vacancy
 
 
