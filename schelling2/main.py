@@ -6,7 +6,7 @@ import os
 import multiprocessing
 
 from schelling.create_array import create_array
-from schelling.segregation_measures import unlike_neighbor_fraction_average_ncv
+from schelling.segregation_measures import unlike_neighbor_fraction_average_ncv, own_group_fraction_avg
 from schelling.arr_to_img import image_save, to_image
 
 threads = 8
@@ -193,6 +193,7 @@ def run_iteration_own_group_th(array, th=[5,5]):
 
 	return False
 
+
 def run_simulation(v, th, imdir):
 	i = 1
 
@@ -223,8 +224,9 @@ def run_simulation(v, th, imdir):
 		i += 1
 
 	unf = unlike_neighbor_fraction_average_ncv(arr, np.argwhere(arr != 0))
+	og = own_group_fraction_avg(arr)
 
-	sim_state = (arr, status, unf, i)
+	sim_state = (arr, status, unf, og, i)
 
 	return sim_state
 
@@ -276,9 +278,10 @@ def sim_thread(run_settings):
 
 	final_state = result[1]
 	final_unf = result[2]
-	final_i = result[3]
+	final_og = result[3]
+	final_i = result[4]
 
-	append_result_csv(v, th0, th1, no, final_state, str(final_unf), str(final_i))
+	append_result_csv(v, th0, th1, no, final_state, str(final_unf), str(final_og), str(final_i))
 	print(name)
 	return result
 	

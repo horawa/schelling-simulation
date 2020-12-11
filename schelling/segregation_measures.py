@@ -1,6 +1,8 @@
 from math import log, isclose
 import numpy as np
 from scipy.ndimage.measurements import label
+import scipy.ndimage as si
+
 
 from schelling.neighborhood import (get_neighborhood, 
 	get_neighborhood_exclusive, get_unlike_neighbor_fraction, has_neighbors)
@@ -254,6 +256,34 @@ def distance(array, agent_index):
 def unlike_neighbor_fraction(array, agent_index, count_vacancies=True):
 	return get_unlike_neighbor_fraction(
 		array, tuple(agent_index), radius=1, count_vacancies=count_vacancies)
+
+
+def own_group_fraction_avg(array, agent_types=2):
+	schelling_filter = np.array([[1,1,1],[1,0,1],[1,1,1]])
+	
+	array_where_vacant = (array==0)
+	agent_type = [None, None]
+	agent_type[0] = (array==1)
+	agent_type[1] = (array==2)
+	
+	# print(array)
+	# print(array_where_vacant)
+
+	own_group_count = [None, None]
+	own_group_count[0] = si.convolve(agent_type[0].astype(np.int8), schelling_filter, mode='constant', cval=0)
+	own_group_count[1] = si.convolve(agent_type[1].astype(np.int8), schelling_filter, mode='constant', cval=0)
+
+	neigbor_count = si.convolve(np.logical_not(array_where_vacant).astype(np.int8), schelling_filter, mode='constant', cval=0).astype(float)
+
+	own_group_rel = [None, None]
+	own_group_rel[0] = np.true_divide(own_group_count[0].astype(float), neigbor_count.astype(float), out=np.zeros_like(neigbor_count), where=neigbor_count!=0)
+	own_group_rel[1] = np.true_divide(own_group_count[1].astype(float), neigbor_count.astype(float), out=np.zeros_like(neigbor_count), where=neigbor_count!=0)
+
+	total_own_group_rel = np.sum(own_group_rel[0], where=agent_type[0]) + np.sum(own_group_rel[1], where=agent_type[1])
+	agent_count = np.sum(np.logical_not(array_where_vacant).astype(np.int8))
+
+	return total_own_group_rel / agent_count
+
 
 
 def mix_deviation(array, agent_index, radius=1):
